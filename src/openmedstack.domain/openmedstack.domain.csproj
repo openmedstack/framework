@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net5.0</TargetFrameworks>
+		<RootNamespace>OpenMedStack.Domain</RootNamespace>
+		<PackageId>OpenMedStack.Domain</PackageId>
+		<PackageTags>OpenMedStack Architecture Domain</PackageTags>
+		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+		<Description>Core domain model types for OpenMedStack based applications.</Description>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<Import Project="..\..\shared.proj" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\openmedstack\openmedstack.csproj" />
+	</ItemGroup>
+
+</Project>

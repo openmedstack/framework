@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net5.0</TargetFrameworks>
+        <RootNamespace>OpenMedStack.Autofac.NEventStore.Sql.Tests</RootNamespace>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <Import Project="..\..\shared.proj" />
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+        <PackageReference Include="Npgsql" Version="5.0.5" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\openmedstack.autofac.masstransit.activemq\openmedstack.autofac.masstransit.activemq.csproj" />
+        <ProjectReference Include="..\..\src\openmedstack.autofac.neventstore.sql\openmedstack.autofac.neventstore.sql.csproj" />
+    </ItemGroup>
+
+</Project>

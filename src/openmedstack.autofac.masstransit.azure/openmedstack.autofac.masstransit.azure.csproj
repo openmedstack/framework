@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <RootNamespace>OpenMedStack.Autofac.MassTransit.Azure</RootNamespace>
+    <PackageId>OpenMedStack.Autofac.MassTransit.Azure</PackageId>
+    <PackageTags>OpenMedStack Architecture Messaging MassTransit Azure</PackageTags>
+    <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+    <Description>Autofac bindings for OpenMedStack based applications.</Description>
+  </PropertyGroup>
+  <Import Project="..\..\shared.proj" />
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
+    <ProjectReference Include="..\openmedstack\openmedstack.csproj" />
+  </ItemGroup>
+
+</Project>

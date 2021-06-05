@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <RootNamespace>OpenMedStack.Web.Testing</RootNamespace>
+    <PackageId>OpenMedStack.Web.Testing</PackageId>
+    <PackageTags>OpenMedStack Architecture Web HTTP Testing</PackageTags>
+    <PackageReleaseNotes>Initial package.</PackageReleaseNotes>
+    <Description>Workflow definition for ASP.NET Core applications based on ASP.NET Core pipeline.</Description>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <Import Project="..\..\shared.proj" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\openmedstack.web.autofac\openmedstack.web.autofac.csproj" />
+  </ItemGroup>
+
+</Project>

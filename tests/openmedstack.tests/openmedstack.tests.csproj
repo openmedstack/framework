@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net5.0</TargetFrameworks>
+        <RootNamespace>OpenMedStack.Tests</RootNamespace>
+        <PackageTags>OpenMedStack Architecture ASAP Analysis Package Calculator</PackageTags>
+        <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+        <Description>Core contracts for OpenMedStack based applications. Includes core interfaces and definitions.</Description>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <Import Project="..\..\shared.proj" />
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+        <PackageReference Include="Moq" Version="4.16.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\openmedstack\openmedstack.csproj" />
+    </ItemGroup>
+
+</Project>

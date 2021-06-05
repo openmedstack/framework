@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <RootNamespace>OpenMedStack.Autofac.NEventstore.Sql</RootNamespace>
+    <PackageId>OpenMedStack.Autofac.NEventstore.Sql</PackageId>
+    <PackageTags>OpenMedStack Architecture EventStore SQL</PackageTags>
+    <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+    <Description>Autofac bindings for OpenMedStack based applications.</Description>
+    <langVersion>latest</langVersion>
+  </PropertyGroup>
+  <Import Project="..\..\shared.proj" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\openmedstack.autofac.neventstore\openmedstack.autofac.neventstore.csproj" />
+  </ItemGroup>
+
+</Project>

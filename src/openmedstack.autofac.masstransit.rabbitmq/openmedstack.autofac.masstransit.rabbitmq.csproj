@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net5.0</TargetFrameworks>
+        <RootNamespace>OpenMedStack.Autofac.MassTransit.RabbitMq</RootNamespace>
+        <PackageId>OpenMedStack.Autofac.MassTransit.RabbitMq</PackageId>
+        <PackageTags>OpenMedStack Architecture Messaging MassTransit RabbitMQ</PackageTags>
+        <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+        <Description>Autofac bindings for OpenMedStack based applications.</Description>
+    </PropertyGroup>
+    <Import Project="..\..\shared.proj" />
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
+    </ItemGroup>
+
+</Project>
