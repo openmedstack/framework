@@ -18,68 +18,37 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
 
     public static class SqlChassisExtensions
     {
-        private const string CompressionKey = "Compression";
-        private const string DialectKey = "Dialect";
-        private const string DbFactoryKey = "DbFactory";
         private const string LogFilters = "LogFilters";
 
-        /// <summary>
-        /// Compresses the event data in the database.
-        /// </summary>
-        /// <param name="chassis">The <see cref="Chassis"/> to configure.</param>
-        /// <param name="usingCompression"><c>true</c> to use compression, otherwise <c>false</c>.</param>
-        /// <returns>A configured instance of the <see cref="Chassis"/>.</returns>
-        public static Chassis UsingDatabaseCompression(this Chassis chassis, bool usingCompression = true)
+        public static Chassis UsingSqlEventStore(this Chassis chassis, DbProviderFactory dbProviderFactory, ISqlDialect dialect, bool compress = false)
         {
-            chassis.Metadata[CompressionKey] = usingCompression;
-            return chassis;
-        }
-
-        public static Chassis UsingDbFactory(this Chassis chassis, DbProviderFactory dbProviderFactory)
-        {
-            chassis.Metadata[DbFactoryKey] = dbProviderFactory;
-            return chassis;
-        }
-
-        public static Chassis UsingDialect(this Chassis chassis, ISqlDialect dialect)
-        {
-            chassis.Metadata[DialectKey] = dialect;
-            return chassis;
+            return chassis.AddAutofacModules(
+                     (c, a) => new SqlEventStoreModule(c.ConnectionString, dbProviderFactory, dialect, compress));
         }
 
         /// <summary>
         /// Configures the <see cref="Chassis"/> to use event sourcing.
         /// </summary>
         /// <param name="chassis">The <see cref="Chassis"/> to configure.</param>
+        /// <param name="compress"><c>true</c> to compress content in database, otherwise <c>false</c>.</param>
         /// <param name="modules">The <see cref="IModule"/> to use for container configuration.</param>
+        /// <param name="dbProviderFactory">The <see cref="DbProviderFactory"/> for the connection</param>
+        /// <param name="dialect">The <see cref="ISqlDialect"/> specific to the database.</param>
         /// <returns>A configured instance of the <see cref="Chassis"/>.</returns>
-        public static Chassis UsingSqlEventSourceBuilder(this Chassis chassis, params IModule[] modules)
+        public static Chassis UsingSqlEventSourceBuilder(this Chassis chassis, DbProviderFactory dbProviderFactory, ISqlDialect dialect, bool compress = false, params IModule[] modules)
         {
-            if (!chassis.Metadata.ContainsKey(DialectKey))
-            {
-                throw new NullReferenceException("Dialect must be specified");
-            }
-
-            if (!chassis.Metadata.ContainsKey(DbFactoryKey))
-            {
-                throw new NullReferenceException("Database factory must be specified");
-            }
-
             chassis.Metadata.TryGetValue(LogFilters, out var filters);
             return chassis.UsingCustomBuilder(
                 (configuration, assemblies) =>
                 {
-                    var compress = (bool)chassis.Metadata.GetOrDefault(
-                        CompressionKey,
-                        false)!;
                     var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(
                         ChassisExtensions.EnableConsoleLogging,
                         true)!;
                     var asm = assemblies.ToArray();
                     return new GenericSqlEventSourceService(
                         configuration,
-                        (DbProviderFactory)chassis.Metadata[DbFactoryKey],
-                        (ISqlDialect)chassis.Metadata[DialectKey],
+                        dbProviderFactory,
+                        dialect,
                         modules.Concat(chassis.GetModules(configuration, asm)),
                         filters as (string, LogLevel)[],
                         enableConsoleLogging,

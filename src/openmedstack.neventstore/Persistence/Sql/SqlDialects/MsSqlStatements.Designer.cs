@@ -79,21 +79,6 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH [cte] AS
-        ///   ( {0}, ROW_NUMBER() OVER ({1}) AS [row] {2} )
-        ///
-        ///SELECT *
-        ///  FROM [cte]
-        /// WHERE [row] BETWEEN @Skip + 1
-        ///                 AND @Limit + @Skip;.
-        /// </summary>
-        internal static string PagedQueryFormat {
-            get {
-                return ResourceManager.GetString("PagedQueryFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to INSERT
         ///  INTO Commits
         ///     ( BucketId, StreamId, StreamIdOriginal, CommitId, CommitSequence, StreamRevision, Items, CommitStamp, Headers, Payload )

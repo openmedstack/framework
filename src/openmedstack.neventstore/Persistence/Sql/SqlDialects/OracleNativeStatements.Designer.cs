@@ -181,8 +181,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///FROM Commits 
         ///WHERE  CheckpointNumber &gt; :CheckpointNumber
-        ///ORDER BY CheckpointNumber
-        ///WHERE ROWNUM &lt;= :Limit;.
+        ///ORDER BY CheckpointNumber;.
         /// </summary>
         internal static string GetCommitsSinceCheckpoint {
             get {
@@ -247,27 +246,11 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///  SELECT InnerQuery.*, ROWNUM AS ROW_NUMBER_VAL FROM (
         ///    {0}    
         ///  ) InnerQuery
-        ///) OuterQuery
-        ///WHERE ROW_NUMBER_VAL &gt; :Skip AND ROW_NUMBER_VAL &lt;= (:Limit + :Skip).
+        ///) OuterQuery;.
         /// </summary>
         internal static string LimitedQueryFormat {
             get {
                 return ResourceManager.GetString("LimitedQueryFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to /*PagedQueryFormat*/
-        ///SELECT *
-        ///FROM ( {0},
-        ///       ROW_NUMBER() OVER({1}) AS ROW_NUMBER_VAL
-        ///       {2}
-        ///) PagedQueryFormat
-        ///WHERE ROW_NUMBER_VAL &gt; :Skip AND ROW_NUMBER_VAL &lt;= (:Limit + :Skip).
-        /// </summary>
-        internal static string PagedQueryFormat {
-            get {
-                return ResourceManager.GetString("PagedQueryFormat", resourceCulture);
             }
         }
         

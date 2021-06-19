@@ -84,7 +84,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit SKIP @Skip BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE BucketId = @BucketId 
         ///   AND CheckpointNumber &gt; @CheckpointNumber
@@ -97,7 +97,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit SKIP @Skip BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///FROM Commits
         ///WHERE  CheckpointNumber &gt; @CheckpointNumber
         ///ORDER BY CheckpointNumber;.
@@ -109,7 +109,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit SKIP @Skip BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE BucketId = @BucketId AND CommitStamp &gt;= @CommitStamp
         /// ORDER BY CommitStamp, StreamId, CommitSequence;.
@@ -121,7 +121,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp,  CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp,  CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE BucketId = @BucketId
         ///   AND StreamId = @StreamId
@@ -137,7 +137,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit SKIP @Skip BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE BucketId = @BucketId
         ///   AND CommitStamp &gt;= @CommitStampStart
@@ -165,7 +165,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit C.BucketId, C.StreamId, C.StreamIdOriginal, MAX(C.StreamRevision) AS StreamRevision, MAX(COALESCE(S.StreamRevision, 0)) AS SnapshotRevision
+        ///   Looks up a localized string similar to SELECT C.BucketId, C.StreamId, C.StreamIdOriginal, MAX(C.StreamRevision) AS StreamRevision, MAX(COALESCE(S.StreamRevision, 0)) AS SnapshotRevision
         ///  FROM Commits AS C
         /// LEFT OUTER JOIN Snapshots AS S
         ///	ON C.BucketId = @BucketId
@@ -182,7 +182,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT FIRST @Limit SKIP @Skip BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
+        ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE Dispatched = 0
         /// ORDER BY CheckpointNumber;.

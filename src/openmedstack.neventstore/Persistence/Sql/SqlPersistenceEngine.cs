@@ -87,7 +87,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
                 query.AddParameter(_dialect.StreamRevision, minRevision);
                 query.AddParameter(_dialect.MaxStreamRevision, maxRevision);
                 query.AddParameter(_dialect.CommitSequence, 0);
-                await foreach (var item in query.ExecutePagedQuery(statement, _dialect.NextPageDelegate, token))
+                await foreach (var item in query.ExecuteWithQuery(statement, token))
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -115,7 +115,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
                 var statement = _dialect.GetCommitsFromInstant;
                 query.AddParameter(_dialect.BucketId, bucketId, DbType.AnsiString);
                 query.AddParameter(_dialect.CommitStamp, start);
-                var enumerable = query.ExecutePagedQuery(statement, (q, r) => { }, token);
+                var enumerable = query.ExecuteWithQuery(statement, token);
                 await foreach (var item in enumerable.WithCancellation(token).ConfigureAwait(false))
                 {
                     if (token.IsCancellationRequested)
@@ -147,7 +147,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
                 query.AddParameter(_dialect.BucketId, bucketId, DbType.AnsiString);
                 query.AddParameter(_dialect.CommitStampStart, start);
                 query.AddParameter(_dialect.CommitStampEnd, end);
-                var enumerable = query.ExecutePagedQuery(statement, (q, r) => { }, token);
+                var enumerable = query.ExecuteWithQuery(statement, token);
                 await foreach (var record in enumerable.WithCancellation(token).ConfigureAwait(false))
                 {
                     if (token.IsCancellationRequested)
@@ -200,12 +200,12 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
                 var statement = _dialect.GetStreamsRequiringSnapshots;
                 query.AddParameter(_dialect.BucketId, bucketId, DbType.AnsiString);
                 query.AddParameter(_dialect.Threshold, maxThreshold);
-                await foreach (var record in query.ExecutePagedQuery(
+                await foreach (var record in query.ExecuteWithQuery(
                         statement,
-                        (q, s) => q.SetParameter(
-                            _dialect.StreamId,
-                            s == null ? null : _dialect.CoalesceParameterValue(s.StreamId()),
-                            DbType.AnsiString),
+                        //(q, s) => q.SetParameter(
+                        //    _dialect.StreamId,
+                        //    s == null ? null : _dialect.CoalesceParameterValue(s.StreamId()),
+                        //    DbType.AnsiString),
                         token)
                     .ConfigureAwait(false))
                 {
@@ -316,7 +316,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
                 var statement = _dialect.GetCommitsFromBucketAndCheckpoint;
                 query.AddParameter(_dialect.BucketId, bucketId, DbType.AnsiString);
                 query.AddParameter(_dialect.CheckpointNumber, checkpointToken);
-                var enumerable = query.ExecutePagedQuery(statement, (q, r) => { }, token);
+                var enumerable = query.ExecuteWithQuery(statement, token);
                 await foreach (var item in enumerable.WithCancellation(token).ConfigureAwait(false))
                 {
                     if (token.IsCancellationRequested)
@@ -338,7 +338,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
             {
                 var statement = _dialect.GetCommitsFromCheckpoint;
                 query.AddParameter(_dialect.CheckpointNumber, checkpointToken);
-                var enumerable = query.ExecutePagedQuery(statement, (q, r) => { }, token);
+                var enumerable = query.ExecuteWithQuery(statement, token);
                 await foreach (var record in enumerable.WithCancellation(token).ConfigureAwait(false))
                 {
                     if (token.IsCancellationRequested)

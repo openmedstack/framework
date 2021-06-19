@@ -182,8 +182,7 @@ ORDER BY CommitSequence</value>
 SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
 FROM Commits 
 WHERE  CheckpointNumber &gt; :CheckpointNumber
-ORDER BY CheckpointNumber
-WHERE ROWNUM &lt;= :Limit;</value>
+ORDER BY CheckpointNumber;</value>
   </data>
   <data name="GetCommitsFromBucketAndCheckpoint" xml:space="preserve">
     <value>/*GetCommitsFromBucketAndCheckpoint*/
@@ -212,8 +211,7 @@ FROM (
   GROUP BY C.StreamId, C.BucketId, C.StreamIdOriginal
   HAVING MAX(C.StreamRevision) &gt;= MAX(COALESCE(S.StreamRevision, 0)) + :Threshold
   ORDER BY C.StreamId
-)
-WHERE ROWNUM &lt;= :Limit;</value>
+);</value>
   </data>
   <data name="InitializeStorage" xml:space="preserve">
     <value>/*InitializeStorage*/
@@ -276,17 +274,7 @@ SELECT OuterQuery.* FROM (
   SELECT InnerQuery.*, ROWNUM AS ROW_NUMBER_VAL FROM (
     {0}    
   ) InnerQuery
-) OuterQuery
-WHERE ROW_NUMBER_VAL &gt; :Skip AND ROW_NUMBER_VAL &lt;= (:Limit + :Skip)</value>
-  </data>
-  <data name="PagedQueryFormat" xml:space="preserve">
-    <value>/*PagedQueryFormat*/
-SELECT *
-FROM ( {0},
-       ROW_NUMBER() OVER({1}) AS ROW_NUMBER_VAL
-       {2}
-) PagedQueryFormat
-WHERE ROW_NUMBER_VAL &gt; :Skip AND ROW_NUMBER_VAL &lt;= (:Limit + :Skip)</value>
+) OuterQuery;</value>
   </data>
   <data name="PersistCommit" xml:space="preserve">
     <value>/*PersistCommit*/

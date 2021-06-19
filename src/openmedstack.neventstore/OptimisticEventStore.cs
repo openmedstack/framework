@@ -6,7 +6,6 @@ using OpenMedStack.NEventStore.Persistence;
 
 namespace OpenMedStack.NEventStore
 {
-    using System.Runtime.CompilerServices;
     using System.Threading;
 
     public class OptimisticEventStore : IStoreEvents, ICommitEvents

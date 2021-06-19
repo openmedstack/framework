@@ -12,7 +12,7 @@
   <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.7" />
   </ItemGroup>
 
   <ItemGroup>

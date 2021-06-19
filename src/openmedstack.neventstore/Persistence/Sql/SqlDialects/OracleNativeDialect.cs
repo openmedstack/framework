@@ -30,13 +30,11 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
         public override string GetCommitsFromStartingRevision =>
             LimitedQuery(OracleNativeStatements.GetCommitsFromStartingRevision);
 
-        public override string GetCommitsFromInstant => OraclePaging(OracleNativeStatements.GetCommitsFromInstant);
+        public override string GetCommitsFromInstant => OracleNativeStatements.GetCommitsFromInstant;
 
-        public override string GetCommitsFromCheckpoint =>
-            OraclePaging(OracleNativeStatements.GetCommitsSinceCheckpoint);
+        public override string GetCommitsFromCheckpoint => OracleNativeStatements.GetCommitsSinceCheckpoint;
 
-        public override string GetCommitsFromBucketAndCheckpoint =>
-            OraclePaging(OracleNativeStatements.GetCommitsFromBucketAndCheckpoint);
+        public override string GetCommitsFromBucketAndCheckpoint => OracleNativeStatements.GetCommitsFromBucketAndCheckpoint;
 
         public override string GetStreamsRequiringSnapshots =>
             LimitedQuery(OracleNativeStatements.GetStreamsRequiringSnapshots);
@@ -163,22 +161,6 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
         }
 
         private static string MakeOracleParameter(string parameterName) => parameterName.Replace('@', ':');
-
-        private static string OraclePaging(string query)
-        {
-            query = RemovePaging(query);
-
-            var orderBy = ExtractOrderBy(ref query);
-
-            var fromIndex = query.IndexOf("FROM ", StringComparison.Ordinal);
-            var from = query[fromIndex..];
-
-            var select = query.Substring(0, fromIndex);
-
-            var value = string.Format(OracleNativeStatements.PagedQueryFormat, select, orderBy, from);
-
-            return value;
-        }
 
         private static string RemovePaging(string query) =>
             query.Replace("\n LIMIT @Limit OFFSET @Skip;", ";")

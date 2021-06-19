@@ -45,10 +45,10 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
             var latest = await _checkpointToken.GetLatest().ConfigureAwait(false);
             _pollingFunc = bucketId == null
                 ? () => _persistStreams.GetFrom(latest, _tokenSource.Token)
-                : (Func<IAsyncEnumerable<ICommit>>)(() => _persistStreams.GetFrom(
-                        bucketId,
-                        latest,
-                        cancellationToken));
+                : () => _persistStreams.GetFrom(
+                    bucketId,
+                    latest,
+                    cancellationToken);
         }
 
         public async Task StartFrom(ITrackCheckpoints checkpointToken, string? bucketId = null, CancellationToken cancellationToken = default)

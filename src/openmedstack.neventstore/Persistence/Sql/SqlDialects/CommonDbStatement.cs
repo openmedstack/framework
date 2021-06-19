@@ -3,6 +3,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Data.Common;
     using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,7 +12,6 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
 
     public class CommonDbStatement : IDbStatement
     {
-        private const int InfinitePageSize = 0;
         private static readonly ILog Logger = LogFactory.BuildLogger(typeof(CommonDbStatement));
         private readonly IDbConnection _connection;
 
@@ -101,20 +101,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
             string queryText,
             CancellationToken cancellationToken)
         {
-            return ExecuteQuery(queryText, (query, latest) => { }, InfinitePageSize, cancellationToken);
-        }
-
-        public virtual IAsyncEnumerable<IDataRecord> ExecutePagedQuery(string queryText, NextPageDelegate nextpage, CancellationToken cancellation = default)
-        {
-            var pageSize = Dialect.CanPage ? PageSize : InfinitePageSize;
-            if (pageSize > 0)
-            {
-                Logger.Verbose(PersistenceMessages.MaxPageSize, pageSize);
-                Parameters.Add(Dialect.Limit, Tuple.Create((object)pageSize, (DbType?)null));
-            }
-
-            var result = ExecuteQuery(queryText, nextpage, pageSize, cancellation);
-            return result;
+            return ExecuteQuery(queryText, cancellationToken);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -124,20 +111,26 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects
             _connection?.Dispose();
         }
 
-        protected virtual IAsyncEnumerable<IDataRecord> ExecuteQuery(string queryText, NextPageDelegate nextpage, int pageSize, CancellationToken cancellationToken)
+        protected virtual async IAsyncEnumerable<IDataRecord> ExecuteQuery(string queryText, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             Parameters.Add(Dialect.Skip, Tuple.Create((object)0, (DbType?)null));
             var command = BuildCommand(queryText);
-
-            try
+            using var reader = command is DbCommand dbcmd
+                   ? await dbcmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false)
+                   : command.ExecuteReader();
+            while (reader.Read())
             {
-                return new PagedEnumerationCollection(Dialect, command, nextpage, pageSize, cancellationToken, this);
+                yield return reader;
             }
-            catch (Exception)
-            {
-                command.Dispose();
-                throw;
-            }
+            //try
+            //{
+            //    return new PagedEnumerationCollection(Dialect, command, nextpage, pageSize, cancellationToken, this);
+            //}
+            //catch (Exception)
+            //{
+            //    command.Dispose();
+            //    throw;
+            //}
         }
 
         protected virtual IDbCommand BuildCommand(string statement)

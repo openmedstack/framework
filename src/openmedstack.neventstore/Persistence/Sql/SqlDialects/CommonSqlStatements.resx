@@ -147,8 +147,7 @@ AND NOT EXISTS
     <value>SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
   FROM Commits
  WHERE BucketId = @BucketId AND CommitStamp &gt;= @CommitStamp
- ORDER BY CommitStamp, StreamId, CommitSequence
- LIMIT @Limit OFFSET @Skip;</value>
+ ORDER BY CommitStamp, StreamId, CommitSequence;</value>
   </data>
   <data name="GetCommitsFromToInstant" xml:space="preserve">
     <value>SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
@@ -156,8 +155,7 @@ AND NOT EXISTS
  WHERE BucketId = @BucketId
    AND CommitStamp &gt;= @CommitStampStart
    AND CommitStamp &lt; @CommitStampEnd
- ORDER BY CommitStamp, StreamId, CommitSequence
- LIMIT @Limit OFFSET @Skip;</value>
+ ORDER BY CommitStamp, StreamId, CommitSequence;</value>
   </data>
   <data name="GetCommitsFromStartingRevision" xml:space="preserve">
     <value>SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp,  CheckpointNumber, Headers, Payload
@@ -167,8 +165,7 @@ AND NOT EXISTS
    AND StreamRevision &gt;= @StreamRevision
    AND (StreamRevision - Items) &lt; @MaxStreamRevision
    AND CommitSequence &gt; @CommitSequence
- ORDER BY CommitSequence
- LIMIT @Limit;</value>
+ ORDER BY CommitSequence;</value>
   </data>
   <data name="GetSnapshot" xml:space="preserve">
     <value>SELECT *
@@ -207,16 +204,14 @@ DROP TABLE Commits;</value>
     <value>SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
 FROM Commits
 WHERE  CheckpointNumber &gt; @CheckpointNumber
-ORDER BY CheckpointNumber
- LIMIT @Limit OFFSET @Skip;</value>
+ORDER BY CheckpointNumber;</value>
   </data>
   <data name="GetCommitsFromBucketAndCheckpoint" xml:space="preserve">
     <value>SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
   FROM Commits
  WHERE BucketId = @BucketId 
    AND CheckpointNumber &gt; @CheckpointNumber
- ORDER BY CheckpointNumber 
- LIMIT @Limit OFFSET @Skip;</value>
+ ORDER BY CheckpointNumber;</value>
   </data>
   <data name="DeleteStream" xml:space="preserve">
     <value>DELETE FROM Snapshots WHERE BucketId =@BucketId AND StreamId = @StreamId;

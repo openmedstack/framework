@@ -123,8 +123,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///  FROM Commits
         /// WHERE BucketId = @BucketId 
         ///   AND CheckpointNumber &gt; @CheckpointNumber
-        /// ORDER BY CheckpointNumber 
-        /// LIMIT @Limit OFFSET @Skip;.
+        /// ORDER BY CheckpointNumber;.
         /// </summary>
         internal static string GetCommitsFromBucketAndCheckpoint {
             get {
@@ -136,8 +135,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///FROM Commits
         ///WHERE  CheckpointNumber &gt; @CheckpointNumber
-        ///ORDER BY CheckpointNumber
-        /// LIMIT @Limit OFFSET @Skip;.
+        ///ORDER BY CheckpointNumber;.
         /// </summary>
         internal static string GetCommitsFromCheckpoint {
             get {
@@ -149,8 +147,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///   Looks up a localized string similar to SELECT BucketId, StreamId, StreamIdOriginal, StreamRevision, CommitId, CommitSequence, CommitStamp, CheckpointNumber, Headers, Payload
         ///  FROM Commits
         /// WHERE BucketId = @BucketId AND CommitStamp &gt;= @CommitStamp
-        /// ORDER BY CommitStamp, StreamId, CommitSequence
-        /// LIMIT @Limit OFFSET @Skip;.
+        /// ORDER BY CommitStamp, StreamId, CommitSequence;.
         /// </summary>
         internal static string GetCommitsFromInstant {
             get {
@@ -166,8 +163,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         ///   AND StreamRevision &gt;= @StreamRevision
         ///   AND (StreamRevision - Items) &lt; @MaxStreamRevision
         ///   AND CommitSequence &gt; @CommitSequence
-        /// ORDER BY CommitSequence
-        /// LIMIT @Limit;.
+        /// ORDER BY CommitSequence;.
         /// </summary>
         internal static string GetCommitsFromStartingRevision {
             get {
@@ -181,8 +177,7 @@ namespace OpenMedStack.NEventStore.Persistence.Sql.SqlDialects {
         /// WHERE BucketId = @BucketId
         ///   AND CommitStamp &gt;= @CommitStampStart
         ///   AND CommitStamp &lt; @CommitStampEnd
-        /// ORDER BY CommitStamp, StreamId, CommitSequence
-        /// LIMIT @Limit OFFSET @Skip;.
+        /// ORDER BY CommitStamp, StreamId, CommitSequence;.
         /// </summary>
         internal static string GetCommitsFromToInstant {
             get {

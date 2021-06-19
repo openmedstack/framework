@@ -5,7 +5,6 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
     using System.Data;
     using System.Threading;
     using System.Threading.Tasks;
-    using SqlDialects;
 
     public interface IDbStatement : IDisposable
     {
@@ -20,7 +19,5 @@ namespace OpenMedStack.NEventStore.Persistence.Sql
         Task<object?> ExecuteScalar(string commandText);
 
         IAsyncEnumerable<IDataRecord> ExecuteWithQuery(string queryText, CancellationToken cancellationToken);
-
-        IAsyncEnumerable<IDataRecord> ExecutePagedQuery(string queryText, NextPageDelegate nextpage, CancellationToken cancellationToken);
     }
 }
