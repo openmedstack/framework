@@ -13,22 +13,7 @@
     using NEventStore.Persistence.AcceptanceTests;
     using NEventStore.Persistence.AcceptanceTests.BDD;
     using Xunit;
-
-    public class CreatingPollingClient2Tests
-    {
-        [Fact]
-        public void When_persist_streams_is_null_then_should_throw()
-        {
-            Catch.Exception(() => new PollingClient2(null, c => Task.FromResult(PollingClient2.HandlingResult.MoveToNext))).Should().BeOfType<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void When_interval_less_than_zero_then_should_throw()
-        {
-            Catch.Exception(() => new PollingClient2(A.Fake<IPersistStreams>(), null)).Should().BeOfType<ArgumentNullException>();
-        }
-    }
-
+    
     public class BaseHandlingCommittedEvents : UsingPollingClient2
     {
         private readonly List<ICommit> _commits = new();
@@ -253,11 +238,11 @@
             OnStart().Wait();
         }
 
-        protected PollingClient2 Sut { get; private set; }
+        protected PollingClient2 Sut { get; private set; } = null!;
 
-        protected IStoreEvents StoreEvents { get; private set; }
+        protected IStoreEvents StoreEvents { get; private set; } = null!;
 
-        protected Func<ICommit, Task<PollingClient2.HandlingResult>> HandleFunction;
+        protected Func<ICommit, Task<PollingClient2.HandlingResult>> HandleFunction = null!;
 
         protected override Task Context()
         {
@@ -273,7 +258,7 @@
             Sut.Dispose();
         }
 
-        protected void WaitForCondition(Func<bool> predicate, int timeoutInSeconds = 4)
+        protected static void WaitForCondition(Func<bool> predicate, int timeoutInSeconds = 4)
         {
             var startTest = DateTime.Now;
             while (!predicate() && DateTime.Now.Subtract(startTest).TotalSeconds < timeoutInSeconds)

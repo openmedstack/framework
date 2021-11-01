@@ -1,16 +1,16 @@
-﻿// ReSharper disable once CheckNamespace
-namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
+﻿namespace OpenMedStack.NEventStore.Persistence.PostgreSql.Tests
 {
     using OpenMedStack.NEventStore.Persistence.Sql;
     using OpenMedStack.NEventStore.Persistence.Sql.SqlDialects;
     using OpenMedStack.NEventStore.Serialization;
     using Npgsql;
+    using OpenMedStack.NEventStore.Persistence.AcceptanceTests;
 
-    public partial class PersistenceEngineFixture
+    public class PersistenceEngineFixture : PersistenceEngineFixtureBase
     {
         public PersistenceEngineFixture()
         {
-            _createPersistence = pageSize =>
+            CreatePersistence = pageSize =>
                 new SqlPersistenceFactory(
                     new NetStandardConnectionFactory(
                         NpgsqlFactory.Instance,

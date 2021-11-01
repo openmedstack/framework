@@ -14,8 +14,8 @@
     {
         private readonly DateTime _endDate = new(2013, 1, 2);
         private readonly DateTime _startDate = new(2013, 1, 1);
-        private ICommit[] _commits;
-        private InMemoryPersistenceEngine _engine;
+        private ICommit[] _commits = null!;
+        private InMemoryPersistenceEngine _engine = null!;
 
         public WhenGettingFromToThenShouldNotGetLaterCommits()
         {
@@ -53,7 +53,7 @@
 
         protected override async Task Because()
         {
-            var fromTo = _engine.GetFromTo(null, _startDate, _endDate, CancellationToken.None);
+            var fromTo = _engine.GetFromTo(Bucket.Default, _startDate, _endDate, CancellationToken.None);
             _commits = await fromTo.ToArray().ConfigureAwait(false);
         }
 

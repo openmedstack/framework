@@ -33,7 +33,10 @@
             {
                 _loggingAction("Exception handling request to " + context.Request.Path);
                 _loggingAction(e.Message);
-                _loggingAction(e.StackTrace);
+                if (e.StackTrace != null)
+                {
+                    _loggingAction(e.StackTrace);
+                }
                 _loggingAction("-------");
             }
         }

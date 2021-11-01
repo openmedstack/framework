@@ -1,13 +1,13 @@
-﻿// ReSharper disable once CheckNamespace
-namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
+﻿namespace OpenMedStack.NEventStore.Tests.Persistence.InMemory
 {
+    using OpenMedStack.NEventStore.Persistence.AcceptanceTests;
     using OpenMedStack.NEventStore.Persistence.InMemory;
 
-    public partial class PersistenceEngineFixture
+    public class PersistenceEngineFixture : PersistenceEngineFixtureBase
     {
         public PersistenceEngineFixture()
         {
-            _createPersistence = _ =>
+            CreatePersistence = _ =>
                 new InMemoryPersistenceEngine();
         }
     }

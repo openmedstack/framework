@@ -5,7 +5,7 @@
 
     public static class Catch
     {
-        public static Exception Exception(Action action)
+        public static Exception? Exception(Action action)
         {
             try
             {
@@ -19,7 +19,7 @@
             return null;
         }
 
-        public static async Task<Exception> Exception(Func<Task> action)
+        public static async Task<Exception?> Exception(Func<Task> action)
         {
             try
             {

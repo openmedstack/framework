@@ -70,7 +70,7 @@ namespace OpenMedStack.Commands
         /// <inheritdoc />
         public bool Equals(DomainCommand? other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
             {
                 return false;
             }

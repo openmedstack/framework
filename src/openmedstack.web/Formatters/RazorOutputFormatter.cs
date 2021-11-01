@@ -49,9 +49,9 @@
                 routeData as RouteData ?? new RouteData(),
                 actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
                 modelState as ModelStateDictionary ?? new ModelStateDictionary());
-            if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || !(viewObject is string viewName))
+            if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
             {
-                viewName = actionContext.RouteData.Values["action"].ToString()!;
+                viewName = actionContext.RouteData.Values["action"]!.ToString()!;
             }
 
             var result = viewEngine.FindView(actionContext, viewName, false);
@@ -75,9 +75,9 @@
                 modelState as ModelStateDictionary ?? new ModelStateDictionary());
             try
             {
-                if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || !(viewObject is string viewName))
+                if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
                 {
-                    viewName = actionContext.RouteData.Values["action"].ToString()!;
+                    viewName = actionContext.RouteData.Values["action"]!.ToString()!;
                 }
 
                 var viewEngineResult = viewEngine.FindView(actionContext, viewName, isMainPage: false);

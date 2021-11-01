@@ -62,7 +62,7 @@
         public virtual async Task Start(CancellationToken cancellationToken = default)
         {
             var bootstrappers = _container.Host.Services.GetServices<IBootstrapSystem>();
-            var logger = _container.Host.Services.GetService<ILogger<TestWebServerService>>();
+            var logger = _container.Host.Services.GetRequiredService<ILogger<TestWebServerService>>();
             foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
             {
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);
@@ -77,7 +77,7 @@
                             ?? throw new Exception($"Could not resolve {nameof(IPublishEvents)}");
                 _commandBus = _container.Host.Services.GetService<IRouteCommands>()
                               ?? throw new Exception($"Could not resolve {nameof(IRouteCommands)}");
-                logger.LogInformation("Web server bound to: " + _container.BaseAddress);
+                logger.LogInformation("Web server bound to: {address}", _container.BaseAddress);
             }
             catch (Exception e)
             {

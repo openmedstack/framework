@@ -26,7 +26,7 @@ namespace OpenMedStack.NEventStore
             Guid commitId,
             int commitSequence,
             DateTimeOffset commitStamp,
-            IDictionary<string, object> headers,
+            IDictionary<string, object>? headers,
             ICollection<EventMessage> events)
         {
             Guard.NotNullOrWhiteSpace(nameof(bucketId), bucketId);

@@ -18,9 +18,9 @@ namespace OpenMedStack.NEventStore.Tests
             private const int HeadCommitSequence = 1;
             private const int ExpectedNextCommitSequence = HeadCommitSequence + 1;
             private const int BeyondEndOfStreamCommitSequence = ExpectedNextCommitSequence + 1;
-            private ICommit _alreadyCommitted;
-            private CommitAttempt _beyondEndOfStream;
-            private Exception _thrown;
+            private ICommit _alreadyCommitted = null!;
+            private CommitAttempt _beyondEndOfStream = null!;
+            private Exception _thrown = null!;
 
             protected override Task Context()
             {
@@ -34,7 +34,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_beyondEndOfStream)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_beyondEndOfStream)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -51,9 +51,9 @@ namespace OpenMedStack.NEventStore.Tests
             private const int NumberOfEventsBeingCommitted = 1;
             private const int ExpectedNextStreamRevision = HeadStreamRevision + 1 + NumberOfEventsBeingCommitted;
             private const int BeyondEndOfStreamRevision = ExpectedNextStreamRevision + 1;
-            private ICommit _alreadyCommitted;
-            private CommitAttempt _beyondEndOfStream;
-            private Exception _thrown;
+            private ICommit _alreadyCommitted = null!;
+            private CommitAttempt _beyondEndOfStream = null!;
+            private Exception _thrown = null!;
 
             protected override async Task Context()
             {
@@ -65,7 +65,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_beyondEndOfStream)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_beyondEndOfStream)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -82,10 +82,9 @@ namespace OpenMedStack.NEventStore.Tests
             private const int HeadStreamRevision = 42;
             private const int HeadCommitSequence = 42;
             private const int DupliateCommitSequence = HeadCommitSequence;
-            private CommitAttempt _attempt;
-            private ICommit _committed;
-
-            private Exception _thrown;
+            private CommitAttempt _attempt = null!;
+            private ICommit _committed = null!;
+            private Exception _thrown = null!;
 
             protected override Task Context()
             {
@@ -99,7 +98,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_attempt)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_attempt)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -124,9 +123,9 @@ namespace OpenMedStack.NEventStore.Tests
             private const int HeadStreamRevision = 3;
             private const int HeadCommitSequence = 2;
             private const int DuplicateStreamRevision = HeadStreamRevision;
-            private ICommit _committed;
-            private CommitAttempt _failedAttempt;
-            private Exception _thrown;
+            private ICommit _committed = null!;
+            private CommitAttempt _failedAttempt = null!;
+            private Exception _thrown = null!;
 
             protected override Task Context()
             {
@@ -140,7 +139,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -162,9 +161,9 @@ namespace OpenMedStack.NEventStore.Tests
                 UsingCommitHooks
         {
             private const int DuplicateCommitSequence = 1;
-            private CommitAttempt _failedAttempt;
-            private ICommit _successfulAttempt;
-            private Exception _thrown;
+            private CommitAttempt _failedAttempt = null!;
+            private ICommit _successfulAttempt = null!;
+            private Exception _thrown = null!;
 
             protected override async Task Context()
             {
@@ -176,7 +175,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -199,9 +198,9 @@ namespace OpenMedStack.NEventStore.Tests
         {
             private const int DuplicateStreamRevision = 2;
 
-            private CommitAttempt _failedAttempt;
-            private ICommit _successfulAttempt;
-            private Exception _thrown;
+            private CommitAttempt _failedAttempt = null!;
+            private ICommit _successfulAttempt = null!;
+            private Exception _thrown = null!;
 
             protected override Task Context()
             {
@@ -215,7 +214,7 @@ namespace OpenMedStack.NEventStore.Tests
 
             protected override async Task Because()
             {
-                _thrown = await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false);
+                _thrown = (await Catch.Exception(() => Hook.PreCommit(_failedAttempt)).ConfigureAwait(false))!;
             }
 
             [Fact]
@@ -235,9 +234,8 @@ namespace OpenMedStack.NEventStore.Tests
         public class WhenTrackingCommits : SpecificationBase
         {
             private const int MaxStreamsToTrack = 2;
-            private ICommit[] _trackedCommitAttempts;
-
-            private OptimisticPipelineHook _hook;
+            private ICommit[] _trackedCommitAttempts = null!;
+            private OptimisticPipelineHook _hook = null!;
 
             public WhenTrackingCommits()
             {
@@ -300,8 +298,8 @@ namespace OpenMedStack.NEventStore.Tests
 
         public class WhenPurging : SpecificationBase
         {
-            private ICommit _trackedCommit;
-            private OptimisticPipelineHook _hook;
+            private ICommit _trackedCommit = null!;
+            private OptimisticPipelineHook _hook = null!;
 
             public WhenPurging()
             {
@@ -345,9 +343,9 @@ namespace OpenMedStack.NEventStore.Tests
 
         public class WhenPurgingABucket : SpecificationBase
         {
-            private ICommit _trackedCommitBucket1;
-            private ICommit _trackedCommitBucket2;
-            private OptimisticPipelineHook _hook;
+            private ICommit _trackedCommitBucket1 = null!;
+            private ICommit _trackedCommitBucket2 = null!;
+            private OptimisticPipelineHook _hook = null!;
 
             public WhenPurgingABucket()
             {
@@ -399,9 +397,9 @@ namespace OpenMedStack.NEventStore.Tests
 
         public class WhenDeletingAStream : SpecificationBase
         {
-            private ICommit _trackedCommit;
-            private ICommit _trackedCommitDeleted;
-            private OptimisticPipelineHook _hook;
+            private ICommit _trackedCommit = null!;
+            private ICommit _trackedCommitDeleted = null!;
+            private OptimisticPipelineHook _hook = null!;
             private readonly Guid _bucketId = Guid.NewGuid();
             private readonly Guid _streamIdDeleted = Guid.NewGuid();
 

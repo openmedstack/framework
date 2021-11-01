@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net5.0</TargetFrameworks>
-    <RootNamespace>OpenMedStack.Autofac.MassTransit.Sqs</RootNamespace>
-    <PackageId>OpenMedStack.Autofac.MassTransit.Sqs</PackageId>
-    <PackageTags>OpenMedStack Architecture Messaging MassTransit SQS</PackageTags>
-    <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
-    <Description>Autofac bindings for OpenMedStack based applications.</Description>
-  </PropertyGroup>
-  <Import Project="..\..\shared.proj" />
-  <ItemGroup>
-    <PackageReference Include="MassTransit.AmazonSQS" Version="7.2.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0</TargetFrameworks>
+		<RootNamespace>OpenMedStack.Autofac.MassTransit.Sqs</RootNamespace>
+		<PackageId>OpenMedStack.Autofac.MassTransit.Sqs</PackageId>
+		<PackageTags>OpenMedStack Architecture Messaging MassTransit SQS</PackageTags>
+		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+		<Description>Autofac bindings for OpenMedStack based applications.</Description>
+	</PropertyGroup>
+	<Import Project="..\..\shared.proj" />
+	<ItemGroup>
+		<PackageReference Include="MassTransit.AmazonSQS" Version="7.2.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
+	</ItemGroup>
 
 </Project>

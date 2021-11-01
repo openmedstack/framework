@@ -1,4 +1,3 @@
-// ReSharper disable once CheckNamespace
 namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 {
     using System;
@@ -9,14 +8,14 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     using FluentAssertions;
     using OpenMedStack.NEventStore;
     using OpenMedStack.NEventStore.Persistence;
-    using OpenMedStack.NEventStore.Persistence.AcceptanceTests;
     using OpenMedStack.NEventStore.Persistence.AcceptanceTests.BDD;
+    using OpenMedStack.NEventStore.Tests.Persistence.InMemory;
     using Xunit;
 
     public class WhenACommitHeaderHasANameThatContainsAPeriod : PersistenceEngineConcern
     {
-        private ICommit _persisted;
-        private string _streamId;
+        private ICommit _persisted = null!;
+        private string _streamId = null!;
 
         protected override Task Context()
         {
@@ -47,10 +46,10 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenACommitIsSuccessfullyPersisted : PersistenceEngineConcern
     {
-        private CommitAttempt _attempt;
+        private CommitAttempt _attempt = null!;
         private DateTimeOffset _now;
-        private ICommit _persisted;
-        private string _streamId;
+        private ICommit _persisted = null!;
+        private string _streamId = null!;
 
         protected override Task Context()
         {
@@ -127,15 +126,15 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     {
         private const int LoadFromCommitContainingRevision = 3;
         private const int UpToCommitWithContainingRevision = 5;
-        private ICommit[] _committed;
-        private ICommit _oldest, _oldest2, _oldest3;
-        private string _streamId;
+        private ICommit[] _committed = null!;
+        private ICommit _oldest = null!, _oldest2 = null!, _oldest3 = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
-            _oldest = await Persistence.CommitSingle().ConfigureAwait(false); // 2 events, revision 1-2
-            _oldest2 = await Persistence.CommitNext(_oldest).ConfigureAwait(false); // 2 events, revision 3-4
-            _oldest3 = await Persistence.CommitNext(_oldest2).ConfigureAwait(false); // 2 events, revision 5-6
+            _oldest = (await Persistence.CommitSingle().ConfigureAwait(false))!; // 2 events, revision 1-2
+            _oldest2 = (await Persistence.CommitNext(_oldest).ConfigureAwait(false))!; // 2 events, revision 3-4
+            _oldest3 = (await Persistence.CommitNext(_oldest2).ConfigureAwait(false))!; // 2 events, revision 5-6
             await Persistence.CommitNext(_oldest3).ConfigureAwait(false); // 2 events, revision 7-8
 
             _streamId = _oldest.StreamId;
@@ -163,15 +162,15 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     {
         private const int LoadFromCommitContainingRevision = 3;
         private const int UpToCommitWithContainingRevision = 6;
-        private ICommit[] _committed;
-        private ICommit _oldest, _oldest2, _oldest3;
-        private string _streamId;
+        private ICommit[] _committed = null!;
+        private ICommit _oldest = null!, _oldest2 = null!, _oldest3 = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
-            _oldest = await Persistence.CommitSingle().ConfigureAwait(false); // 2 events, revision 1-2
-            _oldest2 = await Persistence.CommitNext(_oldest).ConfigureAwait(false); // 2 events, revision 3-4
-            _oldest3 = await Persistence.CommitNext(_oldest2).ConfigureAwait(false); // 2 events, revision 5-6
+            _oldest = (await Persistence.CommitSingle().ConfigureAwait(false))!; // 2 events, revision 1-2
+            _oldest2 = (await Persistence.CommitNext(_oldest).ConfigureAwait(false))!; // 2 events, revision 3-4
+            _oldest3 = (await Persistence.CommitNext(_oldest2).ConfigureAwait(false))!; // 2 events, revision 5-6
             await Persistence.CommitNext(_oldest3).ConfigureAwait(false); // 2 events, revision 7-8
 
             _streamId = _oldest.StreamId;
@@ -197,18 +196,18 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenCommittingAStreamWithTheSameRevision : PersistenceEngineConcern
     {
-        private CommitAttempt _attemptWithSameRevision;
-        private Exception _thrown;
+        private CommitAttempt _attemptWithSameRevision = null!;
+        private Exception _thrown = null!;
 
         protected override async Task Context()
         {
-            var commit = await Persistence.CommitSingle().ConfigureAwait(false);
+            var commit = (await Persistence.CommitSingle().ConfigureAwait(false))!;
             _attemptWithSameRevision = commit.StreamId.BuildAttempt();
         }
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_attemptWithSameRevision)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_attemptWithSameRevision)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -223,8 +222,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     // to avoid concurrency issues
     public class WhenCommittingAStreamWithTheSameSequence : PersistenceEngineConcern
     {
-        private CommitAttempt _attempt1, _attempt2;
-        private Exception _thrown;
+        private CommitAttempt _attempt1 = null!, _attempt2 = null!;
+        private Exception _thrown = null!;
 
         protected override Task Context()
         {
@@ -249,7 +248,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_attempt2)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_attempt2)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -262,8 +261,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     //TODO:This test looks exactly like the one above. What are we trying to prove?
     public class WhenAttemptingToOverwriteACommittedSequence : PersistenceEngineConcern
     {
-        private CommitAttempt _failedAttempt;
-        private Exception _thrown;
+        private CommitAttempt _failedAttempt = null!;
+        private Exception _thrown = null!;
 
         protected override async Task Context()
         {
@@ -275,7 +274,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_failedAttempt)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_failedAttempt)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -287,12 +286,12 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenAttemptingToPersistACommitTwice : PersistenceEngineConcern
     {
-        private CommitAttempt _attemptTwice;
-        private Exception _thrown;
+        private CommitAttempt _attemptTwice = null!;
+        private Exception _thrown = null!;
 
         protected override async Task Context()
         {
-            var commit = await Persistence.CommitSingle().ConfigureAwait(false);
+            var commit = (await Persistence.CommitSingle().ConfigureAwait(false))!;
             _attemptTwice = new CommitAttempt(
                 commit.BucketId,
                 commit.StreamId,
@@ -306,7 +305,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_attemptTwice)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_attemptTwice)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -318,12 +317,12 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenAttemptingToPersistACommitIdTwiceOnSameStream : PersistenceEngineConcern
     {
-        private CommitAttempt _attemptTwice;
-        private Exception _thrown;
+        private CommitAttempt _attemptTwice = null!;
+        private Exception _thrown = null!;
 
         protected override async Task Context()
         {
-            var commit = await Persistence.CommitSingle().ConfigureAwait(false);
+            var commit = (await Persistence.CommitSingle().ConfigureAwait(false))!;
             _attemptTwice = new CommitAttempt(
                 commit.BucketId,
                 commit.StreamId,
@@ -338,7 +337,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_attemptTwice)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_attemptTwice)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -350,9 +349,9 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenCommittingMoreEventsThanTheConfiguredPageSize : PersistenceEngineConcern
     {
-        private CommitAttempt[] _committed;
-        private ICommit[] _loaded;
-        private string _streamId;
+        private CommitAttempt[] _committed = null!;
+        private ICommit[] _loaded = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
@@ -383,8 +382,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     public class WhenSavingASnapshot : PersistenceEngineConcern
     {
         private bool _added;
-        private Snapshot _snapshot;
-        private string _streamId;
+        private Snapshot _snapshot = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
@@ -413,16 +412,16 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenRetrievingASnapshot : PersistenceEngineConcern
     {
-        private ISnapshot _correct;
-        private ISnapshot _snapshot;
-        private string _streamId;
-        private ISnapshot _tooFarForward;
+        private ISnapshot _correct = null!;
+        private ISnapshot _snapshot = null!;
+        private string _streamId = null!;
+        private ISnapshot _tooFarForward = null!;
 
         protected override async Task Context()
         {
             _streamId = Guid.NewGuid().ToString();
-            var commit1 = await Persistence.CommitSingle(_streamId).ConfigureAwait(false); // rev 1-2
-            var commit2 = await Persistence.CommitNext(commit1).ConfigureAwait(false); // rev 3-4
+            var commit1 = (await Persistence.CommitSingle(_streamId).ConfigureAwait(false))!; // rev 1-2
+            var commit2 = (await Persistence.CommitNext(commit1).ConfigureAwait(false))!; // rev 3-4
             await Persistence.CommitNext(commit2).ConfigureAwait(false); // rev 5-6
 
             await Persistence.AddSnapshot(new Snapshot(_streamId, 1, string.Empty)).ConfigureAwait(false); //Too far back
@@ -432,7 +431,9 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _snapshot = await Persistence.GetSnapshot(_streamId, _tooFarForward.StreamRevision - 1, CancellationToken.None).ConfigureAwait(false);
+            _snapshot = (await Persistence
+                .GetSnapshot(_streamId, _tooFarForward.StreamRevision - 1, CancellationToken.None)
+                .ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -457,16 +458,16 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     public class WhenASnapshotHasBeenAddedToTheMostRecentCommitOfAStream : PersistenceEngineConcern
     {
         private const string SnapshotData = "snapshot";
-        private ICommit _newest;
-        private ICommit _oldest, _oldest2;
-        private string _streamId;
+        private ICommit _newest = null!;
+        private ICommit _oldest = null!, _oldest2 = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
             _streamId = Guid.NewGuid().ToString();
-            _oldest = await Persistence.CommitSingle(_streamId).ConfigureAwait(false);
-            _oldest2 = await Persistence.CommitNext(_oldest).ConfigureAwait(false);
-            _newest = await Persistence.CommitNext(_oldest2).ConfigureAwait(false);
+            _oldest = (await Persistence.CommitSingle(_streamId).ConfigureAwait(false))!;
+            _oldest2 = (await Persistence.CommitNext(_oldest).ConfigureAwait(false))!;
+            _newest = (await Persistence.CommitNext(_oldest2).ConfigureAwait(false))!;
         }
 
         protected override Task Because() => Persistence.AddSnapshot(new Snapshot(_streamId, _newest.StreamRevision, SnapshotData));
@@ -486,14 +487,14 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
         private const int WithinThreshold = 2;
         private const int OverThreshold = 3;
         private const string SnapshotData = "snapshot";
-        private ICommit _oldest, _oldest2;
-        private string _streamId;
+        private ICommit _oldest = null!, _oldest2 = null!;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
             _streamId = Guid.NewGuid().ToString();
-            _oldest = await Persistence.CommitSingle(_streamId).ConfigureAwait(false);
-            _oldest2 = await Persistence.CommitNext(_oldest).ConfigureAwait(false);
+            _oldest = (await Persistence.CommitSingle(_streamId).ConfigureAwait(false))!;
+            _oldest2 = (await Persistence.CommitNext(_oldest).ConfigureAwait(false))!;
             await Persistence.AddSnapshot(new Snapshot(_streamId, _oldest2.StreamRevision, SnapshotData)).ConfigureAwait(false);
         }
 
@@ -515,12 +516,12 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenReadingAllCommitsFromAParticularPointInTime : PersistenceEngineConcern
     {
-        private ICommit[] _committed;
-        private CommitAttempt _first;
+        private ICommit[] _committed = null!;
+        private CommitAttempt _first = null!;
         private DateTimeOffset _now;
-        private ICommit _second;
-        private string _streamId;
-        private ICommit _third;
+        private ICommit _second = null!;
+        private string _streamId = null!;
+        private ICommit _third = null!;
 
         protected override async Task Context()
         {
@@ -530,8 +531,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
             _first = _streamId.BuildAttempt(_now.AddSeconds(1));
             await Persistence.Commit(_first).ConfigureAwait(false);
 
-            _second = await Persistence.CommitNext(_first).ConfigureAwait(false);
-            _third = await Persistence.CommitNext(_second).ConfigureAwait(false);
+            _second = (await Persistence.CommitNext(_first).ConfigureAwait(false))!;
+            _third = (await Persistence.CommitNext(_second).ConfigureAwait(false))!;
             await Persistence.CommitNext(_third).ConfigureAwait(false);
         }
 
@@ -550,8 +551,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenPagingOverAllCommitsFromAParticularPointInTime : PersistenceEngineConcern
     {
-        private CommitAttempt[] _committed;
-        private List<ICommit> _loaded;
+        private CommitAttempt[] _committed = null!;
+        private List<ICommit> _loaded = null!;
         private DateTimeOffset _start;
 
         protected override async Task Context()
@@ -586,8 +587,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenPagingOverAllCommitsFromAParticularCheckpoint : PersistenceEngineConcern
     {
-        private List<Guid> _committed;
-        private ICollection<Guid> _loaded;
+        private List<Guid> _committed = null!;
+        private ICollection<Guid> _loaded = null!;
         private const int CheckPoint = 2;
 
         protected override async Task Context()
@@ -616,9 +617,9 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenPagingOverAllCommitsOfABucketFromAParticularCheckpoint : PersistenceEngineConcern
     {
-        private List<Guid> _committedOnBucket1;
-        private List<Guid> _committedOnBucket2;
-        private ICollection<Guid> _loaded;
+        private List<Guid> _committedOnBucket1 = null!;
+        private List<Guid> _committedOnBucket2 = null!;
+        private ICollection<Guid> _loaded = null!;
         private const int CheckPoint = 2;
 
         protected override async Task Context()
@@ -655,24 +656,24 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenReadingAllCommitsFromTheYear1Ad : PersistenceEngineConcern
     {
-        private Exception _thrown;
+        private Exception _thrown = null!;
 
         protected override async Task Because()
         {
             // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            _thrown = await Catch.Exception(
+            _thrown = (await Catch.Exception(
                     async () =>
                     {
                         var enumerable = Persistence.GetFrom(DateTimeOffset.MinValue);
                         _ = await enumerable.FirstOrDefault(CancellationToken.None).ConfigureAwait(false);
                     })
-                .ConfigureAwait(false);
+                .ConfigureAwait(false))!;
         }
 
         [Fact]
         public void should_NOT_throw_an_exception()
         {
-            _thrown.Should().BeNull();
+            _thrown!.Should().BeNull();
         }
     }
 
@@ -698,7 +699,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenInvokingAfterDisposal : PersistenceEngineConcern
     {
-        private Exception _thrown;
+        private Exception _thrown = null!;
 
         protected override Task Context()
         {
@@ -709,20 +710,20 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.CommitSingle()).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.CommitSingle()).ConfigureAwait(false))!;
         }
 
         [Fact]
         public void should_throw_an_ObjectDisposedException()
         {
-            _thrown.Should().BeOfType<ObjectDisposedException>();
+            _thrown!.Should().BeOfType<ObjectDisposedException>();
         }
     }
 
     public class WhenCommittingAStreamWithTheSameIdAsAStreamSameBucket : PersistenceEngineConcern
     {
-        private string _streamId;
-        private static Exception _thrown;
+        private string _streamId = null!;
+        private static Exception _thrown = null!;
 
         protected override async Task Context()
         {
@@ -732,7 +733,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_streamId.BuildAttempt())).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_streamId.BuildAttempt())).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -752,9 +753,9 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     {
         private const string BucketAId = "a";
         private const string BucketBId = "b";
-        private string _streamId;
-        private static CommitAttempt _attemptForBucketB;
-        private static Exception _thrown;
+        private string _streamId = null!;
+        private static CommitAttempt _attemptForBucketB = null!;
+        private static Exception _thrown = null!;
         private DateTimeOffset _attemptACommitStamp;
 
         protected override async Task Context()
@@ -771,7 +772,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         protected override async Task Because()
         {
-            _thrown = await Catch.Exception(() => Persistence.Commit(_attemptForBucketB)).ConfigureAwait(false);
+            _thrown = (await Catch.Exception(() => Persistence.Commit(_attemptForBucketB)).ConfigureAwait(false))!;
         }
 
         [Fact]
@@ -804,10 +805,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     {
         private const string BucketAId = "a";
         private const string BucketBId = "b";
-
-        private string _streamId;
-
-        private static Snapshot _snapshot;
+        private string _streamId = null!;
+        private static Snapshot _snapshot = null!;
 
         protected override async Task Context()
         {
@@ -837,8 +836,8 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
         private const string BucketBId = "b";
 
         private static DateTimeOffset _now;
-        private static ICommit[] _returnedCommits;
-        private CommitAttempt _commitToBucketB;
+        private static ICommit[] _returnedCommits = null!;
+        private CommitAttempt _commitToBucketB = null!;
 
         protected override async Task Context()
         {
@@ -871,7 +870,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenGettingAllCommitsSinceCheckpointAndThereAreStreamsInMultipleBuckets : PersistenceEngineConcern
     {
-        private ICommit[] _commits;
+        private ICommit[] _commits = null!;
 
         protected override async Task Context()
         {
@@ -911,7 +910,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     {
         private const string BucketAId = "a";
         private const string BucketBId = "b";
-        private string _streamId;
+        private string _streamId = null!;
 
         protected override async Task Context()
         {
@@ -954,13 +953,13 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public class WhenGettingfromcheckpointAmountOfCommitsExceedsPagesize : PersistenceEngineConcern
     {
-        private ICommit[] _commits;
+        private ICommit[] _commits = null!;
         private int _moreThanPageSize;
 
         protected override async Task Because()
         {
             _moreThanPageSize = ConfiguredPageSizeForTesting + 1;
-            var eventStore = new OptimisticEventStore(Persistence, null);
+            var eventStore = new OptimisticEventStore(Persistence, Enumerable.Empty<IPipelineHook>());
             // TODO: Not sure how to set the actual page size to the const defined above
             for (var i = 0; i < _moreThanPageSize; i++)
             {
@@ -1001,7 +1000,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
             await Persistence.Commit(attempt).ConfigureAwait(false);
 
             var commits = await Persistence.GetFrom(streamId, 0, int.MaxValue, CancellationToken.None).Single().ConfigureAwait(false);
-            commits.Events.Single().Body.ToString().Length.Should().Be(bodyLength);
+            commits!.Events.Single().Body.ToString()!.Length.Should().Be(bodyLength);
         }
     }
 
@@ -1013,7 +1012,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
     /// </summary>
     public abstract class PersistenceEngineConcern : SpecificationBase//, IClassFixture<PersistenceEngineFixture>
     {
-        private PersistenceEngineFixture _fixture;
+        private PersistenceEngineFixture _fixture = null!;
 
         public PersistenceEngineConcern()
         {
@@ -1038,32 +1037,9 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
         }
     }
 
-    public partial class PersistenceEngineFixture : IDisposable
-    {
-        private readonly Func<int, IPersistStreams> _createPersistence;
-
-        public void Initialize(int pageSize)
-        {
-            Persistence = _createPersistence(pageSize);
-            Persistence.Initialize();
-        }
-
-        public IPersistStreams Persistence { get; private set; }
-
-        public void Dispose()
-        {
-            if (Persistence != null && !Persistence.IsDisposed)
-            {
-                Persistence.Drop();
-                Persistence.Dispose();
-            }
-            GC.SuppressFinalize(this);
-        }
-    }
-
     [Serializable]
     public class Pippo
     {
-        public string S { get; set; }
+        public string S { get; set; } = null!;
     }
 }

@@ -24,10 +24,6 @@
             {
                 waitInterval = TimeSpan.FromMilliseconds(5000);
             }
-            if (persistStreams == null)
-            {
-                throw new ArgumentNullException(nameof(persistStreams));
-            }
 
             if (waitInterval <= TimeSpan.Zero)
             {

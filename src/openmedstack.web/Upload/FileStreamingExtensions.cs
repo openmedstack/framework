@@ -20,7 +20,7 @@ namespace OpenMedStack.Web.Upload
             this HttpRequest request,
             [EnumeratorCancellation] CancellationToken cancellation)
         {
-            if (!request.ContentType.IsMultipartContentType())
+            if (!request.ContentType!.IsMultipartContentType())
             {
                 yield break;
             }
@@ -41,11 +41,11 @@ namespace OpenMedStack.Web.Upload
                     // present without form data. If form data
                     // is present, this method immediately fails
                     // and returns the model error.
-                    if (contentDisposition.HasFileContentDisposition())
+                    if (contentDisposition!.HasFileContentDisposition())
                     {
                         // Don't trust the file name sent by the client. To display
                         // the file name, HTML-encode the value.
-                        var trustedFileNameForDisplay = WebUtility.HtmlEncode(contentDisposition.FileName.Value);
+                        var trustedFileNameForDisplay = WebUtility.HtmlEncode(contentDisposition!.FileName.Value);
 
                         // **WARNING!**
                         // In the following example, the file is saved without
@@ -61,9 +61,9 @@ namespace OpenMedStack.Web.Upload
                             .FirstOrDefault(c => c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier)
                             ?.Value ?? string.Empty;
 
-                        yield return new DataContent(owner, encoding, section.Body, trustedFileNameForDisplay, section.ContentType);
+                        yield return new DataContent(owner, encoding, section.Body, trustedFileNameForDisplay, section.ContentType!);
                     }
-                    else if (contentDisposition.HasFormDataContentDisposition())
+                    else if (contentDisposition!.HasFormDataContentDisposition())
                     {
                         continue;
                     }
@@ -87,7 +87,7 @@ namespace OpenMedStack.Web.Upload
             var hasMediaTypeHeader = MediaTypeHeaderValue.TryParse(section.ContentType, out var mediaType);
             // UTF-7 is insecure and should not be honored. UTF-8 will succeed in
             // most cases.
-            return !hasMediaTypeHeader ? Encoding.UTF8 : mediaType.Encoding;
+            return !hasMediaTypeHeader || mediaType?.Encoding == null ? Encoding.UTF8 : mediaType.Encoding;
         }
     }
 }

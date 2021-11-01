@@ -12,9 +12,9 @@
     {
         public class WhenBuildingAnEventStoreWithoutAnExplicitSerializer : SpecificationBase
         {
-            private Wireup _wireup;
-            private Exception _exception;
-            private IStoreEvents _eventStore;
+            private Wireup _wireup = null!;
+            private Exception _exception = null!;
+            private IStoreEvents _eventStore = null!;
 
             public WhenBuildingAnEventStoreWithoutAnExplicitSerializer()
             {
@@ -29,7 +29,7 @@
 
             protected override Task Because()
             {
-                _exception = Catch.Exception(() => { _eventStore = _wireup.Build(); });
+                _exception = Catch.Exception(() => { _eventStore = _wireup.Build(); })!;
 
                 return Task.CompletedTask;
             }

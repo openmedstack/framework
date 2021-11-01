@@ -14,9 +14,8 @@
 
     public class WhenOpeningACommitThatDoesNotHaveConvertibleEvents : UsingEventConverter
     {
-        private ICommit _commit;
-
-        private ICommit _converted;
+        private ICommit _commit = null!;
+        private ICommit _converted = null!;
 
         protected override Task Context()
         {
@@ -44,10 +43,10 @@
 
     public class WhenOpeningACommitThatHasConvertibleEvents : UsingEventConverter
     {
-        private ICommit _commit;
+        private ICommit _commit = null!;
 
         private readonly Guid _id = Guid.NewGuid();
-        private ICommit _converted;
+        private ICommit _converted = null!;
 
         protected override Task Context()
         {
@@ -75,10 +74,10 @@
 
     public class WhenAnEventConverterImplementsTheIConvertEventsInterfaceExplicitly : UsingEventConverter
     {
-        private ICommit _commit;
+        private ICommit _commit = null!;
         private readonly Guid _id = Guid.NewGuid();
-        private ICommit _converted;
-        private EventMessage _eventMessage;
+        private ICommit _converted = null!;
+        private EventMessage _eventMessage = null!;
 
         protected override Task Context()
         {
@@ -109,9 +108,9 @@
 
     public abstract class UsingEventConverter : SpecificationBase
     {
-        private IEnumerable<Assembly> _assemblies;
-        private Dictionary<Type, Func<object, object>> _converters;
-        private EventUpconverterPipelineHook _eventUpconverter;
+        private IEnumerable<Assembly> _assemblies = null!;
+        private Dictionary<Type, Func<object, object>> _converters = null!;
+        private EventUpconverterPipelineHook? _eventUpconverter;
 
         public UsingEventConverter()
         {
@@ -131,12 +130,12 @@
         {
             var c = from a in toScan
                     from t in a.GetTypes()
-                    let i = t.GetInterface(typeof(IUpconvertEvents<,>).FullName)
+                    let i = t.GetInterface(typeof(IUpconvertEvents<,>).FullName!)
                     where i != null
                     let sourceType = i.GetGenericArguments().First()
                     let convertMethod = i.GetMethods(BindingFlags.Public | BindingFlags.Instance).First()
                     let instance = Activator.CreateInstance(t)
-                    select new KeyValuePair<Type, Func<object, object>>(sourceType, e => convertMethod.Invoke(instance, new[] { e }));
+                    select new KeyValuePair<Type, Func<object, object>>(sourceType, e => convertMethod.Invoke(instance, new[] { e })!);
             try
             {
                 return c.ToDictionary(x => x.Key, x => x.Value);

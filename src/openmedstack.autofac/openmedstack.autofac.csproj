@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net5.0</TargetFrameworks>
+        <TargetFrameworks>net6.0</TargetFrameworks>
         <RootNamespace>OpenMedStack.Autofac</RootNamespace>
         <PackageId>OpenMedStack.Autofac</PackageId>
         <PackageTags>OpenMedStack Architecture</PackageTags>
@@ -11,10 +11,10 @@
     <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="6.2.0" />
+        <PackageReference Include="Autofac" Version="6.3.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
         <PackageReference Include="Autofac.Multitenant" Version="6.0.0" />
-        <PackageReference Include="microsoft.extensions.logging.console" Version="5.0.0" />
+        <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0-rc.2.21480.5" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />
     </ItemGroup>
 

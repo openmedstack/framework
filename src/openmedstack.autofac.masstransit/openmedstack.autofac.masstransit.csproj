@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0</TargetFrameworks>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 		<RootNamespace>OpenMedStack.Autofac.MassTransit</RootNamespace>
 		<PackageId>OpenMedStack.Autofac.MassTransit</PackageId>
 		<PackageTags>OpenMedStack Architecture Messaging MassTransit</PackageTags>
 		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
 		<Description>Autofac bindings for OpenMedStack based applications.</Description>
-		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit.Autofac" Version="7.2.0" />
+		<PackageReference Include="MassTransit.Autofac" Version="7.2.3" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -77,7 +77,10 @@
         {
             _webappConfiguration.ConfigureApplication(app);
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
-            lifetime.ApplicationStopped.Register(() => _container.Dispose());
+            lifetime.ApplicationStopped.Register(async () =>
+            {
+                await _container.DisposeAsync().ConfigureAwait(false);
+            });
         }
     }
 }

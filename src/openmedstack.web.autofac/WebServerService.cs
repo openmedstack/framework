@@ -83,14 +83,14 @@
                 throw new AggregateException("Startup validation failed", startupErrors);
             }
             var bootstrappers = _container.Services.GetServices<IBootstrapSystem>();
-            var logger = _container.Services.GetService<ILogger<WebServerService>>();
+            var logger = _container.Services.GetRequiredService<ILogger<WebServerService>>();
             foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
             {
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);
             }
 
-            _container.Start();
-            logger.LogInformation("Web server bound to: " + _urlBinding);
+            await _container.StartAsync(cancellationToken);
+            logger.LogInformation("Web server bound to: {url}", _urlBinding);
         }
 
         /// <inheritdoc />

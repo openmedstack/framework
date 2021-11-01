@@ -8,28 +8,28 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
     public static class ExtensionMethods
     {
-        public static Task<ICommit> CommitSingle(this IPersistStreams persistence, string streamId = null)
+        public static Task<ICommit?> CommitSingle(this IPersistStreams persistence, string? streamId = null)
         {
             var commitAttempt = (streamId ?? Guid.NewGuid().ToString()).BuildAttempt();
             return persistence.Commit(commitAttempt);
         }
 
-        public static Task<ICommit> CommitNext(this IPersistStreams persistence, ICommit previous)
+        public static Task<ICommit?> CommitNext(this IPersistStreams persistence, ICommit previous)
         {
             var nextAttempt = previous.BuildNextAttempt();
             return persistence.Commit(nextAttempt);
         }
 
-        public static Task<ICommit> CommitNext(this IPersistStreams persistence, CommitAttempt previous)
+        public static Task<ICommit?> CommitNext(this IPersistStreams persistence, CommitAttempt previous)
         {
             var nextAttempt = previous.BuildNextAttempt();
             return persistence.Commit(nextAttempt);
         }
 
-        public static async Task<List<CommitAttempt>> CommitMany(this IPersistStreams persistence, int numberOfCommits, string streamId = null, string bucketId = null)
+        public static async Task<List<CommitAttempt>> CommitMany(this IPersistStreams persistence, int numberOfCommits, string? streamId = null, string? bucketId = null)
         {
             var commits = new List<CommitAttempt>();
-            CommitAttempt attempt = null;
+            CommitAttempt? attempt = null;
 
             for (var i = 0; i < numberOfCommits; i++)
             {
@@ -41,7 +41,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
             return commits;
         }
 
-        public static CommitAttempt BuildAttempt(this string streamId, DateTimeOffset? now = null, string bucketId = null)
+        public static CommitAttempt BuildAttempt(this string streamId, DateTimeOffset? now = null, string? bucketId = null)
         {
             now ??= SystemTime.UtcNow;
             bucketId ??= Bucket.Default;
@@ -103,7 +103,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
         [Serializable]
         public class SomeDomainEvent
         {
-            public string SomeProperty { get; set; }
+            public string SomeProperty { get; set; } = null!;
 
             public override string ToString() => SomeProperty;
         }

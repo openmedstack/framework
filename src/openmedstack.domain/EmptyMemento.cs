@@ -11,8 +11,14 @@ namespace OpenMedStack.Domain
 {
     public class EmptyMemento : IMemento
     {
-        public string Id { get; set; } = null!;
+        public EmptyMemento(string id, int version)
+        {
+            Id = id;
+            Version = version;
+        }
 
-        public int Version { get; set; }
+        public string Id { get; }
+
+        public int Version { get; }
     }
 }

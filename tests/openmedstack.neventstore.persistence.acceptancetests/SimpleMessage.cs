@@ -14,7 +14,7 @@ namespace OpenMedStack.NEventStore.Persistence.AcceptanceTests
 
         public Guid Id { get; set; }
         public DateTime Created { get; set; }
-        public string Value { get; set; }
+        public string? Value { get; set; }
         public int Count { get; set; }
 
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists",

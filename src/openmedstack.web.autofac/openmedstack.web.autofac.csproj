@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>OpenMedStack.Web.Autofac</RootNamespace>
-    <PackageId>OpenMedStack.Web.Autofac</PackageId>
-    <PackageTags>OpenMedStack Architecture Web HTTP OWIN</PackageTags>
-    <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
-    <Description>Workflow definition for ASP.NET Core applications based on OWIN pipeline.</Description>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <Import Project="..\..\shared.proj" />
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>OpenMedStack.Web.Autofac</RootNamespace>
+		<PackageId>OpenMedStack.Web.Autofac</PackageId>
+		<PackageTags>OpenMedStack Architecture Web HTTP OWIN</PackageTags>
+		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+		<Description>Workflow definition for ASP.NET Core applications based on OWIN pipeline.</Description>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<Import Project="..\..\shared.proj" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\openmedstack.autofac\openmedstack.autofac.csproj" />
-    <ProjectReference Include="..\openmedstack.web\openmedstack.web.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\openmedstack.autofac\openmedstack.autofac.csproj" />
+		<ProjectReference Include="..\openmedstack.web\openmedstack.web.csproj" />
+	</ItemGroup>
 
 </Project>

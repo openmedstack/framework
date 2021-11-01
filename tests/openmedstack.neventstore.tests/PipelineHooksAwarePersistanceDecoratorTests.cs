@@ -31,10 +31,10 @@
 
         public class WhenReadingTheAllEventsFromDate : UsingUnderlyingPersistence
         {
-            private ICommit _commit;
+            private ICommit _commit = null!;
             private DateTime _date;
-            private IPipelineHook _hook1;
-            private IPipelineHook _hook2;
+            private IPipelineHook _hook1 = null!;
+            private IPipelineHook _hook2 = null!;
 
             protected override Task Context()
             {
@@ -89,9 +89,9 @@
 
         public class WhenGettingTheAllEventsFromMinToMaxRevision : UsingUnderlyingPersistence
         {
-            private ICommit _commit;
-            private IPipelineHook _hook1;
-            private IPipelineHook _hook2;
+            private ICommit _commit = null!;
+            private IPipelineHook _hook1 = null!;
+            private IPipelineHook _hook2 = null!;
 
             protected override Task Context()
             {
@@ -158,10 +158,10 @@
 
         public class WhenGettingAllEventsFromTo : UsingUnderlyingPersistence
         {
-            private ICommit _commit;
+            private ICommit _commit = null!;
             private DateTime _end;
-            private IPipelineHook _hook1;
-            private IPipelineHook _hook2;
+            private IPipelineHook _hook1 = null!;
+            private IPipelineHook _hook2 = null!;
             private DateTime _start;
 
             protected override Task Context()
@@ -215,7 +215,7 @@
 
         public class WhenCommitting : UsingUnderlyingPersistence
         {
-            private CommitAttempt _attempt;
+            private CommitAttempt _attempt = null!;
 
             protected override Task Context()
             {
@@ -246,9 +246,9 @@
 
         public class WhenReadingTheAllEventsFromCheckpoint : UsingUnderlyingPersistence
         {
-            private ICommit _commit;
-            private IPipelineHook _hook1;
-            private IPipelineHook _hook2;
+            private ICommit _commit = null!;
+            private IPipelineHook _hook1 = null!;
+            private IPipelineHook _hook2 = null!;
 
             protected override Task Context()
             {
@@ -300,7 +300,7 @@
 
         public class WhenPurging : UsingUnderlyingPersistence
         {
-            private IPipelineHook _hook;
+            private IPipelineHook _hook = null!;
 
             protected override Task Context()
             {
@@ -321,7 +321,7 @@
 
         public class WhenPurgingABucket : UsingUnderlyingPersistence
         {
-            private IPipelineHook _hook;
+            private IPipelineHook _hook = null!;
             private const string BucketId = "Bucket";
 
             protected override Task Context()
@@ -343,7 +343,7 @@
 
         public class WhenDeletingAStream : UsingUnderlyingPersistence
         {
-            private IPipelineHook _hook;
+            private IPipelineHook _hook = null!;
             private const string BucketId = "Bucket";
             private const string StreamId = "Stream";
 
@@ -366,7 +366,7 @@
 
         public abstract class UsingUnderlyingPersistence : SpecificationBase
         {
-            private PipelineHooksAwarePersistanceDecorator _decorator;
+            private PipelineHooksAwarePersistanceDecorator _decorator = null!;
             protected readonly IPersistStreams Persistence = A.Fake<IPersistStreams>();
             protected readonly List<IPipelineHook> PipelineHooks = new();
             protected readonly string UnderlyingStreamId = Guid.NewGuid().ToString();

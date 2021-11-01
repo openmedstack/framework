@@ -14,8 +14,8 @@ namespace OpenMedStack.NEventStore.Persistence
             int commitSequence,
             DateTimeOffset commitStamp,
             long checkpointToken,
-            IDictionary<string, object> headers,
-            IEnumerable<EventMessage> events)
+            IDictionary<string, object>? headers,
+            IEnumerable<EventMessage>? events)
         {
             BucketId = bucketId;
             StreamId = streamId;
