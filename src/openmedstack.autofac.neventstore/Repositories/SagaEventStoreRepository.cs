@@ -113,12 +113,12 @@
             }
             catch (DuplicateCommitException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 await stream.ClearChanges().ConfigureAwait(false);
             }
             catch (StorageException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 throw new PersistenceException(ex.Message, ex);
             }
         }

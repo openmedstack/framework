@@ -35,7 +35,8 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
         }
 
         public virtual Task<TAggregate> GetById<TAggregate>(string id, CancellationToken cancellationToken)
-            where TAggregate : class, IAggregate => GetById<TAggregate>(id, int.MaxValue, cancellationToken);
+            where TAggregate : class, IAggregate =>
+            GetById<TAggregate>(id, int.MaxValue, cancellationToken);
 
         public async Task<TAggregate> GetById<TAggregate>(string id, int version, CancellationToken cancellationToken)
             where TAggregate : class, IAggregate
@@ -48,7 +49,10 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             ApplyEventsToAggregate(version, stream, aggregate);
 
             _logger.LogDebug(
-                $"Loaded aggregate of type {typeof(TAggregate).Name} with id {id} at version {aggregate.Version}");
+                "Loaded aggregate of type {typeName} with id {id} at version {version}",
+                typeof(TAggregate).Name,
+                id,
+                aggregate.Version);
 
             return (TAggregate)aggregate;
         }
@@ -61,24 +65,26 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             var commitId = Guid.NewGuid();
             var headers = PrepareHeaders(aggregate, updateHeaders ?? (d => { }));
 
-            var stream = await PrepareStream(_tenantId.GetTenantName(), aggregate, headers, cancellationToken).ConfigureAwait(false);
+            var stream = await PrepareStream(_tenantId.GetTenantName(), aggregate, headers, cancellationToken)
+                .ConfigureAwait(false);
             var count = stream.CommittedEvents.Count;
             try
             {
                 await stream.CommitChanges(commitId, cancellationToken).ConfigureAwait(false);
                 aggregate.ClearUncommittedEvents();
 
-                _logger.LogDebug($"Saved aggregate of type {aggregate.GetType()} with id {aggregate.Id} at version {aggregate.Version}");
+                _logger.LogDebug(
+                    $"Saved aggregate of type {aggregate.GetType()} with id {aggregate.Id} at version {aggregate.Version}");
 
             }
             catch (DuplicateCommitException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 await stream.ClearChanges().ConfigureAwait(false);
             }
             catch (ConcurrencyException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 var flag = ThrowOnConflict(stream, count);
                 await stream.ClearChanges().ConfigureAwait(false);
                 if (flag)
@@ -88,12 +94,12 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             }
             catch (StorageException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 throw new PersistenceException(ex.Message, ex);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
                 throw;
             }
         }
@@ -117,9 +123,19 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             return _factory.Build(typeof(TAggregate), stream.StreamId, snapshot1);
         }
 
-        private Task<ISnapshot?> GetSnapshot(string bucketId, string id, int version, CancellationToken cancellationToken) => _eventStore.Advanced.GetSnapshot(bucketId, id, version, cancellationToken);
+        private Task<ISnapshot?> GetSnapshot(
+            string bucketId,
+            string id,
+            int version,
+            CancellationToken cancellationToken) =>
+            _eventStore.Advanced.GetSnapshot(bucketId, id, version, cancellationToken);
 
-        private async Task<IEventStream> OpenStream(string bucketId, string id, int version, ISnapshot? snapshot, CancellationToken cancellationToken)
+        private async Task<IEventStream> OpenStream(
+            string bucketId,
+            string id,
+            int version,
+            ISnapshot? snapshot,
+            CancellationToken cancellationToken)
         {
             var eventStream = snapshot == null
                 ? _eventStore.OpenStream(bucketId, id, 0, version, cancellationToken)
@@ -133,7 +149,8 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             Dictionary<string, object> headers,
             CancellationToken cancellationToken)
         {
-            var stream = await OpenStream(bucketId, aggregate.Id, aggregate.Version, null, cancellationToken).ConfigureAwait(false);
+            var stream = await OpenStream(bucketId, aggregate.Id, aggregate.Version, null, cancellationToken)
+                .ConfigureAwait(false);
             // _eventStore.CreateStream(bucketId, aggregate.Id).ConfigureAwait(false);
 
             foreach (var (key, value) in headers)
@@ -153,10 +170,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             IAggregate aggregate,
             Action<IDictionary<string, object>> updateHeaders)
         {
-            var dictionary = new Dictionary<string, object>
-            {
-                {AggregateTypeHeader, aggregate.GetType().FullName!}
-            };
+            var dictionary = new Dictionary<string, object> { { AggregateTypeHeader, aggregate.GetType().FullName! } };
             updateHeaders?.Invoke(dictionary);
             return dictionary;
         }

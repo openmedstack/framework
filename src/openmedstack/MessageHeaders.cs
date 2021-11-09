@@ -30,10 +30,19 @@ namespace OpenMedStack
         /// Initializes a new instance of the <see cref="MessageHeaders"/> class.
         /// </summary>
         /// <param name="items">The headers and values to include.</param>
-        public MessageHeaders(IEnumerable<KeyValuePair<string, object>>? items)
+        public MessageHeaders(params KeyValuePair<string, object>[] items)
         {
             _items = (items ?? Enumerable.Empty<KeyValuePair<string, object>>())
                 .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageHeaders"/> class.
+        /// </summary>
+        /// <param name="items">The headers and values to include.</param>
+        public MessageHeaders(IEnumerable<KeyValuePair<string, object>>? items)
+            : this((items ?? Enumerable.Empty<KeyValuePair<string, object>>()).ToArray())
+        {
         }
 
         public ResponseExpectation Expectation => _items.ContainsKey(ExpectationKey)

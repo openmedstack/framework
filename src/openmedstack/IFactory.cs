@@ -18,7 +18,7 @@ namespace OpenMedStack
     public interface IFactory<out TResult> : IDisposable
     {
         /// <summary>
-        /// The create mthod.
+        /// The create method.
         /// </summary>
         /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>
         TResult Create();
@@ -32,7 +32,7 @@ namespace OpenMedStack
     public interface IFactory<in TParameter, out TResult> : IDisposable
     {
         /// <summary>
-        /// The create mthod.
+        /// The create method.
         /// </summary>
         /// <param name="parameter">The creation parameter.</param>
         /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>

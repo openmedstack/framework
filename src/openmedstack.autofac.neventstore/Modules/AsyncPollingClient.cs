@@ -110,7 +110,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
                     switch (await _commitCallback(commit,_tokenSource.Token).ConfigureAwait(false))
                     {
                         case PollingClient2.HandlingResult.Retry:
-                            _logger.LogError("Commit callback ask retry for checkpointToken {0} - last dispatched {1}", commit.CheckpointToken, _checkpointToken);
+                            _logger.LogError("Commit callback ask retry for checkpointToken {commitCheckpoint} - last dispatched {checkpointToken}", commit.CheckpointToken, _checkpointToken);
                             continue;
                         case PollingClient2.HandlingResult.Stop:
                             Stop();
@@ -123,7 +123,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "{message}", ex.Message);
             }
             Interlocked.Exchange(ref _isPolling, 0);
 

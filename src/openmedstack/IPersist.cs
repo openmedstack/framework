@@ -14,7 +14,7 @@ namespace OpenMedStack
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines the persistance interface.
+    /// Defines the persistence interface.
     /// </summary>
     /// <typeparam name="TKey">The <see cref="Type"/> of key.</typeparam>
     /// <typeparam name="TItem">The <see cref="Type"/> of item to persist.</typeparam>

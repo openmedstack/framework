@@ -49,14 +49,17 @@ namespace OpenMedStack.Domain
             IMessageHeaders headers,
             CancellationToken cancellationToken = default)
         {
-            _logger.LogDebug("Handling " + typeof(T).Name + " command. Correlation ID " + command.CorrelationId);
+            _logger.LogDebug(
+                "Handling {name} command. Correlation ID: {correlationId}",
+                typeof(T).Name,
+                command.CorrelationId);
 
             cancellationToken.ThrowIfCancellationRequested();
 
             var userToken = _tokenValidator.Validate(headers.UserToken);
             if (!await VerifyUserToken(userToken).ConfigureAwait(false))
             {
-                _logger.LogError($"Invalid authentication token received with command: {userToken}");
+                _logger.LogError("Invalid authentication token received with command: {userToken}", userToken);
                 return new CommandResponse(
                     command.AggregateId,
                     command.Version,

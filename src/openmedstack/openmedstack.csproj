@@ -10,7 +10,7 @@
 	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
-		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="6.0.0-rc.2.21480.5" />
+		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="6.0.0" />
 	</ItemGroup>
 
 </Project>
