@@ -84,12 +84,6 @@ namespace OpenMedStack
         {
             _service = _serviceBuilder(Configuration, _assemblies);
             await _service.Start(cancellationToken).ConfigureAwait(false);
-            //await Task.Yield();
-            //try
-            //{
-            //    await Task.Run(() => { _waitHandle.Wait(cancellationToken); }, cancellationToken).ConfigureAwait(false);
-            //}
-            //catch (OperationCanceledException) { }
         }
 
         /// <summary>

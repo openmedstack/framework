@@ -13,6 +13,8 @@ namespace OpenMedStack.Autofac.MassTransit
     using global::Autofac;
     using GreenPipes;
     using global::MassTransit;
+    using Newtonsoft.Json;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
@@ -51,7 +53,17 @@ namespace OpenMedStack.Autofac.MassTransit
         private IBusControl CreateInMemory(IComponentContext c, IRetryPolicy retryPolicy)
         {
             return Bus.Factory
-                .CreateUsingInMemory(sbc => { sbc.ConfigureBus(c, _configuration, retryPolicy); })
+                .CreateUsingInMemory(sbc =>
+                {
+                    sbc.UseCloudEvents().WithJsonOptions(
+                        s =>
+                        {
+                            s.MetadataPropertyHandling = MetadataPropertyHandling.Default;
+                            s.DefaultValueHandling = DefaultValueHandling.Ignore;
+                            s.TypeNameHandling = TypeNameHandling.All;
+                            s.Formatting = Formatting.None;
+                        });
+                    sbc.ConfigureBus(c, _configuration, retryPolicy); })
                 .AttachObservers(c);
         }
     }

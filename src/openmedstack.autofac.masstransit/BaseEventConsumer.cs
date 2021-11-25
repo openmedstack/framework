@@ -37,7 +37,7 @@ namespace OpenMedStack.Autofac.MassTransit
             var handleTasks = _messageHandlers.Select(handler => handler.Handle(context.Message, headers, context.CancellationToken));
             await Task.WhenAll(handleTasks).ConfigureAwait(false);
 
-            _logger.LogDebug($"Consumed {typeof(T)} with {_messageHandlers.Length} handler(s).");
+            _logger.LogDebug("Consumed {typeofT} with {messageHandlerLength} handler(s).", typeof(T), _messageHandlers.Length);
         }
     }
 }

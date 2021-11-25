@@ -19,12 +19,16 @@ namespace OpenMedStack.NEventStore
         private readonly ICollection<Guid> _identifiers = new HashSet<Guid>();
         private readonly ICommitEvents _persistence;
         private bool _disposed;
+        private ImmutableCollection<EventMessage> _immutableCollection;
+        private ImmutableCollection<EventMessage> _uncommittedEvents;
 
         private OptimisticEventStream(string bucketId, string streamId, ICommitEvents persistence)
         {
             BucketId = bucketId;
             StreamId = streamId;
             _persistence = persistence;
+            _immutableCollection = new ImmutableCollection<EventMessage>(_committed);
+            _uncommittedEvents = new ImmutableCollection<EventMessage>(_events);
         }
 
         public static Task<OptimisticEventStream> Create(string bucketId, string streamId, ICommitEvents persistence) => Task.FromResult(new OptimisticEventStream(bucketId, streamId, persistence));
@@ -75,11 +79,17 @@ namespace OpenMedStack.NEventStore
         public int StreamRevision { get; private set; }
         public int CommitSequence { get; private set; }
 
-        public ICollection<EventMessage> CommittedEvents => new ImmutableCollection<EventMessage>(_committed);
+        public ICollection<EventMessage> CommittedEvents
+        {
+            get { return _immutableCollection; }
+        }
 
         public IDictionary<string, object> CommittedHeaders { get; } = new Dictionary<string, object>();
 
-        public ICollection<EventMessage> UncommittedEvents => new ImmutableCollection<EventMessage>(_events);
+        public ICollection<EventMessage> UncommittedEvents
+        {
+            get { return _uncommittedEvents; }
+        }
 
         public IDictionary<string, object> UncommittedHeaders { get; } = new Dictionary<string, object>();
 

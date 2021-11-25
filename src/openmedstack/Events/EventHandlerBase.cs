@@ -35,10 +35,10 @@ namespace OpenMedStack.Events
             IMessageHeaders headers,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            _logger.LogDebug("Handling " + typeof(T).Name + " event.");
+            _logger.LogDebug("Handling {typeName} event.", typeof(T).Name);
             if (@event is DomainEvent domainEvent)
             {
-                _logger.LogDebug("Correlation ID " + domainEvent.CorrelationId);
+                _logger.LogDebug("Correlation ID {correlationId}", domainEvent.CorrelationId);
             }
 
             cancellationToken.ThrowIfCancellationRequested();

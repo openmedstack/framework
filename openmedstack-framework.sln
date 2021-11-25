@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.202
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack", "src\openmedstack\openmedstack.csproj", "{6C058AD8-1DC8-40AA-91F3-A82A5FE35122}"
 EndProject
@@ -58,6 +58,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.web", "src\openmedstack.web\openmedstack.web.csproj", "{E56492EE-70BD-4121-B03C-3B4A5740BB40}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.web.autofac", "src\openmedstack.web.autofac\openmedstack.web.autofac.csproj", "{696306BC-0240-4A07-8090-E2B12F4DA12D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "openmedstack.masstransit.tests", "tests\openmedstack.masstransit.tests\openmedstack.masstransit.tests.csproj", "{5B4C22DC-CEC3-4951-B114-8A257476DED7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -455,6 +457,22 @@ Global
 		{696306BC-0240-4A07-8090-E2B12F4DA12D}.Release|x64.Build.0 = Release|Any CPU
 		{696306BC-0240-4A07-8090-E2B12F4DA12D}.Release|x86.ActiveCfg = Release|Any CPU
 		{696306BC-0240-4A07-8090-E2B12F4DA12D}.Release|x86.Build.0 = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|ARM.Build.0 = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|ARM.Build.0 = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x64.Build.0 = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -469,6 +487,7 @@ Global
 		{566171A7-34FE-4F89-8E00-3DE544EA6788} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 		{2B7BED60-8688-41C3-BA61-6DE0D2D691C6} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 		{71FB071D-E2EA-4204-B0BD-A58919896494} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
+		{5B4C22DC-CEC3-4951-B114-8A257476DED7} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AD33AA5D-51E6-4BEC-826D-25B7DFDE3718}

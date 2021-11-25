@@ -33,7 +33,7 @@ namespace OpenMedStack.Autofac.MassTransit
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _serviceBus.Publish(message, new EventHeaderPipe(headers), cancellationToken).ConfigureAwait(false);
-            _logger.LogDebug(typeof(T).Name + " published");
+            _logger.LogDebug("{type} published", typeof(T).Name);
         }
     }
 }

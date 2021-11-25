@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" Version="[2.1.1,3)" />
+      <PackageReference Include="MassTransit" Version="[7.2.2,8)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <Authors>Manuel Riezebosch</Authors>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageId>CloudEventify.MassTransit</PackageId>
+        <Description>Use cloud events for pub/sub with MassTransit.</Description>
+        <PackageReleaseNotes>WithJsonOptions</PackageReleaseNotes>
+        <PackageTags>cloudevents;cloud;events;masstransit</PackageTags>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/riezebosch/MassTransit.CloudEvents.git</RepositoryUrl>
+        <Version>0.0.1</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+</Project>
