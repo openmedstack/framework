@@ -8,9 +8,9 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public static class CloudEventExtensions
+    internal static class CloudEventExtensions
     {
-        public static T? ToObject<T>(this CloudEvent element, JsonSerializerSettings? options = null)
+        public static T? ToObject<T>(this CloudEvent element, JsonSerializerSettings options)
         {
             switch (element.Data)
             {
@@ -26,7 +26,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             }
         }
 
-        public static (ContentType, ReadOnlyMemory<byte>) ToMessage(this CloudEvent cloudEvent, JsonSerializerSettings? options = null)
+        public static (ContentType, ReadOnlyMemory<byte>) ToMessage(this CloudEvent cloudEvent, JsonSerializerSettings options)
         {
             var formatter = new JsonEventFormatter(JsonSerializer.Create(options));
             var bytes = formatter.EncodeStructuredModeMessage(cloudEvent, out var contentType);

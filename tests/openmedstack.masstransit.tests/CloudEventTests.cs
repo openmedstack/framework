@@ -37,7 +37,7 @@ namespace openmedstack.masstransit.tests
         {
             using var ms = new MemoryStream();
             var evt = new TestEvent("test", 1, DateTimeOffset.UtcNow);
-            var serializer = new Serializer();
+            var serializer = new Serializer(new JsonSerializerSettings());
             var deserializer = new JsonEventFormatter<TestEvent>();
             serializer.Serialize(ms, new MessageSendContext<TestEvent>(evt));
             var deserialized = deserializer.DecodeStructuredModeMessage(ms.ToArray(), null, null);
@@ -56,15 +56,14 @@ namespace openmedstack.masstransit.tests
             var bus = Bus.Factory.CreateUsingInMemory(
                 sbc =>
                 {
-                    sbc.UseCloudEvents()
-                        .WithJsonOptions(
-                            s =>
-                            {
-                                s.MetadataPropertyHandling = MetadataPropertyHandling.Default;
-                                s.DefaultValueHandling = DefaultValueHandling.Ignore;
-                                s.TypeNameHandling = TypeNameHandling.All;
-                                s.Formatting = Formatting.None;
-                            });
+                    sbc.UseCloudEvents(
+                        new JsonSerializerSettings
+                        {
+                            MetadataPropertyHandling = MetadataPropertyHandling.Default,
+                            DefaultValueHandling = DefaultValueHandling.Ignore,
+                            TypeNameHandling = TypeNameHandling.All,
+                            Formatting = Formatting.None
+                        });
                     sbc.ReceiveEndpoint(
                         "test",
                         e =>

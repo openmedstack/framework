@@ -31,12 +31,12 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             return this;
         }
 
-        IConfigurator IConfigurator.WithJsonOptions(Action<JsonSerializerSettings> options)
-        {
-            options(_serializer.Settings);
-            options(_deserializer.Options);
+        //IConfigurator IConfigurator.WithJsonOptions(Action<JsonSerializerSettings> options)
+        //{
+        //    options(_serializer.Settings);
+        //    options(_deserializer.Options);
 
-            return this;
-        }
+        //    return this;
+        //}
     }
 }

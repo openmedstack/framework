@@ -55,14 +55,6 @@ namespace OpenMedStack.Autofac.MassTransit
             return Bus.Factory
                 .CreateUsingInMemory(sbc =>
                 {
-                    sbc.UseCloudEvents().WithJsonOptions(
-                        s =>
-                        {
-                            s.MetadataPropertyHandling = MetadataPropertyHandling.Default;
-                            s.DefaultValueHandling = DefaultValueHandling.Ignore;
-                            s.TypeNameHandling = TypeNameHandling.All;
-                            s.Formatting = Formatting.None;
-                        });
                     sbc.ConfigureBus(c, _configuration, retryPolicy); })
                 .AttachObservers(c);
         }

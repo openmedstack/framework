@@ -8,6 +8,6 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
     {
         IConfigurator WithContentType(ContentType contentType);
         IConfigurator Type<T>(string type);
-        IConfigurator WithJsonOptions(Action<JsonSerializerSettings> options);
+        //IConfigurator WithJsonOptions(Action<JsonSerializerSettings> options);
     }
 }
