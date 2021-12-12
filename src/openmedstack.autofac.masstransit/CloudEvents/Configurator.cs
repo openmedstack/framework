@@ -1,15 +1,13 @@
 namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 {
-    using System;
     using System.Net.Mime;
-    using Newtonsoft.Json;
 
     internal class Configurator : IConfigurator
     {
-        private readonly Serializer _serializer;
-        private readonly Deserializer _deserializer;
+        private readonly CloudEventSerializer _serializer;
+        private readonly CloudEventDeserializer _deserializer;
 
-        public Configurator(Serializer serializer, Deserializer deserializer)
+        public Configurator(CloudEventSerializer serializer, CloudEventDeserializer deserializer)
         {
             _serializer = serializer;
             _deserializer = deserializer;
@@ -22,21 +20,5 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             
             return this;
         }
-
-        public IConfigurator Type<T>(string type)
-        {
-            _deserializer.AddType<T>(type);
-            _serializer.AddType<T>(type);
-            
-            return this;
-        }
-
-        //IConfigurator IConfigurator.WithJsonOptions(Action<JsonSerializerSettings> options)
-        //{
-        //    options(_serializer.Settings);
-        //    options(_deserializer.Options);
-
-        //    return this;
-        //}
     }
 }

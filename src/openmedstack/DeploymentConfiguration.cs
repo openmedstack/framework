@@ -128,6 +128,8 @@ namespace OpenMedStack
         /// </summary>
         public string Scope { get; set; } = string.Empty;
 
+        public IDictionary<string, string>? TopicMap { get; set; }
+
         /// <summary>
         /// Gets whether the defined database is an in-memory database.
         /// </summary>

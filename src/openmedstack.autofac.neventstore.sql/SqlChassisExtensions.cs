@@ -9,7 +9,6 @@
 
 namespace OpenMedStack.Autofac.NEventstore.Sql
 {
-    using System;
     using System.Data.Common;
     using System.Linq;
     using global::Autofac.Core;

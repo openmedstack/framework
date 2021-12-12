@@ -5,7 +5,7 @@
         public static Chassis UsingMassTransitOverSqs(this Chassis chassis)
         {
             chassis.AddAutofacModules(
-                (c, a) => new DomainModule(a),
+                (c, a) => new DomainModule(c, a),
                 (c, a) => new SqsMassTransitModule(c));
 
             return chassis;

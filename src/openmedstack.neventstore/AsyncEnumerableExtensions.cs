@@ -3,7 +3,7 @@
 //   Copyright � Reimers.dk
 // </copyright>
 // <summary>
-//   Defines the $TYPE$ type.
+//   Defines the AsyncEnumerableExtensions type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

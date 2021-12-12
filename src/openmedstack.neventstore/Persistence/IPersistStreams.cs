@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace OpenMedStack.NEventStore.Persistence
 {
-    using System.Runtime.CompilerServices;
     using System.Threading;
 
     /// <summary>

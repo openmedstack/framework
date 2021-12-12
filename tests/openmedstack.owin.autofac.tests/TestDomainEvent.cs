@@ -3,6 +3,7 @@
     using System;
     using OpenMedStack.Events;
 
+    [Topic("WebTestDomainEvent")]
     public class TestDomainEvent : DomainEvent
     {
         /// <inheritdoc />

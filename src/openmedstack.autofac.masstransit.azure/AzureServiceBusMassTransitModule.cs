@@ -1,11 +1,9 @@
 ﻿namespace OpenMedStack.Autofac.MassTransit.Azure
 {
-    using System;
     using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
     using GreenPipes;
-    using Microsoft.Azure.ServiceBus.Primitives;
     using OpenMedStack.Autofac.MassTransit;
 
     /// <summary>
@@ -18,7 +16,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureServiceBusMassTransitModule"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="openmedstack.DeploymentConfiguration"/> containing the configuration values.</param>
+        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> containing the configuration values.</param>
         public AzureServiceBusMassTransitModule(DeploymentConfiguration configuration)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(configuration.QueueName));
@@ -50,11 +48,11 @@
                         _configuration.ServiceBus,
                         s =>
                         {
-                            s.OperationTimeout = _configuration.Timeout;
-                            s.TokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(
-                                _configuration.ServiceBusUsername,
-                                _configuration.ServiceBusPassword,
-                                TimeSpan.FromHours(8));
+                            //s.OperationTimeout = _configuration.Timeout;
+                            //s.TokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(
+                            //    _configuration.ServiceBusUsername,
+                            //    _configuration.ServiceBusPassword,
+                            //    TimeSpan.FromHours(8));
                         });
                     rmq.ConfigureBus(c, _configuration, retryPolicy);
                 });

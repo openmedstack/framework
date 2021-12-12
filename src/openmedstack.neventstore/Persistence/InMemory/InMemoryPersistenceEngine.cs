@@ -8,8 +8,6 @@ using OpenMedStack.NEventStore.Logging;
 
 namespace OpenMedStack.NEventStore.Persistence.InMemory
 {
-    using System.Runtime.CompilerServices;
-
     public class InMemoryPersistenceEngine : IPersistStreams
     {
         private static readonly ILog Logger = LogFactory.BuildLogger(typeof(InMemoryPersistenceEngine));

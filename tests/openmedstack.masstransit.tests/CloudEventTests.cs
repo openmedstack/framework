@@ -1,24 +1,16 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CloudEventTests.cs" company="Reimers.dk">
-//   Copyright © Reimers.dk
-// </copyright>
-// <summary>
-//   Defines the $TYPE$ type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
-
 namespace openmedstack.masstransit.tests
 {
     using System;
     using System.Diagnostics;
-    using System.IO;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using CloudNative.CloudEvents.NewtonsoftJson;
     using GreenPipes;
     using MassTransit;
-    using MassTransit.Context;
     using Newtonsoft.Json;
+    using OpenMedStack;
+    using OpenMedStack.Autofac.MassTransit;
     using OpenMedStack.Autofac.MassTransit.CloudEvents;
     using Xunit;
     using Xunit.Abstractions;
@@ -31,27 +23,11 @@ namespace openmedstack.masstransit.tests
         {
             _outputHelper = outputHelper;
         }
-
-        [Fact]
-        public void CanSerializeCloudEvent()
-        {
-            using var ms = new MemoryStream();
-            var evt = new TestEvent("test", 1, DateTimeOffset.UtcNow);
-            var serializer = new Serializer(new JsonSerializerSettings());
-            var deserializer = new JsonEventFormatter<TestEvent>();
-            serializer.Serialize(ms, new MessageSendContext<TestEvent>(evt));
-            var deserialized = deserializer.DecodeStructuredModeMessage(ms.ToArray(), null, null);
-            ms.Position = 0;
-            using var reader = new StreamReader(ms);
-            var json = reader.ReadToEnd();
-            _outputHelper.WriteLine(json);
-
-            Assert.Equal("{\"specversion\":\"1.0\",\"source\":\"cloudevents:openmedstack\",\"id\":\"\"}", json);
-        }
-
+        
         [Fact]
         public async Task CanRoundTrip()
         {
+            var configuration = new DeploymentConfiguration { TenantPrefix = "Test" };
             var waitHandle = new ManualResetEventSlim(false);
             var bus = Bus.Factory.CreateUsingInMemory(
                 sbc =>
@@ -63,7 +39,8 @@ namespace openmedstack.masstransit.tests
                             DefaultValueHandling = DefaultValueHandling.Ignore,
                             TypeNameHandling = TypeNameHandling.All,
                             Formatting = Formatting.None
-                        });
+                        },
+                        new EnvironmentTopicProvider(new ConfigurationTenantProvider(configuration)));
                     sbc.ReceiveEndpoint(
                         "test",
                         e =>
@@ -82,6 +59,31 @@ namespace openmedstack.masstransit.tests
             await bus.StopAsync();
 
             Assert.True(handled);
+        }
+
+        [Fact]
+        public void CanDeserializeFromWire()
+        {
+            const string json = @"{
+""specversion"": ""1.0"",
+""id"": ""53739e1e-3997-4872-88cf-8d9ddc9f02a1"",
+""source"": ""http://localhost"",
+""type"": ""application/cloudevents+json"",
+""datacontenttype"": ""application/json+Sample"",
+""subject"": ""Sample"",
+""time"": ""2021-12-09T19:12:05.2419601Z"",
+""data"": {
+    ""source"": ""sample"",
+    ""version"": 0,
+    ""timestamp"": ""2021-12-09T20:12:05.2096652+01:00"",
+    ""correlationId"": null
+}
+        }";
+            
+            var deserializer = new JsonEventFormatter<TestEvent>();
+            var deserialized = deserializer.DecodeStructuredModeMessage(Encoding.UTF8.GetBytes(json), null, null);
+
+            Assert.NotNull(deserialized);
         }
     }
 }

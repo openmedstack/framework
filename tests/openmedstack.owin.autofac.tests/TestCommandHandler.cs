@@ -22,7 +22,7 @@
             IMessageHeaders headers,
             CancellationToken cancellationToken)
         {
-            var aggregate = await Get<TestAggregate>(command.AggregateId).ConfigureAwait(false);
+            var aggregate = await Get<TestAggregate>(command.AggregateId, cancellationToken).ConfigureAwait(false);
             aggregate.DoSomething();
             await Save(aggregate).ConfigureAwait(false);
 

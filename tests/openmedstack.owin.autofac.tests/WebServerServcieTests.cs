@@ -35,10 +35,13 @@
                                 Name = typeof(GivenAWebServerWorkflow).Assembly.GetName().Name!,
                                 Services = new Dictionary<Regex, Uri>
                                 {
-                                    {new Regex(".+"), new Uri("loopback://localhost/test")}
+                                    { new Regex(".+"), new Uri("loopback://localhost/test") }
                                 },
                                 QueueName = "test",
-                                ServiceBus = new Uri("loopback://localhost/")
+                                ServiceBus = new Uri("loopback://localhost/"),
+                                Timeout = TimeSpan.FromHours(1),
+                                RetryInterval = TimeSpan.FromSeconds(3),
+                                RetryCount = 3
                             };
                             _webServerService = Chassis.From(config)
                                 .AddAutofacModules((c, a) => new TestStartupModule(c))
@@ -105,12 +108,15 @@
                         });
 
                 "when requesting command path".x(
-                    async () => { _ = await client!.GetAsync("http://localhost/commands").ConfigureAwait(false); });
+                    async () =>
+                    {
+                        _ = await client!.GetAsync("http://localhost/commands").ConfigureAwait(false);
+                    });
 
                 "then event is published on bus".x(
                     () =>
                     {
-                        var success = waitHandle.WaitOne(TimeSpan.FromSeconds(3));
+                        var success = waitHandle.WaitOne(TimeSpan.FromSeconds(5));
                         Assert.True(success);
                     });
             }

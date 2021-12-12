@@ -1,10 +1,10 @@
 ﻿namespace OpenMedStack.Autofac.MassTransit
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using global::Autofac;
     using global::MassTransit;
+    using global::MassTransit.Topology;
     using GreenPipes;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
@@ -41,6 +41,8 @@
                     e.UseRetry(r => r.SetRetryPolicy(x => retryPolicy));
                     e.RegisterConsumers(c);
                 });
+
+            sbc.MessageTopology.SetEntityNameFormatter(c.Resolve<IEntityNameFormatter>());
         }
 
         public static IBusControl AttachObservers(this IBusControl bus, IComponentContext c)
@@ -75,7 +77,9 @@
                 settings.Converters.Add(converter);
             }
 
-            configurator.UseCloudEvents(settings);
+            configurator.UseCloudEvents(
+                settings,
+                c.Resolve<IProvideTopic>());
         }
     }
 }

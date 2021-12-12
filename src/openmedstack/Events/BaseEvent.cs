@@ -2,9 +2,10 @@
 {
     using System;
 
-    public abstract class BaseEvent : ICorrelate, IEquatable<BaseEvent>
+    public abstract class BaseEvent : Message, ICorrelate, IEquatable<BaseEvent>
     {
         protected BaseEvent(string source, DateTimeOffset timeStamp, string? correlationId = null)
+        :base(timeStamp)
         {
             if (timeStamp == DateTimeOffset.MinValue)
             {
@@ -12,7 +13,6 @@
             }
 
             Source = source;
-            TimeStamp = timeStamp;
             CorrelationId = correlationId;
         }
 
@@ -20,17 +20,12 @@
         ///     Gets the id of the source instance which raised the event.
         /// </summary>
         public string Source { get; }
-
-        /// <summary>
-        /// Gets the time stamp for the event.
-        /// </summary>
-        public DateTimeOffset TimeStamp { get; }
-
+        
         /// <inheritdoc />
         public string? CorrelationId { get; }
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Source, TimeStamp, CorrelationId);
+        public override int GetHashCode() => HashCode.Combine(Source, Timestamp, CorrelationId);
 
         /// <inheritdoc />
         public bool Equals(BaseEvent? other)
@@ -45,7 +40,7 @@
                 return true;
             }
 
-            return other.GetType() == GetType() && Source == other.Source && TimeStamp.Equals(other.TimeStamp) && CorrelationId == other.CorrelationId;
+            return other.GetType() == GetType() && Source == other.Source && Timestamp.Equals(other.Timestamp) && CorrelationId == other.CorrelationId;
         }
 
         /// <inheritdoc />

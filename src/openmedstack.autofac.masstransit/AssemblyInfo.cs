@@ -5,3 +5,4 @@
 [assembly:InternalsVisibleTo("openmedstack.autofac.masstransit.azure")]
 [assembly:InternalsVisibleTo("openmedstack.autofac.masstransit.kafka")]
 [assembly:InternalsVisibleTo("openmedstack.autofac.masstransit.sqs")]
+[assembly:InternalsVisibleTo("openmedstack.masstransit.tests")]

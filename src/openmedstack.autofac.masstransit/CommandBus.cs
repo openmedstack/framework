@@ -63,6 +63,7 @@ namespace OpenMedStack.Autofac.MassTransit
                 handle.AddPipeSpecification(
                     new ContextFilterPipeSpecification<SendContext<T>>(CommandCallback));
                 var response = await handle.GetResponse<CommandResponse>().ConfigureAwait(false);
+                
                 return response.Message;
             }
             catch (RequestTimeoutException requestTimeoutException)

@@ -47,6 +47,6 @@ namespace OpenMedStack.Events
         public int Version { get; }
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Source, Version, TimeStamp, CorrelationId);
+        public override int GetHashCode() => HashCode.Combine(Source, Version, Timestamp, CorrelationId);
     }
 }

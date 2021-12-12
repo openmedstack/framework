@@ -12,6 +12,7 @@ namespace OpenMedStack.Commands
     /// <summary>
     /// Defines the command response class.
     /// </summary>
+    //[Topic("CommandResponse")]
     public class CommandResponse : ICorrelate
     {
         /// <summary>

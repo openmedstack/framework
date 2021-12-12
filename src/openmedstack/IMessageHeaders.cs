@@ -10,7 +10,6 @@
 namespace OpenMedStack
 {
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Defines the message header interface.

@@ -5,23 +5,18 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 
     public static class ConfiguratorExtensions
     {
-        public static IConfigurator UseCloudEvents(this IBusFactoryConfigurator cfg, JsonSerializerSettings settings)
+        public static IConfigurator UseCloudEvents(
+            this IBusFactoryConfigurator cfg,
+            JsonSerializerSettings settings,
+            IProvideTopic topicProvider)
         {
-            var deserializer = new Deserializer(settings);
+            var deserializer = new CloudEventDeserializer(settings);
+            cfg.ClearMessageDeserializers();
             cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
 
-            var serializer = new Serializer(settings);
-            cfg.SetMessageSerializer(() => serializer);
-
-            return new Configurator(serializer, deserializer);
-        }
-
-        public static IConfigurator UseCloudEvents(this IReceiveEndpointConfigurator cfg, JsonSerializerSettings settings)
-        {
-            var deserializer = new Deserializer(settings);
             cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
 
-            var serializer = new Serializer(settings);
+            var serializer = new CloudEventSerializer(settings, topicProvider);
             cfg.SetMessageSerializer(() => serializer);
 
             return new Configurator(serializer, deserializer);

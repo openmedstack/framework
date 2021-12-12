@@ -3,7 +3,7 @@
 // //
 // // </copyright>
 // // <summary>
-// //   Defines the $TYPE$ type.
+// //   Defines the FirebirdSqlStatement type.
 // // </summary>
 // // --------------------------------------------------------------------------------------------------------------------
 

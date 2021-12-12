@@ -15,6 +15,7 @@ namespace OpenMedStack.Autofac.MassTransit
     using System.Linq;
     using System.Reflection;
     using global::Autofac;
+    using global::MassTransit.Topology;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
     using Module = global::Autofac.Module;
@@ -24,14 +25,16 @@ namespace OpenMedStack.Autofac.MassTransit
     /// </summary>
     public class DomainModule : Module
     {
+        private readonly DeploymentConfiguration _configuration;
         private readonly IEnumerable<Assembly> _sourceAssemblies;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainModule"/> class.
         /// </summary>
         /// <param name="sourceAssemblies"></param>
-        public DomainModule(IEnumerable<Assembly> sourceAssemblies)
+        public DomainModule(DeploymentConfiguration configuration, IEnumerable<Assembly> sourceAssemblies)
         {
+            _configuration = configuration;
             _sourceAssemblies = sourceAssemblies.DistinctBy((a, b) => a.FullName == b.FullName).ToArray();
         }
 
@@ -49,9 +52,13 @@ namespace OpenMedStack.Autofac.MassTransit
             Contract.Assume(builder != null);
 
             base.Load(builder);
+            builder.Register<IProvideTopic>(
+                    ctx => new EnvironmentTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
+                .SingleInstance();
+            builder.RegisterType<EnvironmentTopicNameFormatter>().As<IEntityNameFormatter>().SingleInstance();
             builder.RegisterGeneric(typeof(MassTransitCommandSubscriber<>)).As(typeof(ISubscribeCommands<>)).SingleInstance();
             builder.RegisterGeneric(typeof(MassTransitEventSubscriber<>)).As(typeof(ISubscribeEvents<>)).SingleInstance();
-
+            
             var assemblyTypes = _sourceAssemblies.SelectMany(a => a.GetTypes())
                 .Where(t => !t.IsAbstract)
                 .ToArray();

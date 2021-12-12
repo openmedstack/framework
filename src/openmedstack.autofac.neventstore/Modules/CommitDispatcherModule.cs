@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.InteropServices.ComTypes;
     using global::Autofac;
     using Microsoft.Extensions.Logging;
     using OpenMedStack.Autofac.NEventstore.Domain;

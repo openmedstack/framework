@@ -24,14 +24,16 @@
                     if (ctx.Request.Path == "/commands")
                     {
                         var commandBus = ctx.RequestServices.GetRequiredService<IRouteCommands>();
-                        var response = await commandBus.Send(new TestCommand()).ConfigureAwait(false);
+                        var response = await commandBus.Send(new TestCommand(Guid.NewGuid().ToString("N"))).ConfigureAwait(false);
                         await ctx.Response.WriteAsync(
                                 string.IsNullOrWhiteSpace(response.FaultMessage) ? "Success" : response.FaultMessage)
                             .ConfigureAwait(false);
-                        return;
                     }
-                    var bus = ctx.RequestServices.GetRequiredService<IPublishEvents>();
-                    await bus.Publish(new TestDomainEvent(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
+                    else
+                    {
+                        var bus = ctx.RequestServices.GetRequiredService<IPublishEvents>();
+                        await bus.Publish(new TestDomainEvent(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
+                    }
                 });
         }
     }

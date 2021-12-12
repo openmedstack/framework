@@ -1,12 +1,3 @@
-// // --------------------------------------------------------------------------------------------------------------------
-// // <copyright file="CompositePollingClientSetup.cs" company="Reimers.dk">
-// //
-// // </copyright>
-// // <summary>
-// //   Defines the $TYPE$ type.
-// // </summary>
-// // --------------------------------------------------------------------------------------------------------------------
-
 namespace OpenMedStack.Autofac.NEventstore.Modules
 {
     using System;

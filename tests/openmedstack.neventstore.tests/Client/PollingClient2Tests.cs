@@ -5,11 +5,9 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using FakeItEasy;
     using FluentAssertions;
     using NEventStore;
     using NEventStore.Client;
-    using NEventStore.Persistence;
     using NEventStore.Persistence.AcceptanceTests;
     using NEventStore.Persistence.AcceptanceTests.BDD;
     using Xunit;

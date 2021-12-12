@@ -10,12 +10,11 @@
 namespace OpenMedStack.Commands
 {
     using System;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     ///     The base command definition.
     /// </summary>
-    public abstract class DomainCommand : ICorrelate, IEquatable<DomainCommand>
+    public abstract class DomainCommand : Message, ICorrelate, IEquatable<DomainCommand>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainCommand"/> class.
@@ -34,13 +33,13 @@ namespace OpenMedStack.Commands
         /// The correlation id of the command.
         /// </param>
         protected DomainCommand(string aggregateId, int version, DateTimeOffset timeStamp, string? correlationId = null)
+        :base(timeStamp)
         {
             if (timeStamp == DateTimeOffset.MinValue)
             {
                 throw new ArgumentException("Cannot use min time", nameof(timeStamp));
             }
-
-            Timestamp = timeStamp;
+            
             AggregateId = aggregateId;
             Version = version;
             CorrelationId = correlationId;
@@ -55,11 +54,6 @@ namespace OpenMedStack.Commands
         /// Gets the version the command targets.
         /// </summary>
         public int Version { get; }
-
-        /// <summary>
-        /// Gets the time stamp of the command.
-        /// </summary>
-        public DateTimeOffset Timestamp { get; }
 
         /// <inheritdoc />
         public string? CorrelationId { get; }
