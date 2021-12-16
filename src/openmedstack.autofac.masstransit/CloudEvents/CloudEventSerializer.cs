@@ -12,13 +12,14 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
         private readonly JsonSerializer _jsonSerializer;
         private readonly IProvideTopic _topicProvider;
 
-        public CloudEventSerializer(JsonSerializerSettings settings, IProvideTopic topicProvider)
+        public CloudEventSerializer(JsonSerializer serializer, IProvideTopic topicProvider)
         {
-            _jsonSerializer = JsonSerializer.Create(settings);
+            _jsonSerializer = serializer;
             _topicProvider = topicProvider;
         }
 
-        public void Serialize<T>(Stream stream, SendContext<T> context) where T : class
+        public void Serialize<T>(Stream stream, SendContext<T> context)
+            where T : class
         {
             var topic = _topicProvider.Get<T>();
 
@@ -27,57 +28,55 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                 Data = context.Message,
                 Source = context.SourceAddress,
                 Id = (context.MessageId ?? Guid.NewGuid()).ToString(),
-                Type = ContentType.ToString(),
+                Type = topic,
                 Time = context.SentTime,
                 DataContentType = "application/json+" + topic,
-                Subject = topic
+                Subject = context.Message is ICorrelate correlation
+                          && !string.IsNullOrWhiteSpace(correlation.CorrelationId)
+                    ? correlation.CorrelationId
+                    : null
             };
 
-            if (context.Message is ICorrelate correlation && !string.IsNullOrWhiteSpace(correlation.CorrelationId))
+            if (context.TimeToLive.HasValue)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("correlationid", CloudEventAttributeType.String)] =
-                    correlation.CorrelationId;
+                context.Headers.Set(
+                    CloudEventHeaders.Expiration,
+                    (context.SentTime ?? DateTimeOffset.UtcNow).Add(context.TimeToLive.Value).ToUnixTimeSeconds());
             }
 
             if (context.RequestId.HasValue)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("requestid", CloudEventAttributeType.String)] =
-                    context.RequestId.Value.ToString();
+                context.Headers.Set(CloudEventHeaders.RequestId, context.RequestId.Value.ToString(), true);
             }
 
             if (context.ConversationId.HasValue)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("conversationid", CloudEventAttributeType.String)] =
-                    context.ConversationId.Value.ToString();
+                context.Headers.Set(CloudEventHeaders.ConversationId, context.ConversationId.Value.ToString(), true);
             }
 
             if (context.InitiatorId.HasValue)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("initiatorid", CloudEventAttributeType.String)] =
-                    context.InitiatorId.Value.ToString();
+                context.Headers.Set(CloudEventHeaders.InitiatorId, context.InitiatorId.Value.ToString(), true);
             }
 
             if (context.FaultAddress != null)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("faultaddress", CloudEventAttributeType.String)] =
-                    context.FaultAddress.AbsoluteUri;
+                context.Headers.Set(CloudEventHeaders.FaultAddress, context.FaultAddress.AbsoluteUri, true);
             }
 
             if (context.ResponseAddress != null)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("responseaddress", CloudEventAttributeType.String)] =
-                    context.ResponseAddress.AbsoluteUri;
+                context.Headers.Set(CloudEventHeaders.ResponseAddress, context.ResponseAddress.AbsoluteUri, true);
             }
 
             if (context.DestinationAddress != null)
             {
-                cloudEvent[CloudEventAttribute.CreateExtension("destinationaddress", CloudEventAttributeType.String)] =
-                    context.DestinationAddress.AbsoluteUri;
+                context.Headers.Set(CloudEventHeaders.DestinationAddress, context.DestinationAddress.AbsoluteUri, true);
             }
 
             var formatter = new CustomEventFormatter(_jsonSerializer);
             var bytes = formatter.EncodeStructuredModeMessage(cloudEvent, out var contentType);
-            //contentType.Parameters.Add("topic", topic);
+
             context.ContentType = contentType;
             stream.Write(bytes.Span);
         }

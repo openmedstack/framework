@@ -7,39 +7,26 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using CloudNative.CloudEvents;
-using global::MassTransit;
-using global::MassTransit.Context;
-using global::MassTransit.Metadata;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 {
+    using System;
+    using System.Collections.Generic;
+    using global::MassTransit;
+    using global::MassTransit.Context;
+    using global::MassTransit.Metadata;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
     internal class CloudEventContext : DeserializerConsumeContext
     {
-        private readonly CloudEvent _cloudEvent;
+        private readonly CloudEventEnvelope _envelope;
         private readonly JsonSerializer _jsonSerializer;
 
-        public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent, JsonSerializerSettings options)
+        public CloudEventContext(ReceiveContext receiveContext, CloudEventEnvelope envelope, JsonSerializer serializer)
             : base(receiveContext)
         {
-            _cloudEvent = cloudEvent;
-            _jsonSerializer = JsonSerializer.Create(options);
-            ConversationId = receiveContext.GetConversationId();
-            CorrelationId = receiveContext.GetCorrelationId() ?? cloudEvent.GetGuid("correlationid");
-            InitiatorId = receiveContext.GetInitiatorId();
-            MessageId = receiveContext.GetMessageId(Guid.Parse(_cloudEvent.Id!));
-            RequestId = receiveContext.GetRequestId() ?? cloudEvent.GetGuid("requestid");
-            SourceAddress = _cloudEvent.Source!;
-            Headers = receiveContext.TransportHeaders;
-            DestinationAddress = _cloudEvent.GetUri("destinationaddress");
-            ResponseAddress = _cloudEvent.GetUri("responseaddress") ?? _cloudEvent.Source;
-            FaultAddress = _cloudEvent.GetUri("faultaddress");
-
-            SupportedMessageTypes = new[] { _cloudEvent.Subject! };
+            _envelope = envelope;
+            _jsonSerializer = serializer;
         }
 
         public override bool HasMessageType(Type messageType) => true;
@@ -70,7 +57,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
         /// <inheritdoc />
         public override bool TryGetPayload<T>(out T payload)
         {
-            var data = (_cloudEvent.Data) switch
+            var data = (_envelope.CloudEvent.Data) switch
             {
                 T item => item,
                 JToken token => GetTokenValue<T>(token),
@@ -98,19 +85,23 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             }
         }
 
-        public override Guid? MessageId { get; }
-        public override Guid? RequestId { get; }
-        public override Guid? CorrelationId { get; }
-        public override Guid? ConversationId { get; }
-        public override Guid? InitiatorId { get; }
-        public override DateTime? ExpirationTime { get; }
-        public override Uri SourceAddress { get; }
-        public override Uri? DestinationAddress { get; }
-        public override Uri? ResponseAddress { get; }
-        public override Uri? FaultAddress { get; }
-        public override DateTime? SentTime { get { return _cloudEvent.Time?.DateTime; } }
-        public override Headers? Headers { get; }
+        public override Guid? MessageId => _envelope.MessageId;
+        public override Guid? RequestId => _envelope.RequestId;
+        public override Guid? CorrelationId => _envelope.CorrelationId;
+        public override Guid? ConversationId => _envelope.ConversationId;
+        public override Guid? InitiatorId => _envelope.InitiatorId;
+        public override DateTime? ExpirationTime => _envelope.ExpirationTime;
+        public override Uri? SourceAddress => _envelope.SourceAddress;
+        public override Uri? DestinationAddress => _envelope.DestinationAddress;
+        public override Uri? ResponseAddress => _envelope.ResponseAddress;
+        public override Uri? FaultAddress => _envelope.FaultAddress;
+        public override DateTime? SentTime => _envelope.SentTime;
+        public override Headers? Headers => _envelope.Headers;
+#if DEBUG
         public override HostInfo? Host { get; } = new BusHostInfo(true);
-        public override IEnumerable<string>? SupportedMessageTypes { get; }
+#else
+        public override HostInfo? Host { get; }
+#endif
+        public override IEnumerable<string>? SupportedMessageTypes => _envelope.MessageType;
     }
 }
