@@ -10,7 +10,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
     using Microsoft.Extensions.Logging;
     using OpenMedStack.Commands;
     using NEventStore;
-    using NEventStore.Client;
+    using NEventStore.PollingClient;
 
     public class CommandCommitDispatcher : ICommandCommitDispatcher
     {

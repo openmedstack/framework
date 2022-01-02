@@ -15,7 +15,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NEventStore;
-    using NEventStore.Client;
+    using NEventStore.PollingClient;
 
     public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
     {

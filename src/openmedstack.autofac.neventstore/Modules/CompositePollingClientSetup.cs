@@ -8,7 +8,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
     using OpenMedStack.Autofac.NEventstore.Domain;
     using OpenMedStack.Domain;
     using OpenMedStack.NEventStore;
-    using OpenMedStack.NEventStore.Client;
+    using OpenMedStack.NEventStore.PollingClient;
     using OpenMedStack.NEventStore.Persistence;
 
     internal class CompositePollingClientSetup : IBootstrapSystem

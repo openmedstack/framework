@@ -7,7 +7,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
     using Microsoft.Extensions.Logging;
     using OpenMedStack.Domain;
     using NEventStore;
-    using NEventStore.Client;
+    using NEventStore.PollingClient;
     using NEventStore.Persistence;
 
     internal sealed class AsyncPollingClient : IDisposable

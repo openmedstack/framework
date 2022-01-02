@@ -7,7 +7,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
     using OpenMedStack.Autofac.NEventstore.Domain;
     using OpenMedStack.Domain;
     using NEventStore;
-    using NEventStore.Client;
+    using NEventStore.PollingClient;
     using NEventStore.Persistence;
 
     internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBootstrapSystem

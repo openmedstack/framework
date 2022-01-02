@@ -12,6 +12,7 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
     using System.Data.Common;
     using global::Autofac;
     using global::NEventStore;
+    using Microsoft.Extensions.Logging;
     using OpenMedStack.NEventStore;
     using OpenMedStack.NEventStore.Persistence.Sql;
     using OpenMedStack.NEventStore.Serialization;
@@ -33,8 +34,8 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(
-                    Wireup.Init()
+            builder.Register(
+                    ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
                         .UsingSqlPersistence(_dbProviderFactory, _connectionString)
                         .WithDialect(_dialect)
                         .UsingJsonSerialization()

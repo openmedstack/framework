@@ -4,7 +4,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
     using System.Threading;
     using System.Threading.Tasks;
     using NEventStore;
-    using NEventStore.Client;
+    using OpenMedStack.NEventStore.PollingClient;
 
     public interface ICommitDispatcher : IDisposable
     {

@@ -9,11 +9,13 @@
 		<Description>Autofac bindings for OpenMedStack based applications.</Description>
 	</PropertyGroup>
 	<Import Project="..\..\shared.proj" />
+	<ItemGroup>
+	  <PackageReference Include="openmedstack.neventstore.pollingclient" Version="1.4.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\openmedstack.autofac\openmedstack.autofac.csproj" />
 		<ProjectReference Include="..\openmedstack.domain\openmedstack.domain.csproj" />
-		<ProjectReference Include="..\openmedstack.neventstore\openmedstack.neventstore.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -10,6 +10,7 @@
 namespace OpenMedStack.Autofac.NEventstore.InMemory
 {
     using global::Autofac;
+    using Microsoft.Extensions.Logging;
     using OpenMedStack.NEventStore;
     using OpenMedStack.NEventStore.Serialization;
 
@@ -17,8 +18,8 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(
-                    Wireup.Init()
+            builder.Register(
+                    ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
                         .UsingInMemoryPersistence()
                         .UsingJsonSerialization()
                         .LinkToAutofac(builder)
