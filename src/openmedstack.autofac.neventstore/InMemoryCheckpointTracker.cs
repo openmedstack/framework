@@ -16,16 +16,4 @@ namespace OpenMedStack.Autofac.NEventstore
             return Task.CompletedTask;
         }
     }
-
-    public class InMemoryEventCheckpointTracker : InMemoryCheckpointTracker, ITrackEventCheckpoints
-    {
-    }
-
-    public class InMemoryCommandCheckpointTracker : InMemoryCheckpointTracker, ITrackCommandCheckpoints
-    {
-    }
-
-    public class InMemoryReadModelCheckpointTracker : InMemoryCheckpointTracker, ITrackReadModelCheckpoints
-    {
-    }
 }

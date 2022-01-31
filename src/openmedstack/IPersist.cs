@@ -29,15 +29,4 @@ namespace OpenMedStack
         /// <returns>The <see cref="Task"/> encapsulating the save operation.</returns>
         Task<TKey> Save(TItem item, CancellationToken cancellationToken = default);
     }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false)]
-    public class TopicAttribute : Attribute
-    {
-        public TopicAttribute(string topic)
-        {
-            Topic = topic;
-        }
-    
-        public string Topic { get; }
-    }
 }
