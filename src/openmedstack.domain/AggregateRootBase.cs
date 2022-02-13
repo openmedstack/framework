@@ -53,11 +53,8 @@ namespace OpenMedStack.Domain
             _uncommittedEvents.Clear();
         }
 
-        IMemento IAggregate.GetSnapshot()
-        {
-            var snapshot = CreateSnapshot(Id, Version);
-            return snapshot;
-        }
+        /// <inheritdoc />
+        public abstract IMemento GetSnapshot();
 
         public virtual bool Equals(IAggregate? other) => other?.Id == Id && other.Version == Version;
 
@@ -66,9 +63,7 @@ namespace OpenMedStack.Domain
             ((IAggregate)this).ApplyEvent(@event);
             _uncommittedEvents.Add(@event);
         }
-
-        protected abstract TMemento CreateSnapshot(string id, int version);
-
+        
         public override int GetHashCode() => Id.GetHashCode();
 
         public override bool Equals(object? obj) => Equals(obj as IAggregate);

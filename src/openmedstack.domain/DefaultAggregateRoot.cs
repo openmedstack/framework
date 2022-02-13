@@ -8,7 +8,7 @@ namespace OpenMedStack.Domain
         }
 
         /// <inheritdoc />
-        protected override sealed EmptyMemento CreateSnapshot(string id, int version) => new(id, version);
+        public override sealed EmptyMemento GetSnapshot() => new(Id, Version);
 
         /// <inheritdoc />
         protected override sealed void ApplySnapshot(EmptyMemento snapshot)

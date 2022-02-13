@@ -32,8 +32,7 @@ namespace OpenMedStack
         /// <param name="items">The headers and values to include.</param>
         public MessageHeaders(params KeyValuePair<string, object>[] items)
         {
-            _items = (items ?? Enumerable.Empty<KeyValuePair<string, object>>())
-                .ToDictionary(x => x.Key, x => x.Value);
+            _items = new Dictionary<string, object>(items);
         }
 
         /// <summary>
@@ -45,9 +44,8 @@ namespace OpenMedStack
         {
         }
 
-        public ResponseExpectation Expectation => _items.ContainsKey(ExpectationKey)
-            ? (ResponseExpectation)_items[ExpectationKey]
-            : ResponseExpectation.Always;
+        public ResponseExpectation Expectation =>
+            _items.TryGetValue(ExpectationKey, out var expectation) ? (ResponseExpectation)expectation : ResponseExpectation.Always;
 
         /// <inheritdoc />
         public int SequenceNumber => _items.ContainsKey(SequenceNumberKey)

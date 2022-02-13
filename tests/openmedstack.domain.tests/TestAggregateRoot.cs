@@ -24,7 +24,7 @@
         }
 
         /// <inheritdoc />
-        protected override EmptyMemento CreateSnapshot(string id, int version) => new(Id, Version);
+        public override EmptyMemento GetSnapshot() => new(Id, Version);
 
 #pragma warning disable IDE0051 // Remove unused private members
         private void Apply(TestEvent _)

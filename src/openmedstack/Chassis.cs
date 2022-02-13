@@ -80,10 +80,15 @@ namespace OpenMedStack
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task Start(CancellationToken cancellationToken = default)
+        public Task Start(CancellationToken cancellationToken = default)
         {
             _service = _serviceBuilder(Configuration, _assemblies);
-            await _service.Start(cancellationToken).ConfigureAwait(false);
+            var task = _service.Start(cancellationToken);
+            return Task.Run(async () =>
+                {
+                    await task.ConfigureAwait(false);
+                    _waitHandle.Wait(cancellationToken);
+                }, cancellationToken);
         }
 
         /// <summary>
@@ -98,7 +103,7 @@ namespace OpenMedStack
         {
             if (_service is null)
             {
-                throw new InvalidOperationException("Chassis not started");
+                throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
             return _service.Send(msg, cancellationToken);
         }
@@ -114,7 +119,7 @@ namespace OpenMedStack
         {
             if (_service is null)
             {
-                throw new InvalidOperationException("Chassis not started");
+                throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
             return _service.Publish(msg, cancellationToken);
         }
@@ -123,16 +128,12 @@ namespace OpenMedStack
         {
             if (_service is null)
             {
-                throw new InvalidOperationException("Chassis not started");
+                throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
             return _service.Resolve<T>();
         }
 
-        private static IService BuildService(DeploymentConfiguration manifest, IEnumerable<Assembly> assemblies)
-        {
-            const string message = "Chassis builder not configured";
-            throw new NotImplementedException(message);
-        }
+        private static IService BuildService(DeploymentConfiguration manifest, IEnumerable<Assembly> assemblies) => throw new NotImplementedException(Strings.ChassisBuilderNotConfigured);
 
         /// <inheritdoc />
         public void Dispose()
@@ -142,13 +143,13 @@ namespace OpenMedStack
             _service.TryDispose();
             foreach (var value in Metadata.Values)
             {
-                value?.TryDispose();
+                value.TryDispose();
             }
 
             Metadata.Clear();
-            _waitHandle.Dispose();
             AppDomain.CurrentDomain.ProcessExit -= ProcessExit;
             Console.CancelKeyPress -= CancelKeyPress;
+            _waitHandle.Dispose();
             GC.SuppressFinalize(this);
         }
 
@@ -172,7 +173,7 @@ namespace OpenMedStack
         {
             if (_service is null)
             {
-                throw new InvalidOperationException("Chassis not started");
+                throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
             return _service.Subscribe(observer);
         }
