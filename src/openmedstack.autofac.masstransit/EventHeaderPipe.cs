@@ -9,7 +9,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GreenPipes;
 using MassTransit;
 
 namespace OpenMedStack.Autofac.MassTransit

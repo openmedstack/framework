@@ -5,7 +5,6 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Defines the chassis for tests
@@ -28,14 +27,14 @@
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The started <see cref="ITestWebService"/> as an asynchronous operation.</returns>
-        public Task Start(CancellationToken cancellationToken = default) => _chassis.Start(cancellationToken);
+        public IAsyncDisposable Start(CancellationToken cancellationToken = default) => _chassis.Start(cancellationToken);
 
         public HttpClient CreateClient() => _chassis.Resolve<HttpClient>();
 
         /// <inheritdoc />
         public void Dispose()
         {
-            _chassis?.Dispose();
+            _chassis.Dispose();
             GC.SuppressFinalize(this);
         }
 

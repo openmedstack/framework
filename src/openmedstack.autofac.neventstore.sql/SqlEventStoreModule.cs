@@ -14,6 +14,7 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
     using global::NEventStore;
     using Microsoft.Extensions.Logging;
     using OpenMedStack.NEventStore;
+    using OpenMedStack.NEventStore.Persistence;
     using OpenMedStack.NEventStore.Persistence.Sql;
     using OpenMedStack.NEventStore.Serialization;
 
@@ -22,14 +23,12 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
         private readonly string _connectionString;
         private readonly DbProviderFactory _dbProviderFactory;
         private readonly ISqlDialect _dialect;
-        private readonly bool _compress;
 
-        public SqlEventStoreModule(string connectionString, DbProviderFactory dbProviderFactory, ISqlDialect dialect, bool compress = true)
+        public SqlEventStoreModule(string connectionString, DbProviderFactory dbProviderFactory, ISqlDialect dialect)
         {
             _connectionString = connectionString;
             _dbProviderFactory = dbProviderFactory;
             _dialect = dialect;
-            _compress = compress;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -43,6 +42,7 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
                         .Build())
                 .As<IStoreEvents>()
                 .SingleInstance();
+            builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
         }
     }
 }

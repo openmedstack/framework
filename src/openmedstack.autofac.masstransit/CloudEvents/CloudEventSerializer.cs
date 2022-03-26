@@ -1,7 +1,6 @@
 namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 {
     using System;
-    using System.IO;
     using System.Net.Mime;
     using CloudNative.CloudEvents;
     using global::MassTransit;
@@ -17,11 +16,11 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             _jsonSerializer = serializer;
             _topicProvider = topicProvider;
         }
-
-        public void Serialize<T>(Stream stream, SendContext<T> context)
+        
+        /// <inheritdoc />
+        public MessageBody GetMessageBody<T>(SendContext<T> context)
             where T : class
-        {
-            var topic = _topicProvider.Get<T>();
+        {var topic = _topicProvider.Get<T>();
 
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
@@ -30,7 +29,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                 Id = (context.MessageId ?? Guid.NewGuid()).ToString(),
                 Type = topic,
                 Time = context.SentTime,
-                DataContentType = "application/json+" + topic,
+                DataContentType = $"application/{topic}+json",
                 Subject = context.Message is ICorrelate correlation
                           && !string.IsNullOrWhiteSpace(correlation.CorrelationId)
                     ? correlation.CorrelationId
@@ -75,10 +74,9 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             }
 
             var formatter = new CustomEventFormatter(_jsonSerializer);
-            var bytes = formatter.EncodeStructuredModeMessage(cloudEvent, out var contentType);
+            var bytes = formatter.EncodeStructuredModeMessage(cloudEvent, out _);
 
-            context.ContentType = contentType;
-            stream.Write(bytes.Span);
+            return new BytesMessageBody(bytes.ToArray());
         }
 
         public ContentType ContentType

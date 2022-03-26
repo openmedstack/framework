@@ -10,10 +10,8 @@
 namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 {
     using System;
-    using System.Collections.Generic;
     using CloudNative.CloudEvents;
     using global::MassTransit;
-    using global::MassTransit.Serialization;
 
     internal class CloudEventEnvelope
     {

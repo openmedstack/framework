@@ -29,7 +29,7 @@
 
         public static Chassis UsingWebServer(this Chassis chassis, IConfigureWebApplication configuration)
         {
-            return UsingWebServer(chassis, c => configuration);
+            return UsingWebServer(chassis, _ => configuration);
         }
 
         public static Chassis UsingWebServer(

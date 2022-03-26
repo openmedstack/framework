@@ -1,10 +1,10 @@
 namespace OpenMedStack.Autofac.MassTransit.CloudEvents
 {
     using System;
+    using System.IO;
     using System.Net.Mime;
     using CloudNative.CloudEvents.NewtonsoftJson;
     using global::MassTransit;
-    using GreenPipes;
     using Newtonsoft.Json;
 
     public class CloudEventDeserializer : IMessageDeserializer
@@ -28,12 +28,32 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             return new CloudEventContext(receiveContext, envelope, _serializer);
         }
 
+        /// <inheritdoc />
+        public SerializerContext Deserialize(MessageBody body, Headers headers, Uri? destinationAddress = null)
+        {
+            var envelope = _serializer.Deserialize<CloudEventEnvelope>(new JsonTextReader(new StringReader(body.GetString())));
+            if (envelope == null)
+            {
+                throw new ArgumentException("Invalid message");
+            }
+
+            envelope.Headers = headers;
+            if (destinationAddress != null)
+            {
+                envelope.DestinationAddress = destinationAddress;
+            }
+            return new CloudEventSerializerContext(envelope, _serializer);
+        }
+
+        /// <inheritdoc />
+        public MessageBody GetMessageBody(string text) => new StringMessageBody(text);
+
         public ContentType ContentType { get; set; } = new("application/cloudevents+json");
 
         private CloudEventEnvelope ReadContext(ReceiveContext receiveContext)
         {
             var cloudEvent = _formatter.DecodeStructuredModeMessage(
-                receiveContext.GetBody(),
+                receiveContext.GetBodyStream(),
                 receiveContext.ContentType,
                 null);
             return new CloudEventEnvelope
@@ -43,7 +63,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.ConversationId,
                         out var conversationHeader)
-                    && Guid.TryParse(conversationHeader.ToString(), out var conversationId)
+                    && Guid.TryParse(conversationHeader?.ToString(), out var conversationId)
                         ? conversationId
                         : default(Guid?),
                 CorrelationId =
@@ -52,7 +72,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.InitiatorId,
                         out var initiatorHeader)
-                    && Guid.TryParse(initiatorHeader.ToString(), out var initiatorId)
+                    && Guid.TryParse(initiatorHeader?.ToString(), out var initiatorId)
                         ? initiatorId
                         : default(Guid?),
                 MessageId = receiveContext.GetMessageId(Guid.Parse(cloudEvent.Id!)),
@@ -60,7 +80,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.RequestId,
                         out var requestIdHeader)
-                    && Guid.TryParse(requestIdHeader.ToString(), out var requestId)
+                    && Guid.TryParse(requestIdHeader?.ToString(), out var requestId)
                         ? requestId
                         : default(Guid?),
                 SourceAddress = cloudEvent.Source!,
@@ -69,25 +89,25 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.DestinationAddress,
                         out var destinationAddress)
-                        ? new Uri(destinationAddress.ToString()!)
+                        ? new Uri(destinationAddress?.ToString()!)
                         : default,
                 ResponseAddress =
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.ResponseAddress,
                         out var responseAddress)
-                        ? new Uri(responseAddress.ToString()!)
+                        ? new Uri(responseAddress?.ToString()!)
                         : cloudEvent.Source,
                 FaultAddress =
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.FaultAddress,
                         out var faultAddress)
-                        ? new Uri(faultAddress.ToString()!)
+                        ? new Uri(faultAddress?.ToString()!)
                         : default,
                 ExpirationTime =
                     receiveContext.TransportHeaders.TryGetHeader(
                         CloudEventHeaders.Expiration,
                         out var expirationHeader)
-                    && long.TryParse(expirationHeader.ToString(), out var expiration)
+                    && long.TryParse(expirationHeader?.ToString(), out var expiration)
                         ? DateTimeOffset.FromUnixTimeSeconds(expiration).UtcDateTime
                         : default(DateTime?),
                 MessageType = new[] { cloudEvent.Type! }

@@ -21,7 +21,7 @@
         public class GivenAWebServerWorkflow
         {
             private readonly CancellationTokenSource _cts = new();
-            private Task _workflow = null!;
+            private IAsyncDisposable _workflow = null!;
             private TestChassis _webServerService = null!;
 
             [Background]
@@ -44,7 +44,7 @@
                                 RetryCount = 3
                             };
                             _webServerService = Chassis.From(config)
-                                .AddAutofacModules((c, a) => new TestStartupModule(c))
+                                .AddAutofacModules((c, _) => new TestStartupModule(c))
                                 .UsingInMemoryEventDispatcher(TimeSpan.FromMilliseconds(300))
                                 .UsingInMemoryEventStore()
                                 .UsingNEventStore()
@@ -58,7 +58,7 @@
                         async () =>
                         {
                             _cts.Cancel();
-                            await _workflow.ConfigureAwait(false);
+                            await _workflow.DisposeAsync().ConfigureAwait(false);
                             _webServerService.Dispose();
                         });
             }

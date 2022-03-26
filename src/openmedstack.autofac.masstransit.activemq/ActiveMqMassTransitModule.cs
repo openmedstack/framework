@@ -3,8 +3,6 @@
     using System;
     using global::Autofac;
     using global::MassTransit;
-    using global::MassTransit.ActiveMqTransport;
-    using GreenPipes;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.

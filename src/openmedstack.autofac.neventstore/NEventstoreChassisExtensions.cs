@@ -16,7 +16,7 @@
         /// <param name="chassis">The <see cref="Chassis"/> to register for.</param>
         /// <returns>The updated <see cref="Chassis"/> instance.</returns>
         public static Chassis UsingNEventStore(this Chassis chassis) =>
-            chassis.AddAutofacModules((c, a) => new EventStoreModule(() => GetDetector(chassis), a.ToArray()));
+            chassis.AddAutofacModules((_, a) => new EventStoreModule(() => GetDetector(chassis), a.ToArray()));
 
         /// <summary>
         /// Registers dispatcher types for NEventStore.
@@ -31,10 +31,10 @@
             where TCommandTracker : ITrackCommandCheckpoints
             where TReadModelTracker : ITrackReadModelCheckpoints =>
             chassis.AddAutofacModules(
-                    (c, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker>(
+                    (_, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker>(
                         a,
                         pollingInterval))
-                .AddAutofacModules((c, a) => new CompositePollingClientModule(pollingInterval));
+                .AddAutofacModules((_, _) => new CompositePollingClientModule(pollingInterval));
 
         /// <summary>
         /// Registers dispatcher types for NEventStore.
@@ -49,10 +49,10 @@
             where TCommandTracker : ITrackCommandCheckpoints
             where TReadModelTracker : ITrackReadModelCheckpoints =>
             chassis.AddAutofacModules(
-                    (c, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker>(
+                    (_, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker>(
                         a,
                         pollingInterval))
-                .AddAutofacModules((c, a) => new SeparatePollingClientModule(pollingInterval));
+                .AddAutofacModules((_, _) => new SeparatePollingClientModule(pollingInterval));
 
 
         /// <summary>

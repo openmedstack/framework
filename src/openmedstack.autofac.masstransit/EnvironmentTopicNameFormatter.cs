@@ -9,7 +9,7 @@
 
 namespace OpenMedStack.Autofac.MassTransit
 {
-    using global::MassTransit.Topology;
+    using global::MassTransit;
 
     internal class EnvironmentTopicNameFormatter : IEntityNameFormatter
     {

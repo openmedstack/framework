@@ -22,7 +22,7 @@ namespace OpenMedStack.Domain
     /// <typeparam name="TBaseEvent">The <see cref="DomainEvent"/> to handle.</typeparam>
     public abstract class SagaDomainEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TBaseEvent>
         where TSaga : class, ISaga
-        where TBaseEvent : BaseEvent
+        where TBaseEvent : DomainEvent
     {
         private readonly ISagaRepository _sagaRepository;
         private readonly ILogger<SagaDomainEventHandlerBase<TSaga, TBaseEvent>> _logger;

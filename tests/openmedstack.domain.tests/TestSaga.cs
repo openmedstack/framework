@@ -9,10 +9,8 @@
 namespace OpenMedStack.Domain.Tests
 {
     using System;
-    using OpenMedStack.Commands;
-    using OpenMedStack.Events;
 
-    internal class TestSaga : SagaBase<DomainEvent, DomainCommand>
+    internal class TestSaga : SagaBase
     {
         /// <inheritdoc />
         public TestSaga(string id)

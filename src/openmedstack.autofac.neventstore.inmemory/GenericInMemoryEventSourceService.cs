@@ -21,7 +21,6 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
         public GenericInMemoryEventSourceService(IEnumerable<IModule> modules, DeploymentConfiguration deploymentConfiguration, bool enableConsoleLogging = true, (string, LogLevel)[]? filters = null, params Assembly[] assemblies)
             : base(deploymentConfiguration, enableConsoleLogging, filters, modules.Concat(new InMemoryEventStoreModule()).ToArray())
         {
-            Contract.Requires(modules != null);
             Contract.Assume(assemblies != null);
         }
 

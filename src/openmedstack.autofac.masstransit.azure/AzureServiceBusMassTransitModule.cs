@@ -3,7 +3,6 @@
     using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
-    using GreenPipes;
     using OpenMedStack.Autofac.MassTransit;
 
     /// <summary>

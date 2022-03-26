@@ -5,10 +5,12 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using global::Autofac;
     using Microsoft.Extensions.Logging;
     using OpenMedStack;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
+    using OpenMedStack.Autofac.NEventstore;
     using OpenMedStack.Autofac.NEventstore.InMemory;
     using Xunit;
 
@@ -31,16 +33,19 @@
             };
             _chassis = Chassis.From(config)
                 .UsingInMemoryMassTransit()
+                .UsingNEventStore()
+                .UsingInMemoryEventStore()
+                .AddAutofacModules((_, _) => new TestModule())
                 .AddLogFilter(("Microsoft", LogLevel.Warning))
-                .UsingInMemoryEventSourceBuilder();
+                .Build();
         }
 
         [Fact]
         public async Task WhenSubscribingToServiceEventsThenReceivesPublishedEvents()
         {
-            var cts = new CancellationTokenSource();
-            var waitHandle = new ManualResetEvent(false);
-            var wf = _chassis.Start(cts.Token).ConfigureAwait(false);
+            using var cts = new CancellationTokenSource();
+            using var waitHandle = new ManualResetEvent(false);
+            await using var wf = _chassis.Start(cts.Token);
             using (_chassis.Subscribe(_ => waitHandle.Set()))
             {
                 await _chassis.Publish(new TestEvent(), cts.Token).ConfigureAwait(false);
@@ -50,7 +55,6 @@
                 Assert.True(success);
             }
             cts.Cancel();
-            await wf;
         }
 
         /// <inheritdoc />

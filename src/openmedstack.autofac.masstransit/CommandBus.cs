@@ -14,7 +14,7 @@ namespace OpenMedStack.Autofac.MassTransit
     using System.Threading;
     using System.Threading.Tasks;
     using global::MassTransit;
-    using GreenPipes.Specifications;
+    using global::MassTransit.Configuration;
     using Microsoft.Extensions.Logging;
     using OpenMedStack.Commands;
 

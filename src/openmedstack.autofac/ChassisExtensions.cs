@@ -47,11 +47,11 @@ namespace OpenMedStack.Autofac
         /// <param name="chassis">The <see cref="Chassis"/> to configure.</param>
         /// <param name="moduleFactory">The <see cref="Func{TResult}"/> to use to build the container modules.</param>
         /// <returns>A configured instance of the <see cref="Chassis"/>.</returns>
-        public static Chassis UsingGenericBuilder(
+        public static Chassis Build(
             this Chassis chassis,
             Func<DeploymentConfiguration, IEnumerable<Assembly>, IEnumerable<IModule>> moduleFactory)
         {
-            var enableConsoleLogging = (bool) chassis.Metadata.GetOrDefault(EnableConsoleLogging, true)!;
+            var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(EnableConsoleLogging, true)!;
             chassis.Metadata.TryGetValue(LogFilters, out var filters);
             return chassis.UsingCustomBuilder(
                 (configuration, assemblies) => new AutofacService(
@@ -66,12 +66,16 @@ namespace OpenMedStack.Autofac
         /// </summary>
         /// <param name="chassis">The <see cref="Chassis"/> to configure.</param>
         /// <returns>A configured instance of the <see cref="Chassis"/>.</returns>
-        public static Chassis UsingGenericBuilder(this Chassis chassis)
+        public static Chassis Build(this Chassis chassis, params IModule[] modules)
         {
-            var enableConsoleLogging = (bool) chassis.Metadata.GetOrDefault(EnableConsoleLogging, true)!;
-            var filters = ((string, LogLevel)[]) (chassis.Metadata[LogFilters] ?? Array.Empty<(string, LogLevel)>());
+            var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(EnableConsoleLogging, true)!;
+            var found = (chassis.Metadata.TryGetValue(LogFilters, out var filters));
             return chassis.UsingCustomBuilder(
-                (c, a) => new AutofacService(c, enableConsoleLogging, filters, chassis.GetModules(c, a).ToArray()));
+                (c, a) => new AutofacService(
+                    c,
+                    enableConsoleLogging,
+                    found ? ((string, LogLevel)[])filters! : Array.Empty<(string, LogLevel)>(),
+                    modules.Concat(chassis.GetModules(c, a)).ToArray()));
         }
     }
 }

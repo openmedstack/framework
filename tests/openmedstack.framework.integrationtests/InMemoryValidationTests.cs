@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
     using OpenMedStack.Autofac.NEventstore;
     using OpenMedStack.Autofac.NEventstore.InMemory;
@@ -29,10 +30,15 @@
             var chassis = Chassis.From(config)
                 .DefinedIn(typeof(TestAggregate).Assembly)
                 .UsingNEventStore()
+                .UsingInMemoryEventStore()
                 .UsingInMemoryMassTransit()
-                .UsingInMemoryEventSourceBuilder(new TestModule());
+                .Build(new TestModule());
 
-            await Assert.ThrowsAnyAsync<Exception>(() => chassis.Start()).ConfigureAwait(false);
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+            {
+                var c = chassis.Start();
+                await c.DisposeAsync();
+            }).ConfigureAwait(false);
         }
 
         [Fact]
@@ -50,10 +56,15 @@
             var chassis = Chassis.From(config)
                 .DefinedIn(typeof(TestAggregate).Assembly)
                 .UsingNEventStore()
+                .UsingInMemoryEventStore()
                 .UsingInMemoryMassTransit()
-                .UsingInMemoryEventSourceBuilder(new TestModule());
+                .Build(new TestModule());
 
-            await Assert.ThrowsAnyAsync<Exception>(() => chassis.Start()).ConfigureAwait(false);
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+            {
+                var c = chassis.Start();
+                await c.DisposeAsync().ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
     }
 }

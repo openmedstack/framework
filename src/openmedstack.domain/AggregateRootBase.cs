@@ -40,7 +40,7 @@ namespace OpenMedStack.Domain
             }
         }
 
-        void IAggregate.ApplyEvent(object @event)
+        void IAggregate.ApplyEvent(DomainEvent @event)
         {
             _registeredRoutes.Dispatch(@event);
             ++Version;

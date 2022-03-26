@@ -4,8 +4,6 @@
     using System.Linq;
     using global::Autofac;
     using global::MassTransit;
-    using global::MassTransit.Topology;
-    using GreenPipes;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
     using Newtonsoft.Json;
@@ -38,7 +36,7 @@
                 e =>
                 {
                     e.UseInMemoryOutbox();
-                    e.UseRetry(r => r.SetRetryPolicy(x => retryPolicy));
+                    e.UseRetry(r => r.SetRetryPolicy(_ => retryPolicy));
                     e.RegisterConsumers(c);
                 });
 

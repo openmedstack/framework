@@ -6,7 +6,7 @@
         {
             chassis.AddAutofacModules(
                 (c, a) => new DomainModule(c, a),
-                (c, a) => new AzureServiceBusMassTransitModule(c));
+                (c, _) => new AzureServiceBusMassTransitModule(c));
 
             return chassis;
         }

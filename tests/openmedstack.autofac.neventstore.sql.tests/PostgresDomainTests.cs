@@ -44,14 +44,15 @@
                 .UsingNEventStore()
                 .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.1))
                 .UsingMassTransitOverActiveMq()
-                .UsingSqlEventSourceBuilder(NpgsqlFactory.Instance, new PostgreSqlDialect(NullLogger.Instance), false, new TestModule());
+                .UsingSqlEventStore(NpgsqlFactory.Instance, new PostgreSqlDialect(NullLogger.Instance))
+                .Build(new TestModule());
         }
 
         [Fact]
         public async Task WhenSendingCommandToValidAggregateThenEventIsRaised()
         {
             var waitHandle = new ManualResetEvent(false);
-            await _chassis.Start().ConfigureAwait(false);
+            await using var wf = _chassis.Start();
             using (_chassis.Subscribe(_ => waitHandle.Set()))
             {
                 var response = await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
@@ -62,7 +63,7 @@
 
                 Assert.True(success);
             }
-
+            
             try
             {
                 waitHandle.Dispose();

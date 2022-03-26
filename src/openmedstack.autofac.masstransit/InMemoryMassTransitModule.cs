@@ -11,7 +11,6 @@ namespace OpenMedStack.Autofac.MassTransit
 {
     using System;
     using global::Autofac;
-    using GreenPipes;
     using global::MassTransit;
     using Module = global::Autofac.Module;
 

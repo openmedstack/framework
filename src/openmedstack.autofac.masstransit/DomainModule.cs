@@ -15,7 +15,7 @@ namespace OpenMedStack.Autofac.MassTransit
     using System.Linq;
     using System.Reflection;
     using global::Autofac;
-    using global::MassTransit.Topology;
+    using global::MassTransit;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
     using Module = global::Autofac.Module;

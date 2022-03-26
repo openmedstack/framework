@@ -2,7 +2,6 @@
 {
     using System.Diagnostics.Contracts;
     using global::Autofac;
-    using GreenPipes;
     using global::MassTransit;
 
     /// <summary>

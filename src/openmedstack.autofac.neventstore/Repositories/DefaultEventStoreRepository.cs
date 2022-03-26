@@ -10,6 +10,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
     using OpenMedStack.Domain;
     using NEventStore;
     using NEventStore.Persistence;
+    using OpenMedStack.Events;
 
     public class DefaultEventStoreRepository : IRepository
     {
@@ -63,7 +64,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             CancellationToken cancellationToken = default)
         {
             var commitId = Guid.NewGuid();
-            var headers = PrepareHeaders(aggregate, updateHeaders ?? (d => { }));
+            var headers = PrepareHeaders(aggregate, updateHeaders ?? (_ => { }));
 
             var stream = await PrepareStream(_tenantId.GetTenantName(), aggregate, headers, cancellationToken)
                 .ConfigureAwait(false);
@@ -111,7 +112,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
                 return;
             }
 
-            foreach (var @event in stream.CommittedEvents.Select(x => x.Body).ToArray())
+            foreach (var @event in stream.CommittedEvents.Select(x => x.Body).OfType<DomainEvent>().ToArray())
             {
                 aggregate.ApplyEvent(@event);
             }

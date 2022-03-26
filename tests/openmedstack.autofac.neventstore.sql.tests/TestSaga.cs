@@ -1,13 +1,12 @@
 ﻿namespace OpenMedStack.Autofac.NEventStore.Sql.Tests
 {
-    using OpenMedStack.Commands;
     using OpenMedStack.Domain;
-    using OpenMedStack.Events;
 
-    public class TestSaga : SagaBase<BaseEvent, DomainCommand>
+    public class TestSaga : SagaBase
     {
         /// <inheritdoc />
-        public TestSaga(string id) : base(id)
+        public TestSaga(string id)
+            : base(id)
         {
         }
 

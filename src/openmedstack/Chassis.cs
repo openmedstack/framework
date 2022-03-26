@@ -80,15 +80,11 @@ namespace OpenMedStack
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task Start(CancellationToken cancellationToken = default)
+        public IAsyncDisposable Start(CancellationToken cancellationToken = default)
         {
             _service = _serviceBuilder(Configuration, _assemblies);
             var task = _service.Start(cancellationToken);
-            return Task.Run(async () =>
-                {
-                    await task.ConfigureAwait(false);
-                    _waitHandle.Wait(cancellationToken);
-                }, cancellationToken);
+            return new ChassisInstance(task, _waitHandle, cancellationToken);
         }
 
         /// <summary>
@@ -176,6 +172,34 @@ namespace OpenMedStack
                 throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
             return _service.Subscribe(observer);
+        }
+
+        private class ChassisInstance : IAsyncDisposable
+        {
+            private readonly Task _service;
+
+            public ChassisInstance(Task service, ManualResetEventSlim waitHandle, CancellationToken cancellationToken)
+            {
+                _service = Task.Run(async () =>
+                {
+                    await service.ConfigureAwait(false);
+                    try
+                    {
+                        waitHandle.Wait(cancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        waitHandle.Set();
+                    }
+                }, cancellationToken);
+            }
+
+            /// <inheritdoc />
+            public async ValueTask DisposeAsync()
+            {
+                await _service.ConfigureAwait(false);
+                _service.Dispose();
+            }
         }
     }
 }

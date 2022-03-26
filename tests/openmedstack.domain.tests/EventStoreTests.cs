@@ -10,7 +10,6 @@ namespace OpenMedStack.Domain.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Threading;
     using OpenMedStack.Autofac;
@@ -22,7 +21,7 @@ namespace OpenMedStack.Domain.Tests
     public abstract class EventStoreTests
     {
         private readonly CancellationTokenSource _cts = new();
-        private ConfiguredTaskAwaitable _workflow;
+        private IAsyncDisposable? _workflow;
         protected Chassis Service = null!;
 
         [Background]
@@ -44,19 +43,23 @@ namespace OpenMedStack.Domain.Tests
                                     }
                                 })
                             .DefinedIn(GetType().Assembly)
-                            .AddAutofacModules((c, a) => new TestModule(c))
+                            .AddAutofacModules((c, _) => new TestModule(c))
                             .UsingNEventStore()
                             .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.25))
                             .UsingInMemoryEventStore()
                             .UsingInMemoryMassTransit()
-                            .UsingInMemoryEventSourceBuilder();
-                        _workflow = Service.Start(_cts.Token).ConfigureAwait(false);
+                            .Build();
+                        _workflow = Service.Start(_cts.Token);
                     })
                 .Teardown(
                     async () =>
                     {
                         _cts.Cancel();
-                        await _workflow;
+                        if (_workflow != null)
+                        {
+                            await _workflow.DisposeAsync();
+                        }
+
                         Service.Dispose();
                     });
         }

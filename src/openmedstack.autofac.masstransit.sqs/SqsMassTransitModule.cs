@@ -4,8 +4,6 @@
     using global::Autofac;
     using global::MassTransit;
     using global::MassTransit.AmazonSqsTransport;
-    using global::MassTransit.Topology.EntityNameFormatters;
-    using GreenPipes;
     using OpenMedStack.Autofac.MassTransit;
     using System.Diagnostics.Contracts;
 

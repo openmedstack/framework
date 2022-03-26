@@ -1,6 +1,7 @@
 namespace OpenMedStack.Domain
 {
     using System.Collections.Generic;
+    using OpenMedStack.Events;
 
     public interface ISaga
     {
@@ -8,7 +9,7 @@ namespace OpenMedStack.Domain
 
         int Version { get; }
 
-        void Transition(object message);
+        void Transition(DomainEvent message);
 
         IEnumerable<object> GetUncommittedEvents();
 

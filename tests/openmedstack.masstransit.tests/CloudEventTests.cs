@@ -6,7 +6,6 @@ namespace openmedstack.masstransit.tests
     using System.Threading;
     using System.Threading.Tasks;
     using CloudNative.CloudEvents.NewtonsoftJson;
-    using GreenPipes;
     using MassTransit;
     using Newtonsoft.Json;
     using OpenMedStack;
@@ -46,7 +45,7 @@ namespace openmedstack.masstransit.tests
                         e =>
                         {
                             e.UseInMemoryOutbox();
-                            e.UseRetry(r => r.SetRetryPolicy(x => Retry.Interval(5, TimeSpan.FromMilliseconds(500))));
+                            e.UseRetry(r => r.SetRetryPolicy(_ => Retry.Interval(5, TimeSpan.FromMilliseconds(500))));
                             e.Consumer(() => new TestEventConsumer(waitHandle));
                         });
                 });

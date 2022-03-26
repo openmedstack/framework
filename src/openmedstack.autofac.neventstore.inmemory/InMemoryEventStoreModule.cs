@@ -12,6 +12,7 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
     using global::Autofac;
     using Microsoft.Extensions.Logging;
     using OpenMedStack.NEventStore;
+    using OpenMedStack.NEventStore.Persistence;
     using OpenMedStack.NEventStore.Serialization;
 
     public class InMemoryEventStoreModule : Module
@@ -26,6 +27,7 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
                         .Build())
                 .As<IStoreEvents>()
                 .SingleInstance();
+            builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
         }
     }
 }

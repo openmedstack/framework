@@ -6,7 +6,7 @@
         {
             chassis.AddAutofacModules(
                 (c, a) => new DomainModule(c, a),
-                (c, a) => new SqsMassTransitModule(c));
+                (c, _) => new SqsMassTransitModule(c));
 
             return chassis;
         }

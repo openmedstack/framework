@@ -17,18 +17,14 @@ namespace OpenMedStack.Domain
     /// <summary>
     /// Defines the abstract base class for sagas.
     /// </summary>
-    /// <typeparam name="TEvent">The type constraint for <see cref="BaseEvent"/> which can be handled.</typeparam>
-    /// <typeparam name="TCommand">The type constraint for <see cref="DomainCommand"/> which will be sent.</typeparam>
-    public abstract class SagaBase<TEvent, TCommand> : ISaga, IEquatable<ISaga>
-       where TEvent : BaseEvent
-       where TCommand : DomainCommand
+    public abstract class SagaBase : ISaga, IEquatable<ISaga>
     {
         private readonly IRouteEvents _eventRouter;
-        private readonly ICollection<TEvent> _uncommitted = new LinkedList<TEvent>();
-        private readonly ICollection<TCommand> _undispatched = new LinkedList<TCommand>();
+        private readonly ICollection<BaseEvent> _uncommitted = new LinkedList<BaseEvent>();
+        private readonly ICollection<DomainCommand> _undispatched = new LinkedList<DomainCommand>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SagaBase{TEvent,TCommand}"/> class.
+        /// Initializes a new instance of the <see cref="SagaBase"/> class.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="eventRouter">The event router</param>
@@ -48,16 +44,11 @@ namespace OpenMedStack.Domain
         public virtual bool Equals(ISaga? other) => other?.Id == Id;
 
         /// <inheritdoc />
-        public void Transition(object message)
+        public void Transition(DomainEvent message)
         {
-            if (message is not TEvent item)
-            {
-                return;
-            }
+            _eventRouter.Dispatch(message);
 
-            _eventRouter.Dispatch(item);
-
-            _uncommitted.Add(item);
+            _uncommitted.Add(message);
             ++Version;
         }
 
@@ -81,16 +72,16 @@ namespace OpenMedStack.Domain
         /// <typeparam name="TRegisteredMessage"></typeparam>
         /// <param name="handler"></param>
         protected void Register<TRegisteredMessage>(Action<TRegisteredMessage> handler)
-           where TRegisteredMessage : class, TEvent
+           where TRegisteredMessage : DomainEvent
         {
             _eventRouter.Register(handler);
         }
 
         /// <summary>
-        /// Dispatches the <see cref="TCommand"/>.
+        /// Dispatches the <see cref="DomainCommand"/>.
         /// </summary>
         /// <param name="message"></param>
-        protected void Dispatch(TCommand message)
+        protected void Dispatch(DomainCommand message)
         {
             _undispatched.Add(message);
         }

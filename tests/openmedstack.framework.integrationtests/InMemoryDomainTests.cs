@@ -39,51 +39,62 @@
                 .DefinedIn(typeof(TestAggregate).Assembly)
                 .DisableDefaultConsoleLogging()
                 .UsingNEventStore()
+                .UsingInMemoryEventStore()
                 .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(1))
                 .UsingInMemoryMassTransit()
-                .UsingInMemoryEventSourceBuilder(new TestModule());
+                .Build(new TestModule());
         }
 
         [Fact]
         public async Task WhenSendingCommandToValidAggregateThenEventIsRaised()
         {
-            var cts = new CancellationTokenSource();
-            var waitHandle = new ManualResetEvent(false);
-            var wf = _chassis.Start(cts.Token).ConfigureAwait(false);
-            using var s = _chassis.Subscribe(_ => waitHandle.Set());
-            await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0), cts.Token).ConfigureAwait(false);
+            try
+            {
+                using var cts = new CancellationTokenSource();
+                using var waitHandle = new ManualResetEvent(false);
+                await using var wf = _chassis.Start(cts.Token);
+                using var s = _chassis.Subscribe(_ => waitHandle.Set());
+                await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0), cts.Token).ConfigureAwait(false);
 
-            var success = waitHandle.WaitOne(TimeSpan.FromSeconds(Debugger.IsAttached ? 5 : 50));
+                var success = waitHandle.WaitOne(TimeSpan.FromSeconds(Debugger.IsAttached ? 5 : 50));
 
-            Assert.True(success);
-            cts.Cancel();
-            await wf;
+                Assert.True(success);
+                cts.Cancel();
+            }
+            catch (OperationCanceledException) { }
         }
 
         [Fact]
         public async Task WhenStartTaskIsCancelledThenChassisExits()
         {
-            var tokenSource = new CancellationTokenSource();
-            using var wf = _chassis.Start(tokenSource.Token);
-            tokenSource.Cancel();
-            await wf.ConfigureAwait(false);
+            try
+            {
+                using var tokenSource = new CancellationTokenSource();
+                await using var wf = _chassis.Start(tokenSource.Token);
+                tokenSource.Cancel();
+            }
+            catch (OperationCanceledException) { }
         }
 
         [Fact]
         public async Task CanWriteToLogger()
         {
-            var tokenSource = new CancellationTokenSource();
-            var wf = _chassis.Start(tokenSource.Token).ConfigureAwait(false);
-            var logger = _chassis.Resolve<ILogger<TestAggregate>>();
+            try
+            {
+                using var tokenSource = new CancellationTokenSource();
+                await using var wf = _chassis.Start(tokenSource.Token);
+                var logger = _chassis.Resolve<ILogger<TestAggregate>>();
 
-            logger.LogCritical("test");
-            logger.LogError("test");
-            logger.LogWarning("test");
-            logger.LogInformation("test");
-            logger.LogDebug("test");
-            logger.LogTrace("test");
-            tokenSource.Cancel();
-            await wf;
+                logger.LogCritical("test");
+                logger.LogError("test");
+                logger.LogWarning("test");
+                logger.LogInformation("test");
+                logger.LogDebug("test");
+                logger.LogTrace("test");
+
+                tokenSource.Cancel();
+            }
+            catch (OperationCanceledException) { }
         }
 
         /// <inheritdoc />

@@ -57,7 +57,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
         /// <inheritdoc />
         public override bool TryGetPayload<T>(out T payload)
         {
-            var data = (_envelope.CloudEvent.Data) switch
+            var data = _envelope.CloudEvent.Data switch
             {
                 T item => item,
                 JToken token => GetTokenValue<T>(token),

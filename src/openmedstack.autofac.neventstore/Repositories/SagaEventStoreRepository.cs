@@ -9,6 +9,7 @@
     using OpenMedStack.Domain;
     using NEventStore;
     using NEventStore.Persistence;
+    using OpenMedStack.Events;
 
     public class SagaEventStoreRepository : ISagaRepository
     {
@@ -66,7 +67,7 @@
         private TSaga BuildSaga<TSaga>(string sagaId, IEventStream stream) where TSaga : class, ISaga
         {
             var saga = (TSaga)_factory.Build(typeof(TSaga), sagaId);
-            foreach (var message in stream.CommittedEvents.Select(x => x.Body).ToArray())
+            foreach (var message in stream.CommittedEvents.Select(x => x.Body).OfType<DomainEvent>().ToArray())
             {
                 saga.Transition(message);
             }
@@ -92,9 +93,9 @@
             var stream = await OpenStream(bucketId, saga.Id, saga.Version).ConfigureAwait(false);
             //.CreateStream(bucketId, saga.Id).ConfigureAwait(false);
 
-            foreach (var header in headers)
+            foreach (var (key, value) in headers)
             {
-                stream.UncommittedHeaders[header.Key] = header.Value;
+                stream.UncommittedHeaders[key] = value;
             }
 
             foreach (var msg in saga.GetUncommittedEvents().Select(x => new EventMessage(x)))

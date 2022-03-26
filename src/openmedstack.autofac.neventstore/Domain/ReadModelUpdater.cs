@@ -48,7 +48,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
                                                     _updateMethods.GetOrAdd(
                                                         bodyType,
                                                         t => typeof(IUpdateReadModel<>).MakeGenericType(t).GetMethod("Update")!)
-                                                from updater in _readModelUpdaters.GetOrAdd(bodyType, t => Array.Empty<IUpdateReadModel>())
+                                                from updater in _readModelUpdaters.GetOrAdd(bodyType, _ => Array.Empty<IUpdateReadModel>())
                                                 let result = method.Invoke(updater, new[] { evt.Body, headers, CancellationToken.None })
                                                 select (Task)result).ToArray();
 

@@ -71,11 +71,14 @@ namespace OpenMedStack.Domain
             {
                 var response = await HandleInternal(command, headers, cancellationToken).ConfigureAwait(false);
 
-                return response ?? command.CreateResponse();
+                return response;
             }
             catch (Exception exception)
             {
-                return command.CreateResponse(exception.Message);
+                cancellationToken.ThrowIfCancellationRequested();
+                _logger.LogError(exception, exception.Message);
+
+                return await OnException(exception, command, headers, cancellationToken);
             }
         }
 
@@ -104,6 +107,13 @@ namespace OpenMedStack.Domain
             T command,
             IMessageHeaders headers,
             CancellationToken cancellationToken);
+
+        protected virtual Task<CommandResponse> OnException(
+            Exception exception,
+            T command,
+            IMessageHeaders headers,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(command.CreateResponse(exception.Message));
 
         /// <summary>
         /// Gets the <see cref="AggregateRootBase{T}"/> with the requested id.

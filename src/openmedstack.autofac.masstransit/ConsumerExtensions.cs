@@ -27,7 +27,7 @@
                             .GetInterfaces()
                             .Any(
                                 t => t.IsGenericType
-                                     && (typeof(IConsumer<>).IsAssignableFrom(t.GetGenericTypeDefinition())))))
+                                     && typeof(IConsumer<>).IsAssignableFrom(t.GetGenericTypeDefinition()))))
             {
                 e.Consumer(consumerType, t => ctx.Resolve(t));
             }

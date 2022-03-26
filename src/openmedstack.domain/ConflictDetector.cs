@@ -28,11 +28,11 @@ namespace OpenMedStack.Domain
 
         public bool ConflictsWith(IEnumerable<object> uncommittedEvents, IEnumerable<object> committedEvents)
         {
-            return uncommittedEvents.SelectMany(uncommitted => committedEvents, (uncommitted, committed) => new
+            return uncommittedEvents.SelectMany(_ => committedEvents, (uncommitted, committed) => new
             {
                 uncommitted,
                 committed
-            }).Where(param1 => Conflicts(param1.uncommitted, param1.committed)).Select(param1 => uncommittedEvents).Any();
+            }).Where(param1 => Conflicts(param1.uncommitted, param1.committed)).Select(_ => uncommittedEvents).Any();
         }
 
         private bool Conflicts(object uncommitted, object committed)

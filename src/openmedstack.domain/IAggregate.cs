@@ -10,7 +10,7 @@ namespace OpenMedStack.Domain
 
         int Version { get; }
 
-        void ApplyEvent(object @event);
+        void ApplyEvent(DomainEvent @event);
 
         ICollection<DomainEvent> GetUncommittedEvents();
 
