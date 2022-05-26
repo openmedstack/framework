@@ -15,7 +15,7 @@ namespace OpenMedStack.Events
     /// Defines the abstract base class for value updated events.
     /// </summary>
     /// <typeparam name="TValue">The <see cref="Type"/> of the updated value.</typeparam>
-    public abstract class ValueUpdatedEvent<TValue> : DomainEvent
+    public abstract record ValueUpdatedEvent<TValue> : DomainEvent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueUpdatedEvent{TValue}"/> class.

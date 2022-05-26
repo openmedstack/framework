@@ -61,6 +61,15 @@ namespace OpenMedStack {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot use min time.
+        /// </summary>
+        internal static string CannotUseMinTime {
+            get {
+                return ResourceManager.GetString("CannotUseMinTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chassis builder not configured.
         /// </summary>
         internal static string ChassisBuilderNotConfigured {
@@ -75,6 +84,15 @@ namespace OpenMedStack {
         internal static string ChassisNotStarted {
             get {
                 return ResourceManager.GetString("ChassisNotStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version 0 is invalid.
+        /// </summary>
+        internal static string VersionZeroInvalid {
+            get {
+                return ResourceManager.GetString("VersionZeroInvalid", resourceCulture);
             }
         }
     }

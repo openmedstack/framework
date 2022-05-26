@@ -73,7 +73,7 @@ namespace openmedstack.masstransit.tests
 ""time"": ""2021-12-09T19:12:05.2419601Z"",
 ""data"": {
     ""source"": ""sample"",
-    ""version"": 0,
+    ""version"": 1,
     ""timestamp"": ""2021-12-09T20:12:05.2096652+01:00"",
     ""correlationId"": null
 }

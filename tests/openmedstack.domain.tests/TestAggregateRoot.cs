@@ -14,7 +14,7 @@
 
         public void SomeAction()
         {
-            var evt = new TestEvent(Id, Version, DateTimeOffset.UtcNow);
+            var evt = new TestEvent(Id, Version + 1, DateTimeOffset.UtcNow);
             RaiseEvent(evt);
         }
 

@@ -10,12 +10,11 @@
 namespace OpenMedStack.Events
 {
     using System;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     ///     The domain event base.
     /// </summary>
-    public abstract class DomainEvent : BaseEvent
+    public abstract record DomainEvent : BaseEvent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainEvent"/> class.
@@ -36,17 +35,17 @@ namespace OpenMedStack.Events
         protected DomainEvent(string source, int version, DateTimeOffset timeStamp, string? correlationId = null)
             : base(source, timeStamp, correlationId)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(source));
-            Contract.Requires(version >= 0);
-            Contract.Requires(timeStamp != DateTimeOffset.MinValue);
+            if (version <= 0)
+            {
+                throw new ArgumentException(Strings.VersionZeroInvalid, nameof(version));
+            }
 
             Version = version;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the event version.
+        /// </summary>
         public int Version { get; }
-
-        /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Source, Version, Timestamp, CorrelationId);
     }
 }

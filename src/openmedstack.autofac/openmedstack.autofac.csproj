@@ -11,8 +11,8 @@
     <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="6.3.0" />
-        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
+        <PackageReference Include="Autofac" Version="6.4.0" />
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Autofac.Multitenant" Version="6.0.0" />
         <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />

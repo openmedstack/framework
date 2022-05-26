@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CannotUseMinTime" xml:space="preserve">
+    <value>Cannot use min time</value>
+  </data>
   <data name="ChassisBuilderNotConfigured" xml:space="preserve">
     <value>Chassis builder not configured</value>
   </data>
   <data name="ChassisNotStarted" xml:space="preserve">
     <value>Chassis not started</value>
+  </data>
+  <data name="VersionZeroInvalid" xml:space="preserve">
+    <value>Version 0 is invalid</value>
   </data>
 </root>

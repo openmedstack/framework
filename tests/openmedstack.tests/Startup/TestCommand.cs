@@ -3,7 +3,7 @@
     using System;
     using OpenMedStack.Commands;
 
-    public class TestCommand : DomainCommand
+    public record TestCommand : DomainCommand
     {
         /// <inheritdoc />
         public TestCommand(string aggregateId, int version, DateTimeOffset timeStamp, string? correlationId = null)

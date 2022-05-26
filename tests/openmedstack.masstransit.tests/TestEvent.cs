@@ -5,7 +5,7 @@
     using OpenMedStack.Events;
 
     [Topic("Test")]
-    internal class TestEvent : DomainEvent
+    internal record TestEvent : DomainEvent
     {
         /// <inheritdoc />
         public TestEvent(string source, int version, DateTimeOffset timeStamp)

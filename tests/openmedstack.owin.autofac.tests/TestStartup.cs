@@ -32,7 +32,7 @@
                     else
                     {
                         var bus = ctx.RequestServices.GetRequiredService<IPublishEvents>();
-                        await bus.Publish(new TestDomainEvent(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
+                        await bus.Publish(new TestDomainEvent(Guid.NewGuid().ToString(), 1)).ConfigureAwait(false);
                     }
                 });
         }

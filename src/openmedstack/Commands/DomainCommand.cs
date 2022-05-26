@@ -14,7 +14,7 @@ namespace OpenMedStack.Commands
     /// <summary>
     ///     The base command definition.
     /// </summary>
-    public abstract class DomainCommand : Message, ICorrelate, IEquatable<DomainCommand>
+    public abstract record DomainCommand : Message, ICorrelate
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainCommand"/> class.
@@ -37,7 +37,7 @@ namespace OpenMedStack.Commands
         {
             if (timeStamp == DateTimeOffset.MinValue)
             {
-                throw new ArgumentException("Cannot use min time", nameof(timeStamp));
+                throw new ArgumentException(Strings.CannotUseMinTime, nameof(timeStamp));
             }
             
             AggregateId = aggregateId;
@@ -57,35 +57,5 @@ namespace OpenMedStack.Commands
 
         /// <inheritdoc />
         public string? CorrelationId { get; }
-
-        /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(AggregateId, Version, Timestamp, CorrelationId);
-
-        /// <inheritdoc />
-        public bool Equals(DomainCommand? other)
-        {
-            if (other is null)
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return other.GetType() == GetType()
-                   && AggregateId == other.AggregateId
-                   && Version == other.Version
-                   && Timestamp.Equals(other.Timestamp)
-                   && CorrelationId == other.CorrelationId;
-        }
-
-        /// <inheritdoc />
-        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is DomainCommand other && Equals(other);
-
-        public static bool operator ==(DomainCommand left, DomainCommand right) => Equals(left, right);
-
-        public static bool operator !=(DomainCommand left, DomainCommand right) => !Equals(left, right);
     }
 }

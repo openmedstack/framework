@@ -14,16 +14,11 @@ namespace OpenMedStack
     /// <summary>
     /// The abstract message definition
     /// </summary>
-    public abstract class Message
+    public abstract record Message(DateTimeOffset Timestamp)
     {
-        protected Message(DateTimeOffset timestamp)
-        {
-            Timestamp = timestamp;
-        }
-
         /// <summary>
         /// Gets the time stamp of the message.
         /// </summary>
-        public DateTimeOffset Timestamp { get; }
+        public DateTimeOffset Timestamp { get; } = Timestamp;
     }
 }

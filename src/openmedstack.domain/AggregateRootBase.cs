@@ -22,6 +22,7 @@ namespace OpenMedStack.Domain
         {
             _registeredRoutes = new ConventionEventRouter(true, this);
             Id = id;
+            Version = 1;
             InternalApplySnapshot(snapshot);
         }
 

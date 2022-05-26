@@ -4,7 +4,7 @@
     using OpenMedStack.Events;
 
     [Topic("WebTestDomainEvent")]
-    public class TestDomainEvent : DomainEvent
+    public record TestDomainEvent : DomainEvent
     {
         /// <inheritdoc />
         public TestDomainEvent(string id, int version) : base(id, version, DateTimeOffset.Now)

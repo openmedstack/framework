@@ -17,7 +17,7 @@
                     var sagaId = Guid.NewGuid().ToString();
                     var saga = await repository.GetById<TestSaga>(sagaId).ConfigureAwait(false);
 
-                    saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 0, DateTimeOffset.UtcNow, sagaId));
+                    saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 1, DateTimeOffset.UtcNow, sagaId));
 
                     await repository.Save(saga).ConfigureAwait(false);
                 });
@@ -46,7 +46,7 @@
             });
 
             "When transitioning".x(
-                () => { saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 0, DateTimeOffset.UtcNow)); });
+                () => { saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 1, DateTimeOffset.UtcNow)); });
 
             "Then has uncommitted events".x(
                 () =>
@@ -68,7 +68,7 @@
             });
 
             "When transitioning".x(
-                () => { saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 0, DateTimeOffset.UtcNow)); });
+                () => { saga.Transition(new TestEvent(Guid.NewGuid().ToString(), 1, DateTimeOffset.UtcNow)); });
 
             "Then event is handled".x(() => { Assert.True(((TestSaga)saga).EventHandled); });
         }

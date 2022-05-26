@@ -22,7 +22,7 @@
                 "When handling known event".x(() =>
                 {
                     IAggregate a = _aggregate;
-                    a.ApplyEvent(new TestEvent(a.Id, 0, DateTimeOffset.UtcNow));
+                    a.ApplyEvent(new TestEvent(a.Id, 1, DateTimeOffset.UtcNow));
                 });
 
                 "Then it is handled".x(() =>

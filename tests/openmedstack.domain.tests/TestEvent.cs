@@ -3,7 +3,7 @@
     using System;
     using OpenMedStack.Events;
 
-    internal class TestEvent : DomainEvent
+    internal record TestEvent : DomainEvent
     {
         /// <inheritdoc />
         public TestEvent(string source, int version, DateTimeOffset timeStamp, string? correlationId = null)
