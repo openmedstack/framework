@@ -30,8 +30,6 @@ namespace OpenMedStack.Autofac
     public class AutofacService : IService
     {
         private readonly DeploymentConfiguration _configuration;
-        private readonly bool _enableConsoleLogging;
-        private readonly (string, LogLevel)[] _filters;
         private readonly Subject<BaseEvent> _subject = new();
         private readonly IContainer _container;
         private readonly IPublishEvents _eventBus;
@@ -48,15 +46,13 @@ namespace OpenMedStack.Autofac
         public AutofacService(DeploymentConfiguration configuration, bool enableConsoleLogging = true, (string, LogLevel)[]? filters = null, params IModule[] modules)
         {
             _configuration = configuration;
-            _enableConsoleLogging = enableConsoleLogging;
-            _filters = filters ?? Array.Empty<(string, LogLevel)>();
             var builder = new ContainerBuilder();
             builder.RegisterInstance(configuration)
                 .As<DeploymentConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            builder.RegisterModule(new ConsoleLogModule(_enableConsoleLogging, _filters));
+            builder.RegisterModule(new ConsoleLogModule(enableConsoleLogging, filters ?? Array.Empty<(string, LogLevel)>()));
             builder.RegisterModule(new ValidationModule());
             foreach (var module in modules)
             {
@@ -76,9 +72,9 @@ namespace OpenMedStack.Autofac
             _subject.SubscribeOn(TaskPoolScheduler.Default).Subscribe(observer);
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -114,7 +110,7 @@ namespace OpenMedStack.Autofac
         /// Disposes managed and unmanaged resources.
         /// </summary>
         /// <param name="isDisposing"><c>true</c> if called from Disposing() method. <c>false</c> if called from finalizer.</param>
-        protected virtual void Dispose(bool isDisposing)
+        protected virtual async ValueTask Dispose(bool isDisposing)
         {
             if (_isDisposed || !isDisposing)
             {
@@ -126,11 +122,11 @@ namespace OpenMedStack.Autofac
             foreach (var bootstrapper in bootstrappers.GroupBy(x => x.Order).OrderByDescending(x => x.Key))
             {
                 using var tokenSource = new CancellationTokenSource(_configuration.Timeout);
-                Task.WaitAll(bootstrapper.Select(x => x.Shutdown(tokenSource.Token)).ToArray());
+                await Task.WhenAll(bootstrapper.Select(x => x.Shutdown(tokenSource.Token)).ToArray());
             }
 
-            _subject?.Dispose();
-            _container?.Dispose();
+            _subject.Dispose();
+            _container.Dispose();
         }
     }
 }

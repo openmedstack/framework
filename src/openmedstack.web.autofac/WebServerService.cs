@@ -8,6 +8,7 @@
     using System.Reactive.Subjects;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@
             _manifest = manifest;
             var urlBindings = startup.UrlBindings.ToArray();
             _urlBinding = string.Join(", ", urlBindings);
-            _container = new WebHostBuilder()
+            _container = WebApplication.CreateBuilder().WebHost
                 .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
@@ -43,7 +44,7 @@
                 })
                 .ConfigureServices(x =>
                 {
-                    x.AddSingleton<ISubject<BaseEvent>>(_subject);
+                    x.AddSingleton(_subject);
                     x.AddSingleton<IStartup>(startup);
                 })
                 .UseContentRoot(Directory.GetCurrentDirectory())
@@ -58,15 +59,16 @@
         public IDisposable Subscribe(IObserver<BaseEvent> observer) => _subject.SubscribeOn(TaskPoolScheduler.Default).Subscribe(observer);
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             var bootstrappers = _container.Services.GetServices<IBootstrapSystem>();
             foreach (var bootstrapper in bootstrappers.OrderByDescending(x => x.Order))
             {
-                bootstrapper.Shutdown(CancellationToken.None).Wait(_manifest.Timeout);
+                using var tokenSource = new CancellationTokenSource(_manifest.Timeout);
+                await bootstrapper.Shutdown(tokenSource.Token);
             }
 
-            _container.StopAsync(TimeSpan.FromMinutes(3)).Wait();
+            await _container.StopAsync(_manifest.Timeout);
             _subject.TryDispose();
             _container.Dispose();
             GC.SuppressFinalize(this);

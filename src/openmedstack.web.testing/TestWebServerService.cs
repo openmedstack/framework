@@ -43,15 +43,16 @@
         public IDisposable Subscribe(IObserver<BaseEvent> observer) => _subject.SubscribeOn(TaskPoolScheduler.Default).Subscribe(observer);
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             var bootstrappers = _container.Host.Services.GetServices<IBootstrapSystem>();
             foreach (var bootstrapper in bootstrappers.OrderByDescending(x => x.Order))
             {
-                bootstrapper.Shutdown(CancellationToken.None).Wait(_manifest.Timeout);
+                using var tokenSource = new CancellationTokenSource(_manifest.Timeout);
+                await bootstrapper.Shutdown(tokenSource.Token);
             }
 
-            _container.Host.StopAsync(CancellationToken.None).Wait(TimeSpan.FromMinutes(3));
+            await _container.Host.StopAsync(_manifest.Timeout);
 
             _subject.TryDispose();
             _container.Dispose();

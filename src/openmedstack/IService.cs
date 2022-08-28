@@ -18,7 +18,7 @@ namespace OpenMedStack
     /// <summary>
     /// Defines the service interface.
     /// </summary>
-    public interface IService : IObservable<BaseEvent>, IDisposable
+    public interface IService : IObservable<BaseEvent>, IAsyncDisposable
     {
         /// <summary>
         /// <para>Starts the service.</para>

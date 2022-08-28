@@ -11,14 +11,14 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             IProvideTopic topicProvider)
         {
             var serializer = JsonSerializer.Create(settings);
-            var eventDeserializer = new CloudEventDeserializer(serializer);
+            var eventDeserializer = new CloudEventDeserializer(serializer, topicProvider);
             var eventSerializer = new CloudEventSerializer(serializer, topicProvider);
 
             cfg.ClearSerialization();
             var cloudEventSerializerFactory = new CloudEventSerializerFactory(eventSerializer, eventDeserializer);
             cfg.AddDeserializer(cloudEventSerializerFactory);
             cfg.AddSerializer(cloudEventSerializerFactory, true);
-            
+
             return new Configurator(eventSerializer, eventDeserializer);
         }
     }

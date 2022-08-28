@@ -26,20 +26,7 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
                 enableConsoleLogging,
                 filters,
                 modules.ToArray())
-                //new IModule[]
-                //    {
-                //        new SqlEventStoreModule(
-                //            manifest.ConnectionString ?? throw new NullReferenceException(),
-                //            dbProviderFactory,
-                //            dialect)
-                //    }.Concat(modules)
-                //    .ToArray())
         {
-        }
-
-        ~GenericSqlEventSourceService()
-        {
-            Dispose(false);
         }
     }
 }

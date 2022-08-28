@@ -23,10 +23,5 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
         {
             Contract.Assume(assemblies != null);
         }
-
-        ~GenericInMemoryEventSourceService()
-        {
-            Dispose(false);
-        }
     }
 }

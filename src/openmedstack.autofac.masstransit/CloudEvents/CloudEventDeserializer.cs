@@ -10,11 +10,13 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
     public class CloudEventDeserializer : IMessageDeserializer
     {
         private readonly JsonSerializer _serializer;
+        private readonly IProvideTopic _topicProvider;
         private readonly JsonEventFormatter _formatter;
 
-        public CloudEventDeserializer(JsonSerializer serializer)
+        public CloudEventDeserializer(JsonSerializer serializer, IProvideTopic topicProvider)
         {
             _serializer = serializer;
+            _topicProvider = topicProvider;
             _formatter = new JsonEventFormatter();
         }
 
@@ -42,7 +44,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents
             {
                 envelope.DestinationAddress = destinationAddress;
             }
-            return new CloudEventSerializerContext(envelope, _serializer);
+            return new CloudEventSerializerContext(envelope, _serializer, _topicProvider);
         }
 
         /// <inheritdoc />

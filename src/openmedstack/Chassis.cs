@@ -182,9 +182,9 @@ namespace OpenMedStack
             {
                 _service = Task.Run(async () =>
                 {
-                    await service.ConfigureAwait(false);
                     try
                     {
+                        await service.ConfigureAwait(false);
                         waitHandle.Wait(cancellationToken);
                     }
                     catch (OperationCanceledException)

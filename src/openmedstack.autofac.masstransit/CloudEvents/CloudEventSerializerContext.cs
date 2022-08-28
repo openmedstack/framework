@@ -11,6 +11,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using global::MassTransit;
 using global::MassTransit.Metadata;
 using global::MassTransit.Serialization;
@@ -21,38 +22,15 @@ internal class CloudEventSerializerContext : SerializerContext
 {
     private readonly CloudEventEnvelope _envelope;
     private readonly JsonSerializer _jsonSerializer;
+    private readonly IProvideTopic _topicProvider;
 
-    public CloudEventSerializerContext(CloudEventEnvelope envelope, JsonSerializer serializer)
+    public CloudEventSerializerContext(CloudEventEnvelope envelope, JsonSerializer serializer, IProvideTopic topicProvider)
     {
         _envelope = envelope;
         _jsonSerializer = serializer;
+        _topicProvider = topicProvider;
         SupportedMessageTypes = envelope.MessageType;
     }
-
-    //public bool HasMessageType(Type messageType) => true;
-
-    //public bool TryGetMessage<T>(out ConsumeContext<T>? consumeContext)
-    //{
-    //    try
-    //    {
-    //        if (TryGetPayload(out T? payload))
-    //        {
-    //            consumeContext = new MessageConsumeContext<T>(this, payload);
-    //            return true;
-    //        }
-
-    //        consumeContext = null;
-    //        return false;
-    //    }
-    //    catch (NotSupportedException)
-    //    {
-    //        consumeContext = null;
-    //        return false;
-    //    }
-    //}
-
-    ///// <inheritdoc />
-    //public bool HasPayloadType(Type payloadType) => true;
 
     private T? GetTokenValue<T>(JToken token)
         where T : class
@@ -95,8 +73,8 @@ internal class CloudEventSerializerContext : SerializerContext
     {
         var data = _envelope.CloudEvent.Data switch
         {
-            T item => item,
             JToken token => GetTokenValue<T>(token),
+            T item => item,
             _ => default
         };
         if (data != null)
@@ -110,18 +88,33 @@ internal class CloudEventSerializerContext : SerializerContext
     }
 
     /// <inheritdoc />
-    public bool TryGetMessage(Type messageType, out object? message) => throw new NotImplementedException();
+    public bool TryGetMessage(Type messageType, out object? message)
+    {
+        var data = _envelope.CloudEvent.Data switch
+        {
+            JToken token => token.ToObject<object>(),
+            {} item => item,
+            _ => default
+        };
+        if (data != null)
+        {
+            message = data;
+            return true;
+        }
+
+        message = null;
+        return false;
+    }
 
     /// <inheritdoc />
-    public IMessageSerializer GetMessageSerializer() => throw new NotImplementedException();
+    public IMessageSerializer GetMessageSerializer() => new CloudEventSerializer(_jsonSerializer, _topicProvider);
 
     /// <inheritdoc />
     public IMessageSerializer GetMessageSerializer<T>(MessageEnvelope envelope, T message)
-        where T : class =>
-        throw new NotImplementedException();
+        where T : class => new CloudEventSerializer(_jsonSerializer, _topicProvider);
 
     /// <inheritdoc />
-    public IMessageSerializer GetMessageSerializer(object message, string[] messageTypes) => throw new NotImplementedException();
+    public IMessageSerializer GetMessageSerializer(object message, string[] messageTypes) => new CloudEventSerializer(_jsonSerializer, _topicProvider);
 
     /// <inheritdoc />
     public Dictionary<string, object> ToDictionary<T>(T? message)
@@ -132,11 +125,47 @@ internal class CloudEventSerializerContext : SerializerContext
     public string[] SupportedMessageTypes { get; }
 
     /// <inheritdoc />
-    public T? DeserializeObject<T>(object? value, T? defaultValue = default(T?))
-        where T : class =>
+    public T? DeserializeObject<T>(object? value, T? defaultValue = default)
+        where T : class
+    {
+        if (value is null)
+        {
+            return defaultValue;
+        }
+
         throw new NotImplementedException();
+    }
 
     /// <inheritdoc />
-    T? IObjectDeserializer.DeserializeObject<T>(object? value, T? defaultValue) =>
+    T? IObjectDeserializer.DeserializeObject<T>(object? value, T? defaultValue)
+        where T : struct
+    {
+        if (value is null)
+        {
+            return defaultValue;
+        }
+
         throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public MessageBody SerializeObject(object? value)
+    {
+        return value switch
+        {
+            { } => SerializerInstance(value),
+            _ => new EmptyMessageBody(),
+        };
+    }
+
+    private MessageBody SerializerInstance(object value)
+    {
+        using var ms = new MemoryStream();
+        using var textWriter = new StreamWriter(ms);
+        using var writer = new JsonTextWriter(textWriter);
+        _jsonSerializer.Serialize(writer, value, value.GetType());
+        writer.Flush();
+        ms.Flush();
+        return new BytesMessageBody(ms.ToArray());
+    }
 }
