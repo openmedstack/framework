@@ -21,36 +21,41 @@
     /// </summary>
     internal class WebServerService : IService
     {
-        private readonly DeploymentConfiguration _manifest;
+        private readonly WebDeploymentConfiguration _manifest;
         private readonly ISubject<BaseEvent> _subject = new Subject<BaseEvent>();
-        private readonly IWebHost _container;
+        private readonly WebApplication _container;
         private readonly IPublishEvents _eventBus;
         private readonly IRouteCommands _commandBus;
         private readonly string _urlBinding;
 
-        public WebServerService(DeploymentConfiguration manifest, WebStartup startup)
+        public WebServerService(WebDeploymentConfiguration manifest, WebStartup startup)
         {
             _manifest = manifest;
             var urlBindings = startup.UrlBindings.ToArray();
             _urlBinding = string.Join(", ", urlBindings);
-            _container = WebApplication.CreateBuilder().WebHost
-                .UseKestrel(options =>
-                {
-                    options.AddServerHeader = false;
-                    options.Limits.MaxRequestHeadersTotalSize = (int)Math.Pow(2, 16);
-                    options.Limits.MaxRequestBodySize = startup.MaxRequestSize;
-                    options.Limits.KeepAliveTimeout = startup.KeepAliveTimeout;
-                    options.Limits.MaxConcurrentConnections = startup.MaxConcurrentConnections;
-                })
-                .ConfigureServices(x =>
-                {
-                    x.AddSingleton(_subject);
-                    x.AddSingleton<IStartup>(startup);
-                })
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseSetting(WebHostDefaults.ApplicationKey, _manifest.Name)
-                .UseUrls(urlBindings)
-                .Build();
+            var builder = WebApplication.CreateBuilder(
+                    new WebApplicationOptions
+                    {
+                        ApplicationName = _manifest.Name,
+                        ContentRootPath = _manifest.ContentRoot ?? Directory.GetCurrentDirectory()
+                    });
+            builder.WebHost
+            .UseKestrel(options =>
+            {
+                options.AddServerHeader = false;
+                options.Limits.MaxRequestHeadersTotalSize = (int)Math.Pow(2, 16);
+                options.Limits.MaxRequestBodySize = startup.MaxRequestSize;
+                options.Limits.KeepAliveTimeout = startup.KeepAliveTimeout;
+                options.Limits.MaxConcurrentConnections = startup.MaxConcurrentConnections;
+            })
+            .ConfigureServices(x =>
+            {
+                x.AddSingleton(_subject);
+                x.AddSingleton<IStartup>(startup);
+            })
+            .UseUrls(urlBindings)
+            .Build();
+            _container = builder.Build();
             _eventBus = _container.Services.GetRequiredService<IPublishEvents>();
             _commandBus = _container.Services.GetRequiredService<IRouteCommands>();
         }
@@ -68,9 +73,10 @@
                 await bootstrapper.Shutdown(tokenSource.Token);
             }
 
-            await _container.StopAsync(_manifest.Timeout);
+            using var cancellationTokenSource = new CancellationTokenSource(_manifest.Timeout);
+            await _container.StopAsync(cancellationTokenSource.Token);
             _subject.TryDispose();
-            _container.Dispose();
+            await _container.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 

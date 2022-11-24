@@ -34,25 +34,29 @@
 
         public static Chassis UsingWebServer(
             this Chassis chassis,
-            Func<DeploymentConfiguration, IConfigureWebApplication> configuration)
+            Func<WebDeploymentConfiguration, IConfigureWebApplication> configuration)
         {
             var bindings = chassis.GetUrlBindings();
             var modules =
                 new Func<IEnumerable<Assembly>, IModule[]>(
                     a => chassis.GetModules(chassis.Configuration, a).ToArray());
             var enableConsoleLogging =
-                (bool) chassis.Metadata.GetOrDefault(ChassisExtensions.EnableConsoleLogging, true)!;
+                (bool)chassis.Metadata.GetOrDefault(ChassisExtensions.EnableConsoleLogging, true);
             chassis.Metadata.TryGetValue(LogFilters, out var filters);
             return chassis.UsingCustomBuilder(
-                (c, a) => new WebServerService(
-                    c,
-                    new WebStartup(
-                        enableConsoleLogging,
-                        c,
-                        bindings.Distinct().ToArray(),
-                        configuration(c),
-                        filters as (string, LogLevel)[],
-                        modules(a))));
+                (c, a) =>
+                {
+                    var webDeploymentConfiguration = (WebDeploymentConfiguration)c;
+                    return new WebServerService(
+                        webDeploymentConfiguration,
+                        new WebStartup(
+                            enableConsoleLogging,
+                            c,
+                            bindings.Distinct().ToArray(),
+                            configuration(webDeploymentConfiguration),
+                            filters as (string, LogLevel)[],
+                            modules(a)));
+                });
         }
 
         private static List<string> GetUrlBindings(this Chassis chassis)
@@ -62,7 +66,7 @@
                 chassis.Metadata.Add(UrlBindingKey, new List<string>());
             }
 
-            return ((List<string>)chassis.Metadata[UrlBindingKey])!;
+            return ((List<string>)chassis.Metadata[UrlBindingKey]);
         }
     }
 }
