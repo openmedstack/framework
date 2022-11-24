@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>OpenMedStack.Web</RootNamespace>
 	</PropertyGroup>
 	<Import Project="../../shared.proj"/>

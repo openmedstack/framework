@@ -31,6 +31,7 @@ namespace OpenMedStack.Autofac.MassTransit
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainModule"/> class.
         /// </summary>
+        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> to read configuration values from.</param>
         /// <param name="sourceAssemblies"></param>
         public DomainModule(DeploymentConfiguration configuration, IEnumerable<Assembly> sourceAssemblies)
         {
@@ -52,6 +53,7 @@ namespace OpenMedStack.Autofac.MassTransit
             Contract.Assume(builder != null);
 
             base.Load(builder);
+            builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance();
             builder.Register<IProvideTopic>(
                     ctx => new EnvironmentTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
                 .SingleInstance();

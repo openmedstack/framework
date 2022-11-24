@@ -17,5 +17,5 @@ internal class FakeLogger<T> : ILogger<T>
     public bool IsEnabled(LogLevel logLevel) => true;
 
     /// <inheritdoc />
-    public IDisposable BeginScope<TState>(TState state) => throw new NotImplementedException();
+    IDisposable ILogger.BeginScope<TState>(TState state) => throw new NotImplementedException();
 }

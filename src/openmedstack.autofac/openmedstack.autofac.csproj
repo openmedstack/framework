@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0</TargetFrameworks>
         <RootNamespace>OpenMedStack.Autofac</RootNamespace>
         <PackageId>OpenMedStack.Autofac</PackageId>
         <PackageTags>OpenMedStack Architecture</PackageTags>
-        <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
         <Description>Autofac bindings for OpenMedStack based applications.</Description>
     </PropertyGroup>
     <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="6.4.0" />
+        <PackageReference Include="Autofac" Version="6.5.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Autofac.Multitenant" Version="6.0.0" />
-        <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0" />
+        <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
+        <PackageReference Include="microsoft.extensions.logging.console" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />
     </ItemGroup>
 

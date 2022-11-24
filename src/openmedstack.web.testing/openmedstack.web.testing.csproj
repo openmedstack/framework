@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
     <RootNamespace>OpenMedStack.Web.Testing</RootNamespace>
     <PackageId>OpenMedStack.Web.Testing</PackageId>
     <PackageTags>OpenMedStack Architecture Web HTTP Testing</PackageTags>
-    <PackageReleaseNotes>Initial package.</PackageReleaseNotes>
     <Description>Workflow definition for ASP.NET Core applications based on ASP.NET Core pipeline.</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.11" Condition="'$(TargetFramework)' == 'net6.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
   </ItemGroup>
 
   <ItemGroup>

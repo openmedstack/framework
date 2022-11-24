@@ -58,10 +58,10 @@ namespace OpenMedStack.Web.Upload
 
                         var encoding = GetEncoding(section);
                         var owner = request.HttpContext.User.Claims
-                            .FirstOrDefault(c => c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier)
+                            .FirstOrDefault(c => c.Type is "sub" or ClaimTypes.NameIdentifier)
                             ?.Value ?? string.Empty;
 
-                        yield return new DataContent(owner, encoding, section.Body, trustedFileNameForDisplay, section.ContentType!);
+                        yield return new DataContent(owner, encoding, section.Body, trustedFileNameForDisplay!, section.ContentType!);
                     }
                     else if (contentDisposition!.HasFormDataContentDisposition())
                     {

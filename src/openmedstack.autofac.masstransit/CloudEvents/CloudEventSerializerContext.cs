@@ -44,24 +44,46 @@ internal class CloudEventSerializerContext : SerializerContext
             return default;
         }
     }
-
+    
+    /// <inheritdoc />
     public Guid? MessageId => _envelope.MessageId;
+    
+    /// <inheritdoc />
     public Guid? RequestId => _envelope.RequestId;
+    
+    /// <inheritdoc />
     public Guid? CorrelationId => _envelope.CorrelationId;
+    
+    /// <inheritdoc />
     public Guid? ConversationId => _envelope.ConversationId;
+    
+    /// <inheritdoc />
     public Guid? InitiatorId => _envelope.InitiatorId;
+    
+    /// <inheritdoc />
     public DateTime? ExpirationTime => _envelope.ExpirationTime;
+    
+    /// <inheritdoc />
     public Uri? SourceAddress => _envelope.SourceAddress;
+    
+    /// <inheritdoc />
     public Uri? DestinationAddress => _envelope.DestinationAddress;
+    
+    /// <inheritdoc />
     public Uri? ResponseAddress => _envelope.ResponseAddress;
+    
+    /// <inheritdoc />
     public Uri? FaultAddress => _envelope.FaultAddress;
+    
+    /// <inheritdoc />
     public DateTime? SentTime => _envelope.SentTime;
+    
+    /// <inheritdoc />
     public Headers Headers => _envelope.Headers;
-#if DEBUG
+    
+    /// <inheritdoc />
     public HostInfo Host { get; } = new BusHostInfo(true);
-#else
-        public HostInfo Host { get; }
-#endif
+
     /// <inheritdoc />
     public bool IsSupportedMessageType<T>()
         where T : class =>
@@ -93,7 +115,7 @@ internal class CloudEventSerializerContext : SerializerContext
         var data = _envelope.CloudEvent.Data switch
         {
             JToken token => token.ToObject<object>(),
-            {} item => item,
+            { } item => item,
             _ => default
         };
         if (data != null)

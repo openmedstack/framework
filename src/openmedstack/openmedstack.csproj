@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>
 		<RootNamespace>OpenMedStack</RootNamespace>
 		<PackageId>openmedstack</PackageId>
 		<PackageTags>OpenMedStack Architecture ASAP Analysis Package Calculator</PackageTags>
-		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
 		<Description>Core contracts for OpenMedStack based applications. Includes core interfaces and definitions.</Description>
 	</PropertyGroup>
 	<Import Project="..\..\shared.proj" />
 
-	<ItemGroup>
-		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="6.0.1" />
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="6.0.3" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

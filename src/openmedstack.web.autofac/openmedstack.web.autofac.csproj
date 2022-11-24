@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>OpenMedStack.Web.Autofac</RootNamespace>
 		<PackageId>OpenMedStack.Web.Autofac</PackageId>
-		<PackageTags>OpenMedStack Architecture Web HTTP OWIN</PackageTags>
-		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
-		<Description>Workflow definition for ASP.NET Core applications based on OWIN pipeline.</Description>
+		<PackageTags>OpenMedStack Architecture Web HTTP HTTPS</PackageTags>
+		<Description>Workflow definition for ASP.NET Core applications based on ASP.NET Core pipeline.</Description>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<Import Project="..\..\shared.proj" />

@@ -1,17 +1,19 @@
 <Project>
-    <PropertyGroup>
-        <Version>1.4.0</Version>
-        <Authors>OpenMedStack;Jacob Reimers</Authors>
-        <Company>OpenMedStack</Company>
-        <Product>OpenMedStack Framework</Product>
-        <Copyright>OpenMedStack © 2016 - 2022</Copyright>
-        <RepositoryType>git</RepositoryType>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <Nullable>enable</Nullable>
-        <langVersion>latest</langVersion>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsAsErrors />
-        <WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
-    </PropertyGroup>
+	<PropertyGroup>
+		<Version>1.4.0</Version>
+		<Authors>OpenMedStack;Jacob Reimers</Authors>
+		<Company>OpenMedStack</Company>
+		<Product>OpenMedStack Framework</Product>
+		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+		<Copyright>OpenMedStack © 2016 - 2022</Copyright>
+		<RepositoryType>git</RepositoryType>
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Nullable>enable</Nullable>
+		<langVersion>latest</langVersion>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
+		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+	</PropertyGroup>
 </Project>
