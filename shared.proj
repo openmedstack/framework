@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Version>1.4.0</Version>
+		<Version>1.5.2</Version>
 		<Authors>OpenMedStack;Jacob Reimers</Authors>
 		<Company>OpenMedStack</Company>
 		<Product>OpenMedStack Framework</Product>
@@ -14,6 +14,6 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningsAsErrors />
 		<WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
-		<PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+		<PackageReleaseNotes>Various configuration fixes for web services and updatd to support net7.0.</PackageReleaseNotes>
 	</PropertyGroup>
 </Project>

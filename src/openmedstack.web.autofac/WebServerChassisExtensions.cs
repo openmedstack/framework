@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using global::Autofac.Core;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -37,9 +35,6 @@
             Func<WebDeploymentConfiguration, IConfigureWebApplication> configuration)
         {
             var bindings = chassis.GetUrlBindings();
-            var modules =
-                new Func<IEnumerable<Assembly>, IModule[]>(
-                    a => chassis.GetModules(chassis.Configuration, a).ToArray());
             var enableConsoleLogging =
                 (bool)chassis.Metadata.GetOrDefault(ChassisExtensions.EnableConsoleLogging, true);
             chassis.Metadata.TryGetValue(LogFilters, out var filters);
@@ -55,7 +50,7 @@
                             bindings.Distinct().ToArray(),
                             configuration(webDeploymentConfiguration),
                             filters as (string, LogLevel)[],
-                            modules(a)));
+                            chassis.GetModules(chassis.Configuration, a).ToArray()));
                 });
         }
 
