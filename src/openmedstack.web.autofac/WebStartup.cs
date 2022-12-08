@@ -77,6 +77,7 @@
         {
             _webappConfiguration.ConfigureApplication(app);
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+            // ReSharper disable once AsyncVoidLambda
             lifetime.ApplicationStopped.Register(async () =>
             {
                 await _container.DisposeAsync().ConfigureAwait(false);
