@@ -8,7 +8,7 @@
 	</PropertyGroup>
 	<Import Project="..\..\shared.proj" />
 	<ItemGroup>
-		<PackageReference Include="MassTransit.AmazonSQS" Version="8.0.9" />
+		<PackageReference Include="MassTransit.AmazonSQS" Version="8.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>

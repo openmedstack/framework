@@ -9,9 +9,9 @@
     <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="6.5.0" />
+        <PackageReference Include="Autofac" Version="7.0.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
-        <PackageReference Include="Autofac.Multitenant" Version="6.0.0" />
+        <PackageReference Include="Autofac.Multitenant" Version="7.0.0" />
         <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
         <PackageReference Include="microsoft.extensions.logging.console" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />

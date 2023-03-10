@@ -9,7 +9,7 @@
   <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.9" />
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.13" />
   </ItemGroup>
 
   <ItemGroup>

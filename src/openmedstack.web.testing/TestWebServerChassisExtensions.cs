@@ -28,6 +28,22 @@ namespace OpenMedStack.Web.Testing
         /// Creates a <see cref="TestChassis"/> from the given configuration.
         /// </summary>
         /// <param name="chassis">The chassis definition.</param>
+        /// <param name="configureWebApplication">The application configuration builder.</param>
+        /// <param name="principal">An optional principal to use in requests.</param>
+        /// <returns>A <see cref="TestChassis"/>.</returns>
+        public static TestChassis UsingTestWebServer(
+            this Chassis chassis,
+            Func<WebDeploymentConfiguration, IConfigureWebApplication> configureWebApplication,
+            ClaimsPrincipal? principal = null) =>
+            UsingTestWebServer(
+                chassis,
+                configureWebApplication((WebDeploymentConfiguration)chassis.Configuration),
+                principal);
+
+        /// <summary>
+        /// Creates a <see cref="TestChassis"/> from the given configuration.
+        /// </summary>
+        /// <param name="chassis">The chassis definition.</param>
         /// <param name="configureWebApplication">The application configuration.</param>
         /// <param name="principal">An optional principal to use in requests.</param>
         /// <returns>A <see cref="TestChassis"/>.</returns>
