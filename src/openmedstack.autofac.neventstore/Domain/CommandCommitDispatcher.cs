@@ -12,21 +12,22 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
     using NEventStore;
     using NEventStore.PollingClient;
 
-    public class CommandCommitDispatcher : ICommandCommitDispatcher
+    public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
+        where TConfiguration : DeploymentConfiguration
     {
         private readonly ConcurrentDictionary<Type, MethodInfo> _commandSendMethods =
             new();
 
-        private readonly ILogger<CommandCommitDispatcher> _logger;
+        private readonly ILogger<CommandCommitDispatcher<TConfiguration>> _logger;
         private readonly Func<IRouteCommands> _commandBus;
         private readonly MethodInfo _commandBusSendMethod;
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
         private bool _isDisposed;
 
         public CommandCommitDispatcher(
-            ILogger<CommandCommitDispatcher> logger,
+            ILogger<CommandCommitDispatcher<TConfiguration>> logger,
             Func<IRouteCommands> commandBus,
-            DeploymentConfiguration configuration)
+            TConfiguration configuration)
         {
             Contract.Requires(commandBus != null);
 
@@ -40,6 +41,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
         public void Dispose()
         {
             _isDisposed = true;
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />

@@ -23,17 +23,18 @@ namespace OpenMedStack.Autofac.MassTransit
     /// <summary>
     /// Defines the domain configuration.
     /// </summary>
-    public class DomainModule : Module
+    internal class DomainModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
         private readonly IEnumerable<Assembly> _sourceAssemblies;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainModule"/> class.
+        /// Initializes a new instance of the <see cref="DomainModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> to read configuration values from.</param>
+        /// <param name="configuration">The <see cref="TConfiguration"/> to read configuration values from.</param>
         /// <param name="sourceAssemblies"></param>
-        public DomainModule(DeploymentConfiguration configuration, IEnumerable<Assembly> sourceAssemblies)
+        public DomainModule(TConfiguration configuration, IEnumerable<Assembly> sourceAssemblies)
         {
             _configuration = configuration;
             _sourceAssemblies = sourceAssemblies.DistinctBy((a, b) => a.FullName == b.FullName).ToArray();

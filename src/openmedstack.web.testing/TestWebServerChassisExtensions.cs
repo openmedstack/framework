@@ -25,32 +25,31 @@ namespace OpenMedStack.Web.Testing
     public static class TestWebServerChassisExtensions
     {
         /// <summary>
-        /// Creates a <see cref="TestChassis"/> from the given configuration.
+        /// Creates a <see cref="TestChassis{T}"/> from the given configuration.
         /// </summary>
         /// <param name="chassis">The chassis definition.</param>
         /// <param name="configureWebApplication">The application configuration builder.</param>
         /// <param name="principal">An optional principal to use in requests.</param>
-        /// <returns>A <see cref="TestChassis"/>.</returns>
-        public static TestChassis UsingTestWebServer(
-            this Chassis chassis,
-            Func<WebDeploymentConfiguration, IConfigureWebApplication> configureWebApplication,
-            ClaimsPrincipal? principal = null) =>
-            UsingTestWebServer(
-                chassis,
-                configureWebApplication((WebDeploymentConfiguration)chassis.Configuration),
-                principal);
+        /// <returns>A <see cref="TestChassis{T}"/>.</returns>
+        public static TestChassis<TConfiguration> UsingTestWebServer<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
+            Func<TConfiguration, IConfigureWebApplication> configureWebApplication,
+            ClaimsPrincipal? principal = null)
+            where TConfiguration : WebDeploymentConfiguration =>
+            UsingTestWebServer(chassis, configureWebApplication(chassis.Configuration), principal);
 
         /// <summary>
-        /// Creates a <see cref="TestChassis"/> from the given configuration.
+        /// Creates a <see cref="TestChassis{T}"/> from the given configuration.
         /// </summary>
         /// <param name="chassis">The chassis definition.</param>
         /// <param name="configureWebApplication">The application configuration.</param>
         /// <param name="principal">An optional principal to use in requests.</param>
-        /// <returns>A <see cref="TestChassis"/>.</returns>
-        public static TestChassis UsingTestWebServer(
-            this Chassis chassis,
+        /// <returns>A <see cref="TestChassis{T}"/>.</returns>
+        public static TestChassis<TConfiguration> UsingTestWebServer<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
             IConfigureWebApplication configureWebApplication,
-            ClaimsPrincipal? principal = null) =>
+            ClaimsPrincipal? principal = null)
+            where TConfiguration : WebDeploymentConfiguration =>
             UsingTestWebServer(
                 chassis,
                 configureWebApplication.ConfigureServices,
@@ -58,28 +57,33 @@ namespace OpenMedStack.Web.Testing
                 principal);
 
         /// <summary>
-        /// Creates a <see cref="TestChassis"/> from the given configuration.
+        /// Creates a <see cref="TestChassis{T}"/> from the given configuration.
         /// </summary>
         /// <param name="chassis">The chassis definition.</param>
         /// <param name="applicationConfiguration">The application configuration.</param>
         /// <param name="principal">An optional principal to use in requests.</param>
         /// <param name="serviceConfiguration">The service configuration.</param>
-        /// <returns>A <see cref="TestChassis"/>.</returns>
-        public static TestChassis UsingTestWebServer(
-            this Chassis chassis,
+        /// <returns>A <see cref="TestChassis{T}"/>.</returns>
+        public static TestChassis<TConfiguration> UsingTestWebServer<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
             Action<IServiceCollection>? serviceConfiguration = null,
             Action<IApplicationBuilder>? applicationConfiguration = null,
             ClaimsPrincipal? principal = null)
+            where TConfiguration : WebDeploymentConfiguration
         {
             var modules =
-                new Func<IEnumerable<Assembly>, IModule[]>(
-                    a => chassis.GetModules(chassis.Configuration, a).ToArray());
+                new Func<IEnumerable<Assembly>, IModule[]>(a => chassis.GetModules(chassis.Configuration, a).ToArray());
             var wf = chassis.UsingCustomBuilder(
-                (c, a) => new TestWebServerService(
+                (c, a) => new TestWebServerService<TConfiguration>(
                     c,
-                    new TestWebStartup(serviceConfiguration, applicationConfiguration, principal, modules(a))));
+                    new TestWebStartup<TConfiguration>(
+                        chassis.Configuration,
+                        serviceConfiguration,
+                        applicationConfiguration,
+                        principal,
+                        modules(a))));
 
-            return new TestChassis(wf);
+            return new TestChassis<TConfiguration>(wf);
         }
     }
 }

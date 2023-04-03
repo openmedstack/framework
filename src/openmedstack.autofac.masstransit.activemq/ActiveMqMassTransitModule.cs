@@ -7,16 +7,17 @@
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
     /// </summary>
-    public class ActiveMqMassTransitModule : Module
+    public class ActiveMqMassTransitModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActiveMqMassTransitModule"/> class.
+        /// Initializes a new instance of the <see cref="ActiveMqMassTransitModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> containing the configuration values.</param>
+        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
         /// <exception cref="ArgumentException"></exception>
-        public ActiveMqMassTransitModule(DeploymentConfiguration configuration)
+        public ActiveMqMassTransitModule(TConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.QueueName))
             {
@@ -56,7 +57,7 @@
                         {
                             s.Password(_configuration.ServiceBusPassword);
                             s.Username(_configuration.ServiceBusUsername);
-                            if (_configuration.ClusterHosts?.Length > 0)
+                            if (_configuration.ClusterHosts.Length > 0)
                             {
                                 s.FailoverHosts(_configuration.ClusterHosts);
                             }

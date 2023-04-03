@@ -5,7 +5,6 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using global::Autofac;
     using Microsoft.Extensions.Logging;
     using OpenMedStack;
     using OpenMedStack.Autofac;
@@ -16,7 +15,7 @@
 
     public class InMemoryMassTransitTests : IDisposable
     {
-        private readonly Chassis _chassis;
+        private readonly Chassis<DeploymentConfiguration> _chassis;
 
         public InMemoryMassTransitTests()
         {

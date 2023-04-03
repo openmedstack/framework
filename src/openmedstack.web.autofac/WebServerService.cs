@@ -8,7 +8,6 @@
     using System.Reactive.Subjects;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -19,16 +18,17 @@
     /// <summary>
     /// Defines the Autofac based implementation of <see cref="IService"/>.
     /// </summary>
-    internal class WebServerService : IService
+    internal class WebServerService<TConfiguration> : IService
+        where TConfiguration : WebDeploymentConfiguration
     {
-        private readonly WebDeploymentConfiguration _manifest;
+        private readonly TConfiguration _manifest;
         private readonly ISubject<BaseEvent> _subject = new Subject<BaseEvent>();
         private readonly IWebHost _container;
         private readonly IPublishEvents _eventBus;
         private readonly IRouteCommands _commandBus;
         private readonly string _urlBinding;
 
-        public WebServerService(WebDeploymentConfiguration manifest, WebStartup startup)
+        public WebServerService(TConfiguration manifest, WebStartup<TConfiguration> startup)
         {
             _manifest = manifest;
             var urlBindings = startup.UrlBindings.ToArray();
@@ -86,7 +86,7 @@
                 throw new AggregateException("Startup validation failed", startupErrors);
             }
             var bootstrappers = _container.Services.GetServices<IBootstrapSystem>();
-            var logger = _container.Services.GetRequiredService<ILogger<WebServerService>>();
+            var logger = _container.Services.GetRequiredService<ILogger<WebServerService<TConfiguration>>>();
             foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
             {
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);

@@ -7,15 +7,16 @@
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
     /// </summary>
-    public class RabbitMqMassTransitModule : Module
+    public class RabbitMqMassTransitModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RabbitMqMassTransitModule"/> class.
+        /// Initializes a new instance of the <see cref="RabbitMqMassTransitModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="openmedstack.DeploymentConfiguration"/> containing the configuration values.</param>
-        public RabbitMqMassTransitModule(DeploymentConfiguration configuration)
+        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
+        public RabbitMqMassTransitModule(TConfiguration configuration)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(configuration.QueueName));
 
@@ -46,7 +47,7 @@
                         _configuration.ServiceBus,
                         s =>
                         {
-                            if (_configuration.ClusterHosts?.Length > 0)
+                            if (_configuration.ClusterHosts.Length > 0)
                             {
                                 s.UseCluster(cluster =>
                                 {

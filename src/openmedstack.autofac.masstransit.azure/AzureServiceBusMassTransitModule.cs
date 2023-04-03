@@ -8,15 +8,16 @@
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
     /// </summary>
-    public class AzureServiceBusMassTransitModule : Module
+    public class AzureServiceBusMassTransitModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureServiceBusMassTransitModule"/> class.
+        /// Initializes a new instance of the <see cref="AzureServiceBusMassTransitModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> containing the configuration values.</param>
-        public AzureServiceBusMassTransitModule(DeploymentConfiguration configuration)
+        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
+        public AzureServiceBusMassTransitModule(TConfiguration configuration)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(configuration.QueueName));
 

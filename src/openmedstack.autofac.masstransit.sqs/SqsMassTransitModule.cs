@@ -10,15 +10,16 @@
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
     /// </summary>
-    public class SqsMassTransitModule : Module
+    public class SqsMassTransitModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqsMassTransitModule"/> class.
+        /// Initializes a new instance of the <see cref="SqsMassTransitModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="openmedstack.DeploymentConfiguration"/> containing the configuration values.</param>
-        public SqsMassTransitModule(DeploymentConfiguration configuration)
+        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
+        public SqsMassTransitModule(TConfiguration configuration)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(configuration.QueueName));
 

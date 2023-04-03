@@ -22,7 +22,7 @@ namespace OpenMedStack
     {
         /// <summary>
         /// <para>Starts the service.</para>
-        /// <para>This is called internally and does not need to be called when creating from a <see cref="Chassis"/>.</para>
+        /// <para>This is called internally and does not need to be called when creating from a <see cref="Chassis{TConfiguration}"/>.</para>
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the start task.</param>
         /// <returns>A <see cref="Task"/> encapsulating the start operation.</returns>

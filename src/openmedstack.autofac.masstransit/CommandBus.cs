@@ -18,14 +18,15 @@ namespace OpenMedStack.Autofac.MassTransit
     using Microsoft.Extensions.Logging;
     using OpenMedStack.Commands;
 
-    internal class CommandBus : IRouteCommands
+    internal class CommandBus<TConfiguration> : IRouteCommands
+        where TConfiguration : DeploymentConfiguration
     {
         private readonly IBus _bus;
         private readonly ILookupServices _lookup;
-        private readonly ILogger<CommandBus> _logger;
-        private readonly DeploymentConfiguration _configuration;
+        private readonly ILogger<CommandBus<TConfiguration>> _logger;
+        private readonly TConfiguration _configuration;
 
-        public CommandBus(IBus bus, ILookupServices lookup, ILogger<CommandBus> logger, DeploymentConfiguration configuration)
+        public CommandBus(IBus bus, ILookupServices lookup, ILogger<CommandBus<TConfiguration>> logger, TConfiguration configuration)
         {
             _bus = bus;
             _lookup = lookup;
@@ -63,7 +64,7 @@ namespace OpenMedStack.Autofac.MassTransit
                 handle.AddPipeSpecification(
                     new ContextFilterPipeSpecification<SendContext<T>>(CommandCallback));
                 var response = await handle.GetResponse<CommandResponse>().ConfigureAwait(false);
-                
+
                 return response.Message;
             }
             catch (RequestTimeoutException requestTimeoutException)

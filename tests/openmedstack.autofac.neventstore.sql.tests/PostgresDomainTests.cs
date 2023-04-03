@@ -18,7 +18,7 @@
     public class PostgresDomainTests : IDisposable
     {
         private readonly ITestOutputHelper _output;
-        private readonly Chassis _chassis;
+        private readonly Chassis<DeploymentConfiguration> _chassis;
 
         public PostgresDomainTests(ITestOutputHelper output)
         {

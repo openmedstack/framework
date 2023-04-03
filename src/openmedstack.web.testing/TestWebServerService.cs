@@ -16,19 +16,21 @@
     using OpenMedStack;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
+    using OpenMedStack.Web.Autofac;
 
     /// <summary>
     /// Defines the Autofac based implementation of <see cref="IService"/>.
     /// </summary>
-    internal class TestWebServerService : ITestWebService
+    internal class TestWebServerService<TConfiguration> : ITestWebService
+        where TConfiguration : WebDeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _manifest;
+        private readonly TConfiguration _manifest;
         private ISubject<BaseEvent> _subject = null!;
         private readonly TestServer _container;
         private IPublishEvents _eventBus = null!;
         private IRouteCommands _commandBus = null!;
 
-        public TestWebServerService(DeploymentConfiguration manifest, TestWebStartup startup)
+        public TestWebServerService(TConfiguration manifest, TestWebStartup<TConfiguration> startup)
         {
             _manifest = manifest;
             var hostBuilder = new WebHostBuilder()
@@ -63,7 +65,7 @@
         public virtual async Task Start(CancellationToken cancellationToken = default)
         {
             var bootstrappers = _container.Host.Services.GetServices<IBootstrapSystem>();
-            var logger = _container.Host.Services.GetRequiredService<ILogger<TestWebServerService>>();
+            var logger = _container.Host.Services.GetRequiredService<ILogger<TestWebServerService<TConfiguration>>>();
             foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
             {
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);

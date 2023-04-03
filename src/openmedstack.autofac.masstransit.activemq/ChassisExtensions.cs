@@ -2,11 +2,12 @@
 {
     public static class ChassisExtensions
     {
-        public static Chassis UsingMassTransitOverActiveMq(this Chassis chassis)
+        public static Chassis<TConfiguration> UsingMassTransitOverActiveMq<TConfiguration>(this Chassis<TConfiguration> chassis)
+        where TConfiguration : DeploymentConfiguration
         {
             chassis.AddAutofacModules(
-                (c, a) => new DomainModule(c, a),
-                (c, _) => new ActiveMqMassTransitModule(c));
+                (c, a) => new DomainModule<TConfiguration>(c, a),
+                (c, _) => new ActiveMqMassTransitModule<TConfiguration>(c));
 
             return chassis;
         }

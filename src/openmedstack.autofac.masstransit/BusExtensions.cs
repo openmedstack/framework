@@ -11,7 +11,10 @@
 
     internal static class BusExtensions
     {
-        public static void RegisterBusDependencies(this ContainerBuilder builder, DeploymentConfiguration configuration)
+        public static void RegisterBusDependencies<TConfiguration>(
+            this ContainerBuilder builder,
+            TConfiguration configuration)
+            where TConfiguration : DeploymentConfiguration
         {
             builder.RegisterInstance(new FixedServicesLookup(configuration.Services))
                 .As<ILookupServices>()
@@ -19,16 +22,16 @@
             builder.RegisterType<BusSpy>().AsImplementedInterfaces().SingleInstance();
 
             builder.RegisterType<BusStarter>().As<IBootstrapSystem>().SingleInstance();
-            builder.RegisterType<CommandBus>().As<IRouteCommands>();
+            builder.RegisterType<CommandBus<TConfiguration>>().As<IRouteCommands>();
             builder.RegisterType<MassTransitEventBus>().As<IPublishEvents>();
         }
 
-        public static void ConfigureBus<T>(
+        public static void ConfigureBus<T, TConfiguration>(
             this T sbc,
             IComponentContext c,
-            DeploymentConfiguration configuration,
+            TConfiguration configuration,
             IRetryPolicy retryPolicy)
-            where T : IBusFactoryConfigurator
+            where T : IBusFactoryConfigurator where TConfiguration : DeploymentConfiguration
         {
             ConfigureJson(sbc, c);
             sbc.ReceiveEndpoint(
@@ -75,9 +78,7 @@
                 settings.Converters.Add(converter);
             }
 
-            configurator.UseCloudEvents(
-                settings,
-                c.Resolve<IProvideTopic>());
+            configurator.UseCloudEvents(settings, c.Resolve<IProvideTopic>());
         }
     }
 }

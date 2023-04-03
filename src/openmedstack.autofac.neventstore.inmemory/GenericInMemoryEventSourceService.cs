@@ -16,10 +16,20 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory
     using global::Autofac.Core;
     using Microsoft.Extensions.Logging;
 
-    public class GenericInMemoryEventSourceService : AutofacService
+    public class GenericInMemoryEventSourceService<TConfiguration> : AutofacService<TConfiguration>
+        where TConfiguration : DeploymentConfiguration
     {
-        public GenericInMemoryEventSourceService(IEnumerable<IModule> modules, DeploymentConfiguration deploymentConfiguration, bool enableConsoleLogging = true, (string, LogLevel)[]? filters = null, params Assembly[] assemblies)
-            : base(deploymentConfiguration, enableConsoleLogging, filters, modules.Concat(new InMemoryEventStoreModule()).ToArray())
+        public GenericInMemoryEventSourceService(
+            IEnumerable<IModule> modules,
+            TConfiguration deploymentConfiguration,
+            bool enableConsoleLogging = true,
+            (string, LogLevel)[]? filters = null,
+            params Assembly[] assemblies)
+            : base(
+                deploymentConfiguration,
+                enableConsoleLogging,
+                filters,
+                modules.Concat(new InMemoryEventStoreModule()).ToArray())
         {
             Contract.Assume(assemblies != null);
         }

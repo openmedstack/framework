@@ -14,10 +14,14 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
 
     public static class SqlChassisExtensions
     {
-        public static Chassis UsingSqlEventStore(this Chassis chassis, DbProviderFactory dbProviderFactory, ISqlDialect dialect)
+        public static Chassis<TConfiguration> UsingSqlEventStore<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
+            DbProviderFactory dbProviderFactory,
+            ISqlDialect dialect)
+            where TConfiguration : DeploymentConfiguration
         {
             return chassis.AddAutofacModules(
-                     (c, _) => new SqlEventStoreModule(c.ConnectionString, dbProviderFactory, dialect));
+                (c, _) => new SqlEventStoreModule(c.ConnectionString, dbProviderFactory, dialect));
         }
     }
 }

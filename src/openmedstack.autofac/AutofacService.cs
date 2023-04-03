@@ -27,9 +27,10 @@ namespace OpenMedStack.Autofac
     /// <summary>
     /// Defines the Autofac based implementation of <see cref="IService"/>.
     /// </summary>
-    public class AutofacService : IService
+    public class AutofacService<TConfiguration> : IService
+    where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
         private readonly Subject<BaseEvent> _subject = new();
         private readonly IContainer _container;
         private readonly IPublishEvents _eventBus;
@@ -37,18 +38,18 @@ namespace OpenMedStack.Autofac
         private bool _isDisposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AutofacService"/> class.
+        /// Initializes a new instance of the <see cref="AutofacService{T}"/> class.
         /// </summary>
         /// <param name="configuration">The deployment configuration</param>
         /// <param name="enableConsoleLogging">Register a console logger.</param>
         /// <param name="filters">The set of log level filters to apply.</param>
         /// <param name="modules">The <see cref="IModule"/> to use for configuration.</param>
-        public AutofacService(DeploymentConfiguration configuration, bool enableConsoleLogging = true, (string, LogLevel)[]? filters = null, params IModule[] modules)
+        public AutofacService(TConfiguration configuration, bool enableConsoleLogging = true, (string, LogLevel)[]? filters = null, params IModule[] modules)
         {
             _configuration = configuration;
             var builder = new ContainerBuilder();
             builder.RegisterInstance(configuration)
-                .As<DeploymentConfiguration>()
+                .As<TConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();

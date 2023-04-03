@@ -2,11 +2,13 @@
 {
     public static class ChassisExtensions
     {
-        public static Chassis UsingInMemoryMassTransit(this Chassis chassis)
+        public static Chassis<TConfiguration> UsingInMemoryMassTransit<TConfiguration>(
+            this Chassis<TConfiguration> chassis)
+            where TConfiguration : DeploymentConfiguration
         {
             chassis.AddAutofacModules(
-                (c, a) => new DomainModule(c, a),
-                (c, _) => new InMemoryMassTransitModule(c));
+                (c, a) => new DomainModule<TConfiguration>(c, a),
+                (c, _) => new InMemoryMassTransitModule<TConfiguration>(c));
 
             return chassis;
         }

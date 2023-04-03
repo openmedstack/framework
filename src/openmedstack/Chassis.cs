@@ -18,17 +18,29 @@ namespace OpenMedStack
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
 
+    public static class Chassis
+    {
+        /// <summary>
+        /// Creates a <see cref="Chassis{T}"/> from the passed <see cref="DeploymentConfiguration"/>.
+        /// </summary>
+        /// <param name="manifest">The configuration for the chassis.</param>
+        /// <returns>The created chassis.</returns>
+        public static Chassis<TConfiguration> From<TConfiguration>(TConfiguration manifest)
+            where TConfiguration : DeploymentConfiguration =>
+            new(manifest);
+    }
+
     /// <summary>
     /// Defines the Chassis class.
     /// </summary>
-    public class Chassis : IDisposable, IObservable<BaseEvent>
+    public class Chassis<TConfiguration> : IDisposable, IObservable<BaseEvent> where TConfiguration : DeploymentConfiguration
     {
         private readonly ManualResetEventSlim _waitHandle = new(false);
         private List<Assembly> _assemblies = new();
-        private Func<DeploymentConfiguration, IEnumerable<Assembly>, IService> _serviceBuilder = BuildService;
+        private Func<TConfiguration, IEnumerable<Assembly>, IService> _serviceBuilder = BuildService;
         private IService? _service;
 
-        private Chassis(DeploymentConfiguration manifest)
+        internal Chassis(TConfiguration manifest)
         {
             Configuration = manifest;
             Metadata = new Dictionary<string, object>();
@@ -42,21 +54,14 @@ namespace OpenMedStack
         /// </summary>
         public Dictionary<string, object> Metadata { get; }
 
-        public DeploymentConfiguration Configuration { get; }
-
-        /// <summary>
-        /// Creates a <see cref="Chassis"/> from the passed <see cref="DeploymentConfiguration"/>.
-        /// </summary>
-        /// <param name="manifest">The configuration for the chassis.</param>
-        /// <returns>The created chassis.</returns>
-        public static Chassis From(DeploymentConfiguration manifest) => new(manifest);
+        public TConfiguration Configuration { get; }
 
         /// <summary>
         /// Collects the chassis types from the passed assemblies.
         /// </summary>
         /// <param name="assemblies">The assemblies to scan.</param>
         /// <returns>The chassis definition.</returns>
-        public Chassis DefinedIn(params Assembly[] assemblies)
+        public Chassis<TConfiguration> DefinedIn(params Assembly[] assemblies)
         {
             _assemblies = _assemblies.Concat(assemblies)
                 .DistinctBy((a, b) => string.Equals(a.FullName, b.FullName, StringComparison.OrdinalIgnoreCase))
@@ -69,7 +74,7 @@ namespace OpenMedStack
         /// </summary>
         /// <param name="builder">The function to build the chassis with.</param>
         /// <returns>The built chassis.</returns>
-        public Chassis UsingCustomBuilder(Func<DeploymentConfiguration, IEnumerable<Assembly>, IService> builder)
+        public Chassis<TConfiguration> UsingCustomBuilder(Func<TConfiguration, IEnumerable<Assembly>, IService> builder)
         {
             _serviceBuilder = builder;
             return this;
@@ -90,12 +95,12 @@ namespace OpenMedStack
         /// <summary>
         /// Sends the command to the service service bus end point.
         /// </summary>
-        /// <typeparam name="T">The <see cref="Type"/> of <see cref="DomainCommand"/> to send.</typeparam>
+        /// <typeparam name="TMsg">The <see cref="Type"/> of <see cref="DomainCommand"/> to send.</typeparam>
         /// <param name="msg">The <see cref="DomainCommand"/> to publish.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the send operation.</param>
         /// <returns>A <see cref="Task"/> encapsulating the send task.</returns>
-        public Task<CommandResponse> Send<T>(T msg, CancellationToken cancellationToken = default)
-            where T : DomainCommand
+        public Task<CommandResponse> Send<TMsg>(TMsg msg, CancellationToken cancellationToken = default)
+            where TMsg : DomainCommand
         {
             if (_service is null)
             {
@@ -107,11 +112,11 @@ namespace OpenMedStack
         /// <summary>
         /// Publishes the event to the service service bus end point.
         /// </summary>
-        /// <typeparam name="T">The <see cref="Type"/> of <see cref="BaseEvent"/> to publish.</typeparam>
+        /// <typeparam name="TMsg">The <see cref="Type"/> of <see cref="BaseEvent"/> to publish.</typeparam>
         /// <param name="msg">The <see cref="BaseEvent"/> to publish.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the publish operation.</param>
         /// <returns>A <see cref="Task"/> encapsulating the publish task.</returns>
-        public Task Publish<T>(T msg, CancellationToken cancellationToken = default) where T : BaseEvent
+        public Task Publish<TMsg>(TMsg msg, CancellationToken cancellationToken = default) where TMsg : BaseEvent
         {
             if (_service is null)
             {

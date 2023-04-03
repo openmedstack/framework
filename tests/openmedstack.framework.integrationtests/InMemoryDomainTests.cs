@@ -16,7 +16,7 @@
 
     public class InMemoryDomainTests : IDisposable
     {
-        private readonly Chassis _chassis;
+        private readonly Chassis<DeploymentConfiguration> _chassis;
 
         public InMemoryDomainTests()
         {

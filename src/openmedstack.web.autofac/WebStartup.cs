@@ -16,10 +16,11 @@
     using OpenMedStack.Autofac;
     using OpenMedStack.Events;
 
-    internal class WebStartup : IStartup
+    internal class WebStartup<TConfiguration> : IStartup
+        where TConfiguration : WebDeploymentConfiguration
     {
         private readonly bool _enableConsoleLogging;
-        private readonly DeploymentConfiguration _deploymentConfiguration;
+        private readonly TConfiguration _deploymentConfiguration;
         private readonly IConfigureWebApplication _webappConfiguration;
         private readonly (string, LogLevel)[]? _filters;
         private readonly IModule[] _modules;
@@ -27,7 +28,7 @@
 
         public WebStartup(
             bool enableConsoleLogging,
-            DeploymentConfiguration deploymentConfiguration,
+            TConfiguration deploymentConfiguration,
             IEnumerable<string> urlBindings,
             IConfigureWebApplication builder,
             (string, LogLevel)[]? filters = null,
@@ -57,7 +58,7 @@
             builder.RegisterModule(new ConsoleLogModule(_enableConsoleLogging, _filters));
             builder.RegisterModule(new ValidationModule());
             builder.RegisterInstance(_deploymentConfiguration)
-                .As<DeploymentConfiguration>()
+                .As<TConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
@@ -78,10 +79,8 @@
             _webappConfiguration.ConfigureApplication(app);
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
             // ReSharper disable once AsyncVoidLambda
-            lifetime.ApplicationStopped.Register(async () =>
-            {
-                await _container.DisposeAsync().ConfigureAwait(false);
-            });
+            lifetime.ApplicationStopped.Register(
+                async () => { await _container.DisposeAsync().ConfigureAwait(false); });
         }
     }
 }

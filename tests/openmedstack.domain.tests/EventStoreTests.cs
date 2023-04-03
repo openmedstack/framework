@@ -22,7 +22,7 @@ namespace OpenMedStack.Domain.Tests
     {
         private readonly CancellationTokenSource _cts = new();
         private IAsyncDisposable? _workflow;
-        protected Chassis Service = null!;
+        protected Chassis<DeploymentConfiguration> Service = null!;
 
         [Background]
         public void Background()

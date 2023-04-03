@@ -2,11 +2,13 @@
 {
     public static class AzureChassisExtensions
     {
-        public static Chassis UsingMassTransitOverAzure(this Chassis chassis)
+        public static Chassis<TConfiguration> UsingMassTransitOverAzure<TConfiguration>(
+            this Chassis<TConfiguration> chassis)
+            where TConfiguration : DeploymentConfiguration
         {
             chassis.AddAutofacModules(
-                (c, a) => new DomainModule(c, a),
-                (c, _) => new AzureServiceBusMassTransitModule(c));
+                (c, a) => new DomainModule<TConfiguration>(c, a),
+                (c, _) => new AzureServiceBusMassTransitModule<TConfiguration>(c));
 
             return chassis;
         }

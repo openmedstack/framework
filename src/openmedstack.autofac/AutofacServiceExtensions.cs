@@ -10,9 +10,10 @@ namespace OpenMedStack.Autofac
     {
         private const string AutofacModules = "AutofacModules";
 
-        public static Chassis AddAutofacModules(
-            this Chassis chassis,
-            params Func<DeploymentConfiguration, IEnumerable<Assembly>, IModule>[] modules)
+        public static Chassis<TConfiguration> AddAutofacModules<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
+            params Func<TConfiguration, IEnumerable<Assembly>, IModule>[] modules)
+            where TConfiguration : DeploymentConfiguration
         {
             var moduleList = InnerGetModules(chassis);
             moduleList.AddRange(modules);
@@ -20,23 +21,29 @@ namespace OpenMedStack.Autofac
             return chassis;
         }
 
-        public static IEnumerable<IModule> GetModules(
-            this Chassis chassis,
-            DeploymentConfiguration configuration,
+        public static IEnumerable<IModule> GetModules<TConfiguration>(
+            this Chassis<TConfiguration> chassis,
+            TConfiguration configuration,
             IEnumerable<Assembly> assemblies)
+            where TConfiguration : DeploymentConfiguration
         {
             return InnerGetModules(chassis).Select(x => x(configuration, assemblies));
         }
 
-        private static IList<Func<DeploymentConfiguration, IEnumerable<Assembly>, IModule>> InnerGetModules(Chassis chassis)
+        private static IList<Func<TConfiguration, IEnumerable<Assembly>, IModule>>
+            InnerGetModules<TConfiguration>(Chassis<TConfiguration> chassis)
+            where TConfiguration : DeploymentConfiguration
         {
             if (!chassis.Metadata.ContainsKey(AutofacModules))
             {
-                chassis.Metadata.Add(AutofacModules, new List<Func<DeploymentConfiguration, IEnumerable<Assembly>, IModule>>());
+                chassis.Metadata.Add(
+                    AutofacModules,
+                    new List<Func<TConfiguration, IEnumerable<Assembly>, IModule>>());
             }
 
-            return chassis.Metadata[AutofacModules] as IList<Func<DeploymentConfiguration, IEnumerable<Assembly>, IModule>>
-                   ?? Array.Empty<Func<DeploymentConfiguration, IEnumerable<Assembly>, IModule>>();
+            return chassis.Metadata[AutofacModules] as
+                       IList<Func<TConfiguration, IEnumerable<Assembly>, IModule>>
+                   ?? Array.Empty<Func<TConfiguration, IEnumerable<Assembly>, IModule>>();
         }
     }
 }

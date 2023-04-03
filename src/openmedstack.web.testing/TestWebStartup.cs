@@ -13,21 +13,38 @@
     using OpenMedStack.Events;
     using OpenMedStack.Web.Autofac;
 
-    internal class TestWebStartup : IStartup
+    internal class TestWebStartup<TConfiguration> : IStartup
+        where TConfiguration : WebDeploymentConfiguration
     {
+        private readonly TConfiguration _configuration;
         private readonly Action<IServiceCollection>? _webappConfiguration;
         private readonly Action<IApplicationBuilder>? _configureApplication;
         private readonly ClaimsPrincipal? _principal;
         private readonly IModule[] _modules;
         private IContainer _container = null!;
 
-        public TestWebStartup(IConfigureWebApplication configureApplication, ClaimsPrincipal? principal = null, params IModule[] modules)
-            : this(configureApplication.ConfigureServices, configureApplication.ConfigureApplication, principal, modules)
+        public TestWebStartup(
+            TConfiguration configuration,
+            IConfigureWebApplication configureApplication,
+            ClaimsPrincipal? principal = null,
+            params IModule[] modules)
+            : this(
+                configuration,
+                configureApplication.ConfigureServices,
+                configureApplication.ConfigureApplication,
+                principal,
+                modules)
         {
         }
 
-        public TestWebStartup(Action<IServiceCollection>? builder = null, Action<IApplicationBuilder>? configureApplication = null, ClaimsPrincipal? principal = null, params IModule[] modules)
+        public TestWebStartup(
+            TConfiguration configuration,
+            Action<IServiceCollection>? builder = null,
+            Action<IApplicationBuilder>? configureApplication = null,
+            ClaimsPrincipal? principal = null,
+            params IModule[] modules)
         {
+            _configuration = configuration;
             _webappConfiguration = builder;
             _configureApplication = configureApplication;
             _principal = principal;
@@ -39,6 +56,11 @@
         {
             _webappConfiguration?.Invoke(services);
             var builder = new ContainerBuilder();
+            builder.RegisterInstance(_configuration)
+                .As<TConfiguration>()
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .SingleInstance();
             builder.Populate(services);
             builder.RegisterInstance(new Subject<BaseEvent>()).AsImplementedInterfaces().SingleInstance();
             foreach (var module in _modules)
@@ -60,6 +82,7 @@
                     {
                         ctx.User = _principal;
                     }
+
                     return next();
                 });
             _configureApplication?.Invoke(app);

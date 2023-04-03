@@ -14,18 +14,15 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
     using global::Autofac.Core;
     using Microsoft.Extensions.Logging;
 
-    public class GenericSqlEventSourceService : AutofacService
+    public class GenericSqlEventSourceService<TConfiguration> : AutofacService<TConfiguration>
+        where TConfiguration : DeploymentConfiguration
     {
         public GenericSqlEventSourceService(
-            DeploymentConfiguration manifest,
+            TConfiguration manifest,
             IEnumerable<IModule> modules,
             (string, LogLevel)[]? filters = null,
             bool enableConsoleLogging = true)
-            : base(
-                manifest,
-                enableConsoleLogging,
-                filters,
-                modules.ToArray())
+            : base(manifest, enableConsoleLogging, filters, modules.ToArray())
         {
         }
     }

@@ -22,7 +22,7 @@
         {
             private readonly CancellationTokenSource _cts = new();
             private IAsyncDisposable _workflow = null!;
-            private TestChassis _webServerService = null!;
+            private TestChassis<WebDeploymentConfiguration> _webServerService = null!;
 
             [Background]
             public void Background()
@@ -30,7 +30,7 @@
                 "Given a service".x(
                         () =>
                         {
-                            var config = new DeploymentConfiguration
+                            var config = new WebDeploymentConfiguration
                             {
                                 Name = typeof(GivenAWebServerWorkflow).Assembly.GetName().Name!,
                                 Services = new Dictionary<Regex, Uri>

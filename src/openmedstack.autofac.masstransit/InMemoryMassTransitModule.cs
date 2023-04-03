@@ -17,15 +17,16 @@ namespace OpenMedStack.Autofac.MassTransit
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
     /// </summary>
-    public class InMemoryMassTransitModule : Module
+    public class InMemoryMassTransitModule<TConfiguration> : Module
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly DeploymentConfiguration _configuration;
+        private readonly TConfiguration _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InMemoryMassTransitModule"/> class.
+        /// Initializes a new instance of the <see cref="InMemoryMassTransitModule{T}"/> class.
         /// </summary>
-        /// <param name="configuration">The <see cref="DeploymentConfiguration"/> containing the configuration values.</param>
-        public InMemoryMassTransitModule(DeploymentConfiguration configuration)
+        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
+        public InMemoryMassTransitModule(TConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.QueueName))
             {

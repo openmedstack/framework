@@ -10,10 +10,11 @@
     using OpenMedStack.ReadModels;
     using Module = global::Autofac.Module;
 
-    internal class CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker> : Module
+    internal class CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration> : Module
         where TEventTracker : ITrackEventCheckpoints
         where TCommandTracker : ITrackCommandCheckpoints
         where TReadModelTracker : ITrackReadModelCheckpoints
+        where TConfiguration : DeploymentConfiguration
     {
         private readonly Assembly[] _assemblies;
         private readonly TimeSpan _pollingInterval;
@@ -38,7 +39,7 @@
                 .As<IUpdateReadModel>();
 
             builder.RegisterType<ReadModelCommitDispatcher>().As<IReadModelCommitDispatcher>().SingleInstance();
-            builder.RegisterType<CommandCommitDispatcher>().As<ICommandCommitDispatcher>().SingleInstance();
+            builder.RegisterType<CommandCommitDispatcher<TConfiguration>>().As<ICommandCommitDispatcher>().SingleInstance();
             builder.RegisterType<EventCommitDispatcher>().As<IEventCommitDispatcher>().SingleInstance();
             builder.RegisterType<TEventTracker>().As<ITrackEventCheckpoints>().SingleInstance();
             builder.RegisterType<TCommandTracker>().As<ITrackCommandCheckpoints>().SingleInstance();
