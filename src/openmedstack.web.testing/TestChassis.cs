@@ -34,6 +34,8 @@
 
         public HttpClient CreateClient() => _chassis.Resolve<HttpClient>();
 
+        public T Resolve<T>()  where T : class => _chassis.Resolve<T>();
+
         /// <inheritdoc />
         public void Dispose()
         {

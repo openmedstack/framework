@@ -106,6 +106,11 @@
             {
                 return (_container.CreateClient() as T)!;
             }
+
+            if (typeof(HttpMessageHandler).IsAssignableFrom(typeof(T)))
+            {
+                return (_container.CreateHandler() as T)!;
+            }
             return _container.Host.Services.GetRequiredService<T>();
         }
 
