@@ -7,7 +7,6 @@
     using System.Security.Claims;
     using System.Text.RegularExpressions;
     using System.Threading;
-    using System.Threading.Tasks;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
     using OpenMedStack.Autofac.NEventstore;
@@ -64,21 +63,21 @@
             }
 
             [Scenario]
-            public void WhenRequestingAppplicationRootThenEventIsPublishedOnBus()
+            public void WhenRequestingApplicationRootThenEventIsPublishedOnBus()
             {
                 HttpClient client = null!;
                 var waitHandle = new ManualResetEvent(false);
                 IDisposable subscription = null!;
 
                 "and a client".x(() => client = _webServerService.CreateClient())
-                    .Teardown(() => { client!.Dispose(); });
+                    .Teardown(() => { client.Dispose(); });
 
                 "and an event subscription".x(
                         () => { subscription = _webServerService.Subscribe(_ => waitHandle.Set()); })
-                    .Teardown(() => { subscription?.Dispose(); });
+                    .Teardown(() => { subscription.Dispose(); });
 
                 "when requesting application root".x(
-                    async () => { _ = await client!.GetAsync("http://localhost").ConfigureAwait(false); });
+                    async () => { _ = await client.GetAsync("http://localhost").ConfigureAwait(false); });
 
                 "then event is published on bus".x(
                     () =>
@@ -91,9 +90,9 @@
             [Scenario]
             public void WhenRequestingCommandPathThenCommandIsSentOnBus()
             {
-                HttpClient client = null!;
+                HttpClient? client = null!;
                 var waitHandle = new ManualResetEvent(false);
-                IDisposable subscription = null!;
+                IDisposable? subscription = null!;
 
                 "and a client".x(() => client = _webServerService.CreateClient())
                     .Teardown(() => { client?.Dispose(); });
@@ -110,7 +109,7 @@
                 "when requesting command path".x(
                     async () =>
                     {
-                        _ = await client!.GetAsync("http://localhost/commands").ConfigureAwait(false);
+                        _ = await client.GetAsync("http://localhost/commands").ConfigureAwait(false);
                     });
 
                 "then event is published on bus".x(
@@ -122,9 +121,9 @@
             }
 
             [Scenario]
-            public void WhenRequestingAppplicationRootThenGetsOkResponse()
+            public void WhenRequestingApplicationRootThenGetsOkResponse()
             {
-                HttpClient client = null!;
+                HttpClient? client = null!;
                 HttpResponseMessage response = null!;
 
                 "and a client".x(() => client = _webServerService.CreateClient())
@@ -133,7 +132,7 @@
                 "when requesting command path".x(
                     async () => { response = await client!.GetAsync("http://localhost").ConfigureAwait(false); });
 
-                "then response is ok".x(() => { Assert.Equal(HttpStatusCode.OK, response!.StatusCode); });
+                "then response is ok".x(() => { Assert.Equal(HttpStatusCode.OK, response.StatusCode); });
             }
         }
     }

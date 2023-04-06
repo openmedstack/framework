@@ -61,7 +61,7 @@ namespace OpenMedStack.Autofac.MassTransit
             builder.RegisterType<EnvironmentTopicNameFormatter>().As<IEntityNameFormatter>().SingleInstance();
             builder.RegisterGeneric(typeof(MassTransitCommandSubscriber<>)).As(typeof(ISubscribeCommands<>)).SingleInstance();
             builder.RegisterGeneric(typeof(MassTransitEventSubscriber<>)).As(typeof(ISubscribeEvents<>)).SingleInstance();
-            
+
             var assemblyTypes = _sourceAssemblies.SelectMany(a => a.GetTypes())
                 .Where(t => !t.IsAbstract)
                 .ToArray();
@@ -90,7 +90,7 @@ namespace OpenMedStack.Autofac.MassTransit
 
             builder.RegisterTypes(messageHandlerTypes).AsSelf().AsImplementedInterfaces();
 
-            var messageHandlers = messageHandlerTypes
+            var eventHandlers = messageHandlerTypes
                 .SelectMany(t => t.GetInterfaces())
                 .Where(IsDomainEventHandler)
                 .Select(t => t.GetGenericArguments()[0])
@@ -98,7 +98,7 @@ namespace OpenMedStack.Autofac.MassTransit
                 .Select(t => typeof(BaseEventConsumer<>).MakeGenericType(t))
                 .ToArray();
 
-            builder.RegisterTypes(messageHandlers).AsSelf().AsImplementedInterfaces();
+            builder.RegisterTypes(eventHandlers).AsSelf().AsImplementedInterfaces();
         }
 
         private static bool IsDomainEventHandler(Type t) =>
