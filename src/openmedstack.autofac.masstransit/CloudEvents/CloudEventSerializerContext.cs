@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CloudEventSerializerContext.cs" company="Reimers.dk">
-//   Copyright © Reimers.dk
+//   Copyright ï¿½ Reimers.dk
 // </copyright>
 // <summary>
 //   Defines the $TYPE$ type.
@@ -11,6 +11,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using global::MassTransit;
 using global::MassTransit.Metadata;
@@ -112,7 +113,7 @@ internal class CloudEventSerializerContext : SerializerContext
     }
 
     /// <inheritdoc />
-    public bool TryGetMessage(Type messageType, out object? message)
+    public bool TryGetMessage(Type messageType, [NotNullWhen(true)] out object? message)
     {
         var data = _envelope.CloudEvent.Data switch
         {
