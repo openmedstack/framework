@@ -41,7 +41,7 @@ namespace OpenMedStack
         private Func<TConfiguration, IEnumerable<Assembly>, IService> _serviceBuilder = BuildService;
         private IService? _service;
         private ChassisInstance? _instance;
-        private bool _disposed = false;
+        private bool _disposed;
 
         internal Chassis(TConfiguration manifest)
         {
