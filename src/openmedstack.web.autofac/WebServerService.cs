@@ -65,11 +65,11 @@
             foreach (var bootstrapper in bootstrappers.OrderByDescending(x => x.Order))
             {
                 using var tokenSource = new CancellationTokenSource(_manifest.Timeout);
-                await bootstrapper.Shutdown(tokenSource.Token);
+                await bootstrapper.Shutdown(tokenSource.Token).ConfigureAwait(false);
             }
 
             using var cancellationTokenSource = new CancellationTokenSource(_manifest.Timeout);
-            await _container.StopAsync(cancellationTokenSource.Token);
+            await _container.StopAsync(cancellationTokenSource.Token).ConfigureAwait(false);
             _subject.TryDispose();
             _container.Dispose();
             GC.SuppressFinalize(this);
@@ -92,7 +92,7 @@
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);
             }
 
-            await _container.StartAsync(cancellationToken);
+            await _container.StartAsync(cancellationToken).ConfigureAwait(false);
             logger.LogInformation("Web server bound to: {url}", _urlBinding);
         }
 

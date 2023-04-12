@@ -78,7 +78,7 @@ namespace OpenMedStack.Domain
                 cancellationToken.ThrowIfCancellationRequested();
                 _logger.LogError(exception, exception.Message);
 
-                return await OnException(exception, command, headers, cancellationToken);
+                return await OnException(exception, command, headers, cancellationToken).ConfigureAwait(false);
             }
         }
 

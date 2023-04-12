@@ -4,13 +4,13 @@
     using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
-    using System.Threading;
+    using System.Threading.Tasks;
     using OpenMedStack.Web.Autofac;
 
     /// <summary>
     /// Defines the chassis for tests
     /// </summary>
-    public class TestChassis<TConfiguration> : IDisposable
+    public class TestChassis<TConfiguration> : IAsyncDisposable
         where TConfiguration : WebDeploymentConfiguration
     {
         private readonly Chassis<TConfiguration> _chassis;
@@ -27,19 +27,17 @@
         /// <summary>
         /// Starts the chassis.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The started <see cref="ITestWebService"/> as an asynchronous operation.</returns>
-        public IAsyncDisposable Start(CancellationToken cancellationToken = default) =>
-            _chassis.Start(cancellationToken);
+        public void Start() => _chassis.Start();
 
         public HttpClient CreateClient() => _chassis.Resolve<HttpClient>();
 
-        public T Resolve<T>()  where T : class => _chassis.Resolve<T>();
+        public T Resolve<T>() where T : class => _chassis.Resolve<T>();
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _chassis.Dispose();
+            await _chassis.DisposeAsync().ConfigureAwait(false);
             GC.SuppressFinalize(this);
         }
 

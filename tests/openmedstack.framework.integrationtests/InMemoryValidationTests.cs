@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
-    using System.Threading;
     using System.Threading.Tasks;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
@@ -37,8 +36,8 @@
 
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var c = chassis.Start(CancellationToken.None);
-                await c.DisposeAsync();
+                chassis.Start();
+                await chassis.DisposeAsync().ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
 
@@ -63,8 +62,8 @@
 
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var c = chassis.Start(CancellationToken.None);
-                await c.DisposeAsync().ConfigureAwait(false);
+                chassis.Start();
+                await chassis.DisposeAsync().ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
     }

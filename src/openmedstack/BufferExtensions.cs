@@ -32,7 +32,8 @@ namespace OpenMedStack
                 return memoryInput.ToArray();
             }
 
-            await using var ms = new MemoryStream();
+            var ms = new MemoryStream();
+            await using var _ = ms.ConfigureAwait(false);
             await input!.CopyToAsync(ms, 8192, cancellationToken).ConfigureAwait(false);
             return ms.ToArray();
         }
@@ -45,8 +46,10 @@ namespace OpenMedStack
         /// <returns>The compressed bytes.</returns>
         public static async Task<byte[]> Compress(this byte[] inputData, CancellationToken cancellationToken = default)
         {
-            await using var compressIntoMs = new MemoryStream();
-            await using (var gzs = new GZipStream(compressIntoMs, CompressionMode.Compress))
+            var compressIntoMs = new MemoryStream();
+            await using var _ = compressIntoMs.ConfigureAwait(false);
+            var gzs = new GZipStream(compressIntoMs, CompressionMode.Compress);
+            await using (gzs.ConfigureAwait(false))
             {
                 await gzs.WriteAsync(inputData, 0, inputData.Length, cancellationToken).ConfigureAwait(false);
             }
@@ -62,9 +65,12 @@ namespace OpenMedStack
         /// <returns>The decompressed bytes.</returns>
         public static async Task<byte[]> Decompress(this byte[] inputData, CancellationToken cancellationToken = default)
         {
-            await using var compressedMs = new MemoryStream(inputData);
-            await using var decompressedMs = new MemoryStream();
-            await using (var gzs = new GZipStream(compressedMs, CompressionMode.Decompress))
+            var compressedMs = new MemoryStream(inputData);
+            await using var _ = compressedMs.ConfigureAwait(false);
+            var decompressedMs = new MemoryStream();
+            await using var __ = decompressedMs.ConfigureAwait(false);
+            var gzs = new GZipStream(compressedMs, CompressionMode.Decompress);
+            await using (gzs.ConfigureAwait(false))
             {
                 await gzs.CopyToAsync(decompressedMs, 8192, cancellationToken).ConfigureAwait(false);
             }

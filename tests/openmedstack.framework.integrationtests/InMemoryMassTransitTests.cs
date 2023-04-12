@@ -13,7 +13,7 @@
     using OpenMedStack.Autofac.NEventstore.InMemory;
     using Xunit;
 
-    public class InMemoryMassTransitTests : IDisposable
+    public class InMemoryMassTransitTests : IAsyncLifetime
     {
         private readonly Chassis<DeploymentConfiguration> _chassis;
 
@@ -42,25 +42,30 @@
         [Fact]
         public async Task WhenSubscribingToServiceEventsThenReceivesPublishedEvents()
         {
-            using var cts = new CancellationTokenSource();
             using var waitHandle = new ManualResetEvent(false);
-            await using var wf = _chassis.Start(cts.Token);
+            _chassis.Start();
             using (_chassis.Subscribe(_ => waitHandle.Set()))
             {
-                await _chassis.Publish(new TestEvent(), cts.Token).ConfigureAwait(false);
+                await _chassis.Publish(new TestEvent(), CancellationToken.None).ConfigureAwait(false);
 
                 var success = waitHandle.WaitOne(TimeSpan.FromSeconds(5));
 
                 Assert.True(success);
             }
-            cts.Cancel();
+
+            await _chassis.DisposeAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        public Task InitializeAsync()
         {
-            _chassis?.Dispose();
-            GC.SuppressFinalize(this);
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public async Task DisposeAsync()
+        {
+            await _chassis.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

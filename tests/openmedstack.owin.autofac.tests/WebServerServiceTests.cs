@@ -19,8 +19,6 @@
     {
         public class GivenAWebServerWorkflow
         {
-            private readonly CancellationTokenSource _cts = new();
-            private IAsyncDisposable _workflow = null!;
             private TestChassis<WebDeploymentConfiguration> _webServerService = null!;
 
             [Background]
@@ -50,16 +48,12 @@
                                 .UsingInMemoryMassTransit()
                                 .UsingTestWebServer(
                                     new TestStartup(),
-                                    new ClaimsPrincipal(new ClaimsIdentity(new[] {new Claim("test", "yes")}, "test")));
-                            _workflow = _webServerService.Start(_cts.Token);
+                                    new ClaimsPrincipal(
+                                        new ClaimsIdentity(new[] { new Claim("test", "yes") }, "test")));
+                            _webServerService.Start();
                         })
                     .Teardown(
-                        async () =>
-                        {
-                            _cts.Cancel();
-                            await _workflow.DisposeAsync().ConfigureAwait(false);
-                            _webServerService.Dispose();
-                        });
+                        async () => { await _webServerService.DisposeAsync().ConfigureAwait(false); });
             }
 
             [Scenario]
@@ -107,10 +101,7 @@
                         });
 
                 "when requesting command path".x(
-                    async () =>
-                    {
-                        _ = await client.GetAsync("http://localhost/commands").ConfigureAwait(false);
-                    });
+                    async () => { _ = await client.GetAsync("http://localhost/commands").ConfigureAwait(false); });
 
                 "then event is published on bus".x(
                     () =>

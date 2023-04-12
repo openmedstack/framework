@@ -51,10 +51,10 @@
             foreach (var bootstrapper in bootstrappers.OrderByDescending(x => x.Order))
             {
                 using var tokenSource = new CancellationTokenSource(_manifest.Timeout);
-                await bootstrapper.Shutdown(tokenSource.Token);
+                await bootstrapper.Shutdown(tokenSource.Token).ConfigureAwait(false);
             }
 
-            await _container.Host.StopAsync(_manifest.Timeout);
+            await _container.Host.StopAsync(_manifest.Timeout).ConfigureAwait(false);
 
             _subject.TryDispose();
             _container.Dispose();

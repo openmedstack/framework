@@ -14,7 +14,7 @@
     using OpenMedStack.Autofac.NEventstore.InMemory;
     using Xunit;
 
-    public class InMemoryDomainTests : IDisposable
+    public class InMemoryDomainTests
     {
         private readonly Chassis<DeploymentConfiguration> _chassis;
 
@@ -26,7 +26,7 @@
                 QueueName = "Test",
                 Services = new Dictionary<Regex, Uri>
                 {
-                    {new Regex(".+"), new Uri("loopback://localhost/Test") }
+                    { new Regex(".+"), new Uri("loopback://localhost/Test") }
                 },
                 RetryCount = 5,
                 RetryInterval = TimeSpan.FromSeconds(3),
@@ -50,18 +50,23 @@
         {
             try
             {
-                using var cts = new CancellationTokenSource();
                 using var waitHandle = new ManualResetEvent(false);
-                await using var wf = _chassis.Start(cts.Token);
+                _chassis.Start();
                 using var s = _chassis.Subscribe(_ => waitHandle.Set());
-                await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0), cts.Token).ConfigureAwait(false);
+                await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0), CancellationToken.None)
+                    .ConfigureAwait(false);
 
                 var success = waitHandle.WaitOne(TimeSpan.FromSeconds(Debugger.IsAttached ? 5 : 50));
 
                 Assert.True(success);
-                cts.Cancel();
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                await _chassis.DisposeAsync().ConfigureAwait(false);
+            }
         }
 
         [Fact]
@@ -69,11 +74,12 @@
         {
             try
             {
-                using var tokenSource = new CancellationTokenSource();
-                await using var wf = _chassis.Start(tokenSource.Token);
-                tokenSource.Cancel();
+                _chassis.Start();
+                await _chassis.DisposeAsync().ConfigureAwait(false);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
         }
 
         [Fact]
@@ -81,8 +87,7 @@
         {
             try
             {
-                using var tokenSource = new CancellationTokenSource();
-                await using var wf = _chassis.Start(tokenSource.Token);
+                _chassis.Start();
                 var logger = _chassis.Resolve<ILogger<TestAggregate>>();
 
                 logger.LogCritical("test");
@@ -91,17 +96,11 @@
                 logger.LogInformation("test");
                 logger.LogDebug("test");
                 logger.LogTrace("test");
-
-                tokenSource.Cancel();
+                await _chassis.DisposeAsync().ConfigureAwait(false);
             }
-            catch (OperationCanceledException) { }
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            _chassis?.Dispose();
+            catch (OperationCanceledException)
+            {
+            }
         }
     }
 }

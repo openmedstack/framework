@@ -11,7 +11,6 @@ namespace openmedstack.masstransit.tests
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
     using Xunit;
-    using Xunit.Abstractions;
 
     public class CloudEventTests
     {
@@ -22,15 +21,16 @@ namespace openmedstack.masstransit.tests
                 new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
             var waitHandle = new ManualResetEventSlim(false);
             var configuration = new DeploymentConfiguration { TenantPrefix = "Test", QueueName = "test" };
-            using var chassis = Chassis.From(configuration)
+            var chassis = Chassis.From(configuration)
                 .DefinedIn(typeof(TestEvent).Assembly)
                 .UsingInMemoryMassTransit()
                 .AddAutofacModules((_, _) => new BusTestModule(waitHandle))
                 .Build();
-            chassis.Start(tokenSource.Token);
+            await using var __ = chassis.ConfigureAwait(false);
+            chassis.Start();
             var publishTask = chassis.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow), tokenSource.Token);
             var handled = waitHandle.Wait(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
-            await publishTask;
+            await publishTask.ConfigureAwait(false);
 
             Assert.True(handled);
         }

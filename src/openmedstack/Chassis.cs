@@ -11,7 +11,6 @@ namespace OpenMedStack
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
@@ -33,12 +32,16 @@ namespace OpenMedStack
     /// <summary>
     /// Defines the Chassis class.
     /// </summary>
-    public class Chassis<TConfiguration> : IDisposable, IObservable<BaseEvent> where TConfiguration : DeploymentConfiguration
+    public class Chassis<TConfiguration> : IAsyncDisposable, IObservable<BaseEvent>
+        where TConfiguration : DeploymentConfiguration
     {
-        private readonly ManualResetEventSlim _waitHandle = new(false);
-        private List<Assembly> _assemblies = new();
+        private readonly SemaphoreSlim _semaphore = new(1);
+        private readonly CancellationTokenSource _tokenSource = new();
+        private readonly List<Assembly> _assemblies = new();
         private Func<TConfiguration, IEnumerable<Assembly>, IService> _serviceBuilder = BuildService;
         private IService? _service;
+        private ChassisInstance? _instance;
+        private bool _disposed = false;
 
         internal Chassis(TConfiguration manifest)
         {
@@ -63,9 +66,9 @@ namespace OpenMedStack
         /// <returns>The chassis definition.</returns>
         public Chassis<TConfiguration> DefinedIn(params Assembly[] assemblies)
         {
-            _assemblies = _assemblies.Concat(assemblies)
-                .DistinctBy((a, b) => string.Equals(a.FullName, b.FullName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            _assemblies.AddRange(
+                _assemblies.Concat(assemblies)
+                    .DistinctBy((a, b) => string.Equals(a.FullName, b.FullName, StringComparison.OrdinalIgnoreCase)));
             return this;
         }
 
@@ -83,13 +86,12 @@ namespace OpenMedStack
         /// <summary>
         /// Creates an instance of an <see cref="IService"/> and starts it.
         /// </summary>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public IAsyncDisposable Start(CancellationToken cancellationToken)
+        public void Start()
         {
             _service = _serviceBuilder(Configuration, _assemblies);
-            var task = _service.Start(cancellationToken);
-            return new ChassisInstance(task, _waitHandle, cancellationToken);
+            var task = _service.Start(_tokenSource.Token);
+            _instance = new ChassisInstance(task, _tokenSource.Token);
         }
 
         /// <summary>
@@ -106,6 +108,7 @@ namespace OpenMedStack
             {
                 throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
+
             return _service.Send(msg, cancellationToken);
         }
 
@@ -122,6 +125,7 @@ namespace OpenMedStack
             {
                 throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
+
             return _service.Publish(msg, cancellationToken);
         }
 
@@ -131,15 +135,32 @@ namespace OpenMedStack
             {
                 throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
+
             return _service.Resolve<T>();
         }
 
-        private static IService BuildService(DeploymentConfiguration manifest, IEnumerable<Assembly> assemblies) => throw new NotImplementedException(Strings.ChassisBuilderNotConfigured);
+        private static IService BuildService(DeploymentConfiguration manifest, IEnumerable<Assembly> assemblies) =>
+            throw new NotImplementedException(Strings.ChassisBuilderNotConfigured);
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _waitHandle.Set();
+            try
+            {
+                await _semaphore.WaitAsync();
+                if (_disposed)
+                {
+                    return;
+                }
+
+                _disposed = true;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            _tokenSource.Cancel();
             _assemblies.Clear();
             _service.TryDispose();
             foreach (var value in Metadata.Values)
@@ -150,20 +171,25 @@ namespace OpenMedStack
             Metadata.Clear();
             AppDomain.CurrentDomain.ProcessExit -= ProcessExit;
             Console.CancelKeyPress -= CancelKeyPress;
-            _waitHandle.Dispose();
+            if (_instance != null)
+            {
+                await _instance.DisposeAsync().ConfigureAwait(false);
+            }
+
+            _tokenSource.Dispose();
             GC.SuppressFinalize(this);
         }
 
         private void CancelKeyPress(object? sender, ConsoleCancelEventArgs eventArgs)
         {
-            _waitHandle.Set();
+            _tokenSource.Cancel();
             // Don't terminate the process immediately, wait for the Main thread to exit gracefully.
             eventArgs.Cancel = true;
         }
 
         private void ProcessExit(object? sender, EventArgs eventArgs)
         {
-            _waitHandle.Set();
+            _tokenSource.Cancel();
             // On Linux if the shutdown is triggered by SIGTERM then that's signaled with the 143 exit code.
             // Suppress that since we shut down gracefully. https://github.com/dotnet/aspnetcore/issues/6526
             Environment.ExitCode = 0;
@@ -176,27 +202,31 @@ namespace OpenMedStack
             {
                 throw new InvalidOperationException(Strings.ChassisNotStarted);
             }
+
             return _service.Subscribe(observer);
         }
 
         private class ChassisInstance : IAsyncDisposable
         {
+            private readonly ManualResetEventSlim _waitHandle = new(false);
             private readonly Task _service;
 
-            public ChassisInstance(Task service, ManualResetEventSlim waitHandle, CancellationToken cancellationToken)
+            public ChassisInstance(Task service, CancellationToken cancellationToken)
             {
-                _service = Task.Run(async () =>
-                {
-                    try
+                _service = Task.Run(
+                    async () =>
                     {
-                        await service.ConfigureAwait(false);
-                        waitHandle.Wait(cancellationToken);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        waitHandle.Set();
-                    }
-                }, cancellationToken);
+                        try
+                        {
+                            await service.ConfigureAwait(false);
+                            _waitHandle.Wait(cancellationToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _waitHandle.Set();
+                        }
+                    },
+                    cancellationToken);
             }
 
             /// <inheritdoc />

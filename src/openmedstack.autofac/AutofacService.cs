@@ -75,7 +75,7 @@ namespace OpenMedStack.Autofac
         /// <inheritdoc />
         public async ValueTask DisposeAsync()
         {
-            await Dispose(true);
+            await Dispose(true).ConfigureAwait(false);
             GC.SuppressFinalize(this);
         }
 
@@ -123,7 +123,7 @@ namespace OpenMedStack.Autofac
             foreach (var bootstrapper in bootstrappers.GroupBy(x => x.Order).OrderByDescending(x => x.Key))
             {
                 using var tokenSource = new CancellationTokenSource(_configuration.Timeout);
-                await Task.WhenAll(bootstrapper.Select(x => x.Shutdown(tokenSource.Token)).ToArray());
+                await Task.WhenAll(bootstrapper.Select(x => x.Shutdown(tokenSource.Token)).ToArray()).ConfigureAwait(false);
             }
 
             _subject.Dispose();

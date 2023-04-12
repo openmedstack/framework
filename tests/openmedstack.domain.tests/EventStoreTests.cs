@@ -6,12 +6,12 @@
 //   Defines the Blob type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace OpenMedStack.Domain.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
-    using System.Threading;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
     using OpenMedStack.Autofac.NEventstore;
@@ -20,8 +20,6 @@ namespace OpenMedStack.Domain.Tests
 
     public abstract class EventStoreTests
     {
-        private readonly CancellationTokenSource _cts = new();
-        private IAsyncDisposable? _workflow;
         protected Chassis<DeploymentConfiguration> Service = null!;
 
         [Background]
@@ -39,7 +37,7 @@ namespace OpenMedStack.Domain.Tests
                                     ServiceBus = new Uri("loopback://localhost"),
                                     Services = new Dictionary<Regex, Uri>
                                     {
-                                        {new Regex(".+"), new Uri("loopback://localhost/test")}
+                                        { new Regex(".+"), new Uri("loopback://localhost/test") }
                                     }
                                 })
                             .DefinedIn(GetType().Assembly)
@@ -49,18 +47,12 @@ namespace OpenMedStack.Domain.Tests
                             .UsingInMemoryEventStore()
                             .UsingInMemoryMassTransit()
                             .Build();
-                        _workflow = Service.Start(_cts.Token);
+                        Service.Start();
                     })
                 .Teardown(
                     async () =>
                     {
-                        _cts.Cancel();
-                        if (_workflow != null)
-                        {
-                            await _workflow.DisposeAsync();
-                        }
-
-                        Service.Dispose();
+                        await Service.DisposeAsync().ConfigureAwait(false);
                     });
         }
     }
