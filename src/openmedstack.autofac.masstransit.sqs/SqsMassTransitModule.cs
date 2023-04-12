@@ -6,6 +6,8 @@
     using global::MassTransit.AmazonSqsTransport;
     using OpenMedStack.Autofac.MassTransit;
     using System.Diagnostics.Contracts;
+    using Newtonsoft.Json;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
@@ -43,26 +45,27 @@
 
         private IBusControl CreateSqsBus(IComponentContext c, IRetryPolicy retryPolicy)
         {
-            var bus = Bus.Factory.CreateUsingAmazonSqs(
-                sqs =>
-                {
-                    var environment = _configuration.Environment ?? throw new Exception("Must set environment name");
-                    sqs.MessageTopology.SetEntityNameFormatter(
-                        new MessageNameFormatterEntityNameFormatter(
-                            new SegmentedMessageNameFormatter(
-                                environment,
-                                new AmazonSqsMessageNameFormatter())));
-                    sqs.Host(
-                        _configuration.ServiceBus,
-                        s =>
-                        {
-                            s.AccessKey(_configuration.ServiceBusUsername);
-                            s.SecretKey(_configuration.ServiceBusPassword);
-                        });
-                    sqs.ConfigureBus(c, _configuration, retryPolicy);
-                });
-
-            return bus.AttachObservers(c);
+            return Bus.Factory.CreateUsingAmazonSqs(
+                    sqs =>
+                    {
+                        sqs.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        var environment = _configuration.Environment
+                                          ?? throw new Exception("Must set environment name");
+                        sqs.Host(
+                            _configuration.ServiceBus,
+                            s =>
+                            {
+                                s.AccessKey(_configuration.ServiceBusUsername);
+                                s.SecretKey(_configuration.ServiceBusPassword);
+                            });
+                        sqs.ConfigureBus(c, _configuration, retryPolicy);
+                        sqs.MessageTopology.SetEntityNameFormatter(
+                            new MessageNameFormatterEntityNameFormatter(
+                                new SegmentedMessageNameFormatter(
+                                    environment,
+                                    new AmazonSqsMessageNameFormatter())));
+                    })
+                .AttachObservers(c);
         }
     }
 }

@@ -6,7 +6,7 @@
 
         public ConfigurationTenantProvider(DeploymentConfiguration configuration)
         {
-            _tenantId = configuration.TenantPrefix + configuration.QueueName;
+            _tenantId = $"{configuration.TenantPrefix}{configuration.QueueName}";
         }
 
         /// <inheritdoc />

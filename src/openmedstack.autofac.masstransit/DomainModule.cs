@@ -16,6 +16,7 @@ namespace OpenMedStack.Autofac.MassTransit
     using System.Reflection;
     using global::Autofac;
     using global::MassTransit;
+    using Newtonsoft.Json;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
     using Module = global::Autofac.Module;
@@ -54,6 +55,17 @@ namespace OpenMedStack.Autofac.MassTransit
             Contract.Assume(builder != null);
 
             base.Load(builder);
+
+            builder.RegisterInstance(
+                    new JsonSerializerSettings
+                    {
+                        MetadataPropertyHandling = MetadataPropertyHandling.Default,
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        TypeNameHandling = TypeNameHandling.All,
+                        Formatting = Formatting.None
+                    })
+                .AsSelf()
+                .IfNotRegistered(typeof(JsonSerializerSettings));
             builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance();
             builder.Register<IProvideTopic>(
                     ctx => new EnvironmentTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))

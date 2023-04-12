@@ -3,7 +3,9 @@
     using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
+    using Newtonsoft.Json;
     using OpenMedStack.Autofac.MassTransit;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
@@ -41,7 +43,7 @@
 
         private IBusControl CreateAzureBus(IComponentContext c, IRetryPolicy retryPolicy)
         {
-            var bus = Bus.Factory.CreateUsingAzureServiceBus(
+            return Bus.Factory.CreateUsingAzureServiceBus(
                 rmq =>
                 {
                     rmq.Host(
@@ -54,10 +56,9 @@
                             //    _configuration.ServiceBusPassword,
                             //    TimeSpan.FromHours(8));
                         });
+                    rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
                     rmq.ConfigureBus(c, _configuration, retryPolicy);
-                });
-
-            return bus.AttachObservers(c);
+                }).AttachObservers(c);
         }
     }
 }

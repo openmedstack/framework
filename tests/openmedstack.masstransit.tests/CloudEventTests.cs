@@ -5,57 +5,32 @@ namespace openmedstack.masstransit.tests
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Autofac;
     using CloudNative.CloudEvents.NewtonsoftJson;
-    using MassTransit;
-    using Newtonsoft.Json;
     using OpenMedStack;
+    using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.MassTransit;
-    using OpenMedStack.Autofac.MassTransit.CloudEvents;
     using Xunit;
     using Xunit.Abstractions;
 
     public class CloudEventTests
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public CloudEventTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
-        
         [Fact]
         public async Task CanRoundTrip()
         {
-            var configuration = new DeploymentConfiguration { TenantPrefix = "Test" };
+            using var tokenSource =
+                new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
             var waitHandle = new ManualResetEventSlim(false);
-            var bus = Bus.Factory.CreateUsingInMemory(
-                sbc =>
-                {
-                    sbc.UseCloudEvents(
-                        new JsonSerializerSettings
-                        {
-                            MetadataPropertyHandling = MetadataPropertyHandling.Default,
-                            DefaultValueHandling = DefaultValueHandling.Ignore,
-                            TypeNameHandling = TypeNameHandling.All,
-                            Formatting = Formatting.None
-                        },
-                        new EnvironmentTopicProvider(new ConfigurationTenantProvider(configuration)));
-                    sbc.ReceiveEndpoint(
-                        "test",
-                        e =>
-                        {
-                            e.UseInMemoryOutbox();
-                            e.UseRetry(r => r.SetRetryPolicy(_ => Retry.Interval(5, TimeSpan.FromMilliseconds(500))));
-                            e.Consumer(() => new TestEventConsumer(waitHandle));
-                        });
-                });
-            await bus.StartAsync();
-
-            var publishTask = bus.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow));
+            var configuration = new DeploymentConfiguration { TenantPrefix = "Test", QueueName = "test" };
+            using var chassis = Chassis.From(configuration)
+                .DefinedIn(typeof(TestEvent).Assembly)
+                .UsingInMemoryMassTransit()
+                .AddAutofacModules((_, _) => new BusTestModule(waitHandle))
+                .Build();
+            chassis.Start(tokenSource.Token);
+            var publishTask = chassis.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow), tokenSource.Token);
             var handled = waitHandle.Wait(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
             await publishTask;
-
-            await bus.StopAsync();
 
             Assert.True(handled);
         }
@@ -78,11 +53,29 @@ namespace openmedstack.masstransit.tests
     ""correlationId"": null
 }
         }";
-            
+
             var deserializer = new JsonEventFormatter<TestEvent>();
             var deserialized = deserializer.DecodeStructuredModeMessage(Encoding.UTF8.GetBytes(json), null, null);
 
             Assert.NotNull(deserialized);
+        }
+    }
+
+    internal class BusTestModule : Module
+    {
+        private readonly ManualResetEventSlim _waitHandle;
+
+        public BusTestModule(ManualResetEventSlim waitHandle)
+        {
+            _waitHandle = waitHandle;
+        }
+
+        /// <inheritdoc />
+        protected override void Load(ContainerBuilder builder)
+        {
+            base.Load(builder);
+
+            builder.RegisterInstance(_waitHandle);
         }
     }
 }

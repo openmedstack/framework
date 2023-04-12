@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		shared.proj = shared.proj
 		build.sh = build.sh
 		build_mac.sh = build_mac.sh
+		push.sh = push.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.autofac.masstransit.azure", "src\openmedstack.autofac.masstransit.azure\openmedstack.autofac.masstransit.azure.csproj", "{302AE1E9-22C8-4F0A-B878-6D3234C2CD64}"

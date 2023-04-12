@@ -31,9 +31,10 @@
             IComponentContext c,
             TConfiguration configuration,
             IRetryPolicy retryPolicy)
-            where T : IBusFactoryConfigurator where TConfiguration : DeploymentConfiguration
+            where T : class, IBusFactoryConfigurator
+            where TConfiguration : DeploymentConfiguration
         {
-            ConfigureJson(sbc, c);
+            sbc.ConfigureJson(c);
             sbc.ReceiveEndpoint(
                 configuration.QueueName,
                 e =>
@@ -61,16 +62,9 @@
             return bus;
         }
 
-        private static void ConfigureJson(IBusFactoryConfigurator configurator, IComponentContext c)
+        private static void ConfigureJson(this IBusFactoryConfigurator configurator, IComponentContext c)
         {
-            var settings = c.ResolveOptional(typeof(JsonSerializerSettings)) as JsonSerializerSettings
-                           ?? new JsonSerializerSettings
-                           {
-                               TypeNameHandling = TypeNameHandling.All,
-                               DefaultValueHandling = DefaultValueHandling.Ignore,
-                               MetadataPropertyHandling = MetadataPropertyHandling.Default,
-                               TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
-                           };
+            var settings = c.Resolve<JsonSerializerSettings>();
             var converters = c.Resolve<IEnumerable<JsonConverter>>().ToArray();
 
             foreach (var converter in converters)

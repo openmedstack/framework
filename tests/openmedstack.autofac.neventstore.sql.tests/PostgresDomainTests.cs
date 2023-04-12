@@ -52,7 +52,7 @@
         public async Task WhenSendingCommandToValidAggregateThenEventIsRaised()
         {
             var waitHandle = new ManualResetEvent(false);
-            await using var wf = _chassis.Start();
+            await using var wf = _chassis.Start(CancellationToken.None);
             using (_chassis.Subscribe(_ => waitHandle.Set()))
             {
                 var response = await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
@@ -63,7 +63,7 @@
 
                 Assert.True(success);
             }
-            
+
             try
             {
                 waitHandle.Dispose();

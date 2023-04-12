@@ -40,7 +40,7 @@
                 .DisableDefaultConsoleLogging()
                 .UsingNEventStore()
                 .UsingInMemoryEventStore()
-                .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(1))
+                .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.25))
                 .UsingInMemoryMassTransit()
                 .Build(new TestModule());
         }

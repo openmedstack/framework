@@ -44,7 +44,7 @@
                             };
                             _webServerService = Chassis.From(config)
                                 .AddAutofacModules((c, _) => new TestStartupModule(c))
-                                .UsingInMemoryEventDispatcher(TimeSpan.FromMilliseconds(300))
+                                .UsingInMemoryEventDispatcher(TimeSpan.FromMilliseconds(200))
                                 .UsingInMemoryEventStore()
                                 .UsingNEventStore()
                                 .UsingInMemoryMassTransit()

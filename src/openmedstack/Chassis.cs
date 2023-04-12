@@ -85,7 +85,7 @@ namespace OpenMedStack
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public IAsyncDisposable Start(CancellationToken cancellationToken = default)
+        public IAsyncDisposable Start(CancellationToken cancellationToken)
         {
             _service = _serviceBuilder(Configuration, _assemblies);
             var task = _service.Start(cancellationToken);
@@ -156,17 +156,17 @@ namespace OpenMedStack
 
         private void CancelKeyPress(object? sender, ConsoleCancelEventArgs eventArgs)
         {
+            _waitHandle.Set();
             // Don't terminate the process immediately, wait for the Main thread to exit gracefully.
             eventArgs.Cancel = true;
-            _waitHandle.Set();
         }
 
         private void ProcessExit(object? sender, EventArgs eventArgs)
         {
+            _waitHandle.Set();
             // On Linux if the shutdown is triggered by SIGTERM then that's signaled with the 143 exit code.
             // Suppress that since we shut down gracefully. https://github.com/dotnet/aspnetcore/issues/6526
             Environment.ExitCode = 0;
-            _waitHandle.Set();
         }
 
         /// <inheritdoc />

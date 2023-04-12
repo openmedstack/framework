@@ -1,6 +1,5 @@
 #!/bin/sh
 
-config=$1
 if [ ! -n "$config" ]
 then
     config="Release"

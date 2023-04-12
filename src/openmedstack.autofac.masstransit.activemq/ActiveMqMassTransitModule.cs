@@ -3,6 +3,8 @@
     using System;
     using global::Autofac;
     using global::MassTransit;
+    using Newtonsoft.Json;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
@@ -47,29 +49,30 @@
 
         private IBusControl CreateActiveMq(IComponentContext c, IRetryPolicy retryPolicy)
         {
-            var bus = Bus.Factory.CreateUsingActiveMq(
-                rmq =>
-                {
-                    rmq.Host(
-                        _configuration.ServiceBus!.Host,
-                        _configuration.ServiceBus.Port,
-                        s =>
-                        {
-                            s.Password(_configuration.ServiceBusPassword);
-                            s.Username(_configuration.ServiceBusUsername);
-                            if (_configuration.ClusterHosts.Length > 0)
+            return Bus.Factory.CreateUsingActiveMq(
+                    rmq =>
+                    {
+                        rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        rmq.Host(
+                            _configuration.ServiceBus!.Host,
+                            _configuration.ServiceBus.Port,
+                            s =>
                             {
-                                s.FailoverHosts(_configuration.ClusterHosts);
-                            }
-                            if (_configuration.ServiceBus.Scheme == "ssl")
-                            {
-                                s.UseSsl();
-                            }
-                        });
-                    rmq.ConfigureBus(c, _configuration, retryPolicy);
-                });
+                                s.Password(_configuration.ServiceBusPassword);
+                                s.Username(_configuration.ServiceBusUsername);
+                                if (_configuration.ClusterHosts.Length > 0)
+                                {
+                                    s.FailoverHosts(_configuration.ClusterHosts);
+                                }
 
-            return bus.AttachObservers(c);
+                                if (_configuration.ServiceBus.Scheme == "ssl")
+                                {
+                                    s.UseSsl();
+                                }
+                            });
+                        rmq.ConfigureBus(c, _configuration, retryPolicy);
+                    })
+                .AttachObservers(c);
         }
     }
 }

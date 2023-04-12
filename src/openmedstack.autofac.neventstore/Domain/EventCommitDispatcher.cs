@@ -56,7 +56,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain
                                   let result = method.Invoke(eventBus, new[] { evt.Body, eventHeaders, CancellationToken.None })
                                   select (Task)result).ToArray();
 
-                    _logger.LogInformation($"Publishing {events.Length} events for commit {commit.CommitId}");
+                    _logger.LogInformation("Publishing {count} events for commit {commitId}", events.Length, commit.CommitId);
 
                     await Task.WhenAll(events).ConfigureAwait(false);
                 }

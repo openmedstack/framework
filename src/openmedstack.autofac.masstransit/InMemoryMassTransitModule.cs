@@ -12,6 +12,8 @@ namespace OpenMedStack.Autofac.MassTransit
     using System;
     using global::Autofac;
     using global::MassTransit;
+    using Newtonsoft.Json;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
     using Module = global::Autofac.Module;
 
     /// <summary>
@@ -52,11 +54,13 @@ namespace OpenMedStack.Autofac.MassTransit
         private IBusControl CreateInMemory(IComponentContext c, IRetryPolicy retryPolicy)
         {
             return Bus.Factory.CreateUsingInMemory(
-                    sbc =>
-                    {
-                        sbc.ConfigureBus(c, _configuration, retryPolicy);
-                    })
-                .AttachObservers(c);
+                sbc =>
+                {
+                    sbc.UseCloudEvents(
+                        c.Resolve<JsonSerializerSettings>(),
+                        c.Resolve<IProvideTopic>());
+                    sbc.ConfigureBus(c, _configuration, retryPolicy);
+                }).AttachObservers(c);
         }
     }
 }

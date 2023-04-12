@@ -3,6 +3,8 @@
     using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
+    using Newtonsoft.Json;
+    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.
@@ -40,30 +42,32 @@
 
         private IBusControl CreateRabbitMq(IComponentContext c, IRetryPolicy retryPolicy)
         {
-            var bus = Bus.Factory.CreateUsingRabbitMq(
-                rmq =>
-                {
-                    rmq.Host(
-                        _configuration.ServiceBus,
-                        s =>
-                        {
-                            if (_configuration.ClusterHosts.Length > 0)
+            return Bus.Factory.CreateUsingRabbitMq(
+                    rmq =>
+                    {
+                        rmq.Host(
+                            _configuration.ServiceBus,
+                            s =>
                             {
-                                s.UseCluster(cluster =>
+                                if (_configuration.ClusterHosts.Length > 0)
                                 {
-                                    foreach (var clusterHost in _configuration.ClusterHosts)
-                                    {
-                                        cluster.Node(clusterHost);
-                                    }
-                                });
-                            }
-                            s.Password(_configuration.ServiceBusPassword);
-                            s.Username(_configuration.ServiceBusUsername);
-                        });
-                    rmq.ConfigureBus(c, _configuration, retryPolicy);
-                });
+                                    s.UseCluster(
+                                        cluster =>
+                                        {
+                                            foreach (var clusterHost in _configuration.ClusterHosts)
+                                            {
+                                                cluster.Node(clusterHost);
+                                            }
+                                        });
+                                }
 
-            return bus.AttachObservers(c);
+                                s.Password(_configuration.ServiceBusPassword);
+                                s.Username(_configuration.ServiceBusUsername);
+                            });
+                        rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        rmq.ConfigureBus(c, _configuration, retryPolicy);
+                    })
+                .AttachObservers(c);
         }
     }
 }
