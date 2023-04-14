@@ -59,6 +59,7 @@
             builder.RegisterModule(new ValidationModule());
             builder.RegisterInstance(_deploymentConfiguration)
                 .As<TConfiguration>()
+                .As<DeploymentConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();

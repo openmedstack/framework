@@ -50,6 +50,7 @@ namespace OpenMedStack.Autofac
             var builder = new ContainerBuilder();
             builder.RegisterInstance(configuration)
                 .As<TConfiguration>()
+                .As<DeploymentConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();

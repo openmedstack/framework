@@ -66,8 +66,8 @@ namespace OpenMedStack.Web.Testing
         /// <returns>A <see cref="TestChassis{T}"/>.</returns>
         public static TestChassis<TConfiguration> UsingTestWebServer<TConfiguration>(
             this Chassis<TConfiguration> chassis,
-            Action<IServiceCollection>? serviceConfiguration = null,
-            Action<IApplicationBuilder>? applicationConfiguration = null,
+            Action<IServiceCollection> serviceConfiguration,
+            Action<IApplicationBuilder> applicationConfiguration,
             ClaimsPrincipal? principal = null)
             where TConfiguration : WebDeploymentConfiguration
         {

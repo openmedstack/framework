@@ -1,6 +1,5 @@
 ﻿namespace OpenMedStack.Autofac.MassTransit.RabbitMq
 {
-    using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
     using Newtonsoft.Json;
@@ -20,16 +19,12 @@
         /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
         public RabbitMqMassTransitModule(TConfiguration configuration)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(configuration.QueueName));
-
             _configuration = configuration;
         }
 
         /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
         {
-            Contract.Assume(builder != null);
-
             base.Load(builder);
             builder.RegisterBusDependencies(_configuration);
             builder.Register(
@@ -49,6 +44,8 @@
                             _configuration.ServiceBus,
                             s =>
                             {
+                                s.Heartbeat(_configuration.Timeout);
+                                s.RequestedConnectionTimeout(_configuration.Timeout);
                                 if (_configuration.ClusterHosts.Length > 0)
                                 {
                                     s.UseCluster(
@@ -60,7 +57,6 @@
                                             }
                                         });
                                 }
-
                                 s.Password(_configuration.ServiceBusPassword);
                                 s.Username(_configuration.ServiceBusUsername);
                             });

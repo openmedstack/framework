@@ -17,8 +17,8 @@
         where TConfiguration : WebDeploymentConfiguration
     {
         private readonly TConfiguration _configuration;
-        private readonly Action<IServiceCollection>? _webappConfiguration;
-        private readonly Action<IApplicationBuilder>? _configureApplication;
+        private readonly Action<IServiceCollection> _webappConfiguration;
+        private readonly Action<IApplicationBuilder> _configureApplication;
         private readonly ClaimsPrincipal? _principal;
         private readonly IModule[] _modules;
         private IContainer _container = null!;
@@ -39,8 +39,8 @@
 
         public TestWebStartup(
             TConfiguration configuration,
-            Action<IServiceCollection>? builder = null,
-            Action<IApplicationBuilder>? configureApplication = null,
+            Action<IServiceCollection> builder,
+            Action<IApplicationBuilder> configureApplication,
             ClaimsPrincipal? principal = null,
             params IModule[] modules)
         {
@@ -54,10 +54,11 @@
         /// <inheritdoc />
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            _webappConfiguration?.Invoke(services);
+            _webappConfiguration.Invoke(services);
             var builder = new ContainerBuilder();
             builder.RegisterInstance(_configuration)
                 .As<TConfiguration>()
+                .As<DeploymentConfiguration>()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
@@ -85,7 +86,7 @@
 
                     return next();
                 });
-            _configureApplication?.Invoke(app);
+            _configureApplication.Invoke(app);
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
             lifetime.ApplicationStopped.Register(_container.Dispose);
         }
