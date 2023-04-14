@@ -14,6 +14,7 @@ namespace OpenMedStack
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
 
@@ -27,6 +28,28 @@ namespace OpenMedStack
         public static Chassis<TConfiguration> From<TConfiguration>(TConfiguration manifest)
             where TConfiguration : DeploymentConfiguration =>
             new(manifest);
+
+        /// <summary>
+        /// Creates a <see cref="Chassis{T}"/> from the passed <see cref="IConfiguration"/> list.
+        /// </summary>
+        /// <param name="configurationBuilder">The function to read the configuration values into the <see cref="TConfiguration"/>.</param>
+        /// <param name="configurations">The configuration loaders.</param>
+        /// <returns>The created chassis.</returns>
+        public static Chassis<TConfiguration> From<TConfiguration>(
+            Func<IConfiguration, TConfiguration> configurationBuilder,
+            params Action<IConfigurationBuilder>[] configurations)
+            where TConfiguration : DeploymentConfiguration
+        {
+            var builder = new ConfigurationBuilder();
+            foreach (var configuration in configurations)
+            {
+                configuration(builder);
+            }
+
+            var root = builder.Build();
+            var manifest = configurationBuilder(root);
+            return new Chassis<TConfiguration>(manifest);
+        }
     }
 
     /// <summary>

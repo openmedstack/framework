@@ -6,6 +6,8 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Configuration.Memory;
     using Microsoft.Extensions.Logging;
     using OpenMedStack;
     using OpenMedStack.Autofac;
@@ -20,22 +22,39 @@
 
         public InMemoryDomainTests()
         {
-            var config = new DeploymentConfiguration
-            {
-                TenantPrefix = "Test",
-                QueueName = "Test",
-                Services = new Dictionary<Regex, Uri>
-                {
-                    { new Regex(".+"), new Uri("loopback://localhost/Test") }
-                },
-                RetryCount = 5,
-                RetryInterval = TimeSpan.FromSeconds(3),
-                Timeout = TimeSpan.FromSeconds(5),
-                Name = "Test",
-                ServiceBus = new Uri("loopback://localhost/")
-            };
-
-            _chassis = Chassis.From(config)
+            _chassis = Chassis.From(
+                    config =>
+                        new DeploymentConfiguration
+                        {
+                            TenantPrefix = config["DeploymentConfiguration:Tenant"]!,
+                            QueueName = config["DeploymentConfiguration:Queue"]!,
+                            Services = new Dictionary<Regex, Uri>
+                            {
+                                { new Regex(".+"), new Uri("loopback://localhost/Test") }
+                            },
+                            RetryCount = 5,
+                            RetryInterval = TimeSpan.FromSeconds(3),
+                            Timeout = TimeSpan.FromSeconds(5),
+                            Name = config["DeploymentConfiguration:Name"]!,
+                            ServiceBus = new Uri(config["DeploymentConfiguration:ServiceBus:Host"]!)
+                        },
+                    b => b.AddConfiguration(
+                        new ConfigurationRoot(
+                            new List<IConfigurationProvider>
+                            {
+                                new
+                                    MemoryConfigurationProvider(
+                                        new MemoryConfigurationSource
+                                            {
+                                                InitialData = new Dictionary<string, string?>
+                                                        {
+["DeploymentConfiguration:Tenant"] = "Test",
+["DeploymentConfiguration:Queue"] = "Test",
+["DeploymentConfiguration:Name"] = "Test",
+["DeploymentConfiguration:ServiceBus:Host"] = "loopback://localhost/",
+                                                        }
+                                            })
+                            })))
                 .DefinedIn(typeof(TestAggregate).Assembly)
                 .DisableDefaultConsoleLogging()
                 .UsingNEventStore()
