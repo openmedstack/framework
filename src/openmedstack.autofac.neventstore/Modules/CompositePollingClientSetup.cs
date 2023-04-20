@@ -20,7 +20,8 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
         private readonly CompositeCheckpointTracker _tracker;
         private byte _errorCount;
 
-        public CompositePollingClientSetup(IPersistStreams persistence,
+        public CompositePollingClientSetup(
+            IPersistStreams persistence,
             IProvideTenant tenantProvider,
             ILogger<AsyncPollingClient> logger,
             TimeSpan pollingInterval = default,
@@ -37,7 +38,9 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
                 pollingInterval == default ? TimeSpan.FromMilliseconds(500) : pollingInterval);
         }
 
-        private async Task<PollingClient2.HandlingResult> HandleCommit(ICommit commit, CancellationToken cancellationToken)
+        private async Task<PollingClient2.HandlingResult> HandleCommit(
+            ICommit commit,
+            CancellationToken cancellationToken)
         {
             var tasks = _dispatchers.Select(
                 async tuple =>
@@ -49,12 +52,13 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
                         {
                             return PollingClient2.HandlingResult.MoveToNext;
                         }
+
                         return await commitDispatcher.Dispatch(commit, cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
                         _errorCount++;
-                        _logger.LogError(ex.Message);
+                        _logger.LogError("{error}", ex.Message);
                         return _errorCount >= 3
                             ? PollingClient2.HandlingResult.Stop
                             : PollingClient2.HandlingResult.Retry;
@@ -66,12 +70,10 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
             {
                 return PollingClient2.HandlingResult.Stop;
             }
-            if (results.Any(x => x == PollingClient2.HandlingResult.Retry))
-            {
-                return PollingClient2.HandlingResult.Retry;
-            }
 
-            return PollingClient2.HandlingResult.MoveToNext;
+            return results.Any(x => x == PollingClient2.HandlingResult.Retry)
+                ? PollingClient2.HandlingResult.Retry
+                : PollingClient2.HandlingResult.MoveToNext;
         }
 
         /// <inheritdoc />
@@ -94,6 +96,7 @@ namespace OpenMedStack.Autofac.NEventstore.Modules
                 checkpointTracker.TryDispose();
                 commitDispatcher.Dispose();
             }
+
             return Task.CompletedTask;
         }
     }

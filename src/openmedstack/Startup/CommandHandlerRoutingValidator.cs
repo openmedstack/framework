@@ -4,17 +4,23 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using OpenMedStack.Commands;
 
     public class CommandHandlerRoutingValidator : IValidateStartup
     {
         private readonly DeploymentConfiguration _configuration;
         private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
+        private readonly ILogger<CommandHandlerRoutingValidator> _logger;
 
-        public CommandHandlerRoutingValidator(DeploymentConfiguration configuration, Func<IEnumerable<IHandleCommands>> loaderFunc)
+        public CommandHandlerRoutingValidator(
+            DeploymentConfiguration configuration,
+            Func<IEnumerable<IHandleCommands>> loaderFunc,
+            ILogger<CommandHandlerRoutingValidator> logger)
         {
             _configuration = configuration;
             _loaderFunc = loaderFunc;
+            _logger = logger;
         }
 
         /// <inheritdoc />
@@ -29,6 +35,7 @@
             {
                 return Task.FromResult<Exception?>(null);
             }
+
             var errors = (from handler in handlers
                           from commandType in handler.GetType()
                               .GetInterfaces()
@@ -40,6 +47,18 @@
                           where !_configuration.Services.Any(x => x.Key.IsMatch(commandType.FullName!))
                           select new Exception($"{commandType.FullName} is not handled by any registered endpoint."))
                 .ToList();
+
+            if (errors.Count > 0)
+            {
+                foreach (var error in errors)
+                {
+                    _logger.LogError(error, "{error}", error.Message);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Validated command handler routing");
+            }
 
             return errors.Count switch
             {

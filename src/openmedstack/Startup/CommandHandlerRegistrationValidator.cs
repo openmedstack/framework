@@ -13,7 +13,10 @@
         private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
         private readonly ILogger<CommandHandlerRegistrationValidator> _logger;
 
-        public CommandHandlerRegistrationValidator(DeploymentConfiguration configuration, Func<IEnumerable<IHandleCommands>> loaderFunc, ILogger<CommandHandlerRegistrationValidator> logger)
+        public CommandHandlerRegistrationValidator(
+            DeploymentConfiguration configuration,
+            Func<IEnumerable<IHandleCommands>> loaderFunc,
+            ILogger<CommandHandlerRegistrationValidator> logger)
         {
             _configuration = configuration;
             _loaderFunc = loaderFunc;
@@ -33,7 +36,7 @@
                 return Task.FromResult<Exception?>(null);
             }
 
-            var commandTypes = from handler in handlers
+            var commandTypes = (from handler in handlers
                                from commandType in handler.GetType()
                                    .GetInterfaces()
                                    .Where(t => t.IsGenericType)
@@ -41,17 +44,26 @@
                                    .Where(x => x.Length == 1)
                                    .Select(x => x[0])
                                    .Where(t => typeof(DomainCommand).IsAssignableFrom(t))
-                               select commandType;
-            var errors = from configurationService in _configuration.Services
-                         where !commandTypes.Any(t => configurationService.Key.IsMatch(t.FullName!))
-                         select "No commands target " + configurationService.Value.AbsoluteUri;
+                               select commandType).ToArray();
+            var errors = (from configurationService in _configuration.Services
+                          where !commandTypes.Any(t => configurationService.Key.IsMatch(t.FullName!))
+                          select "No commands target " + configurationService.Value.AbsoluteUri).ToArray();
 
-            foreach (var error in errors)
+            if (errors.Length <= 0)
             {
-                _logger.LogWarning(error);
+                return Task.FromResult<Exception?>(null);
             }
 
-            return Task.FromResult<Exception?>(null);
+            var aggregateException = new AggregateException(
+                "Failed to validate command handler registration",
+                errors.Select(x => new Exception(x)));
+            foreach (var error in aggregateException.InnerExceptions)
+            {
+                _logger.LogError(error, "{error}", error.Message);
+            }
+
+            _logger.LogInformation("Validated {count} command handlers", commandTypes.Length);
+            return Task.FromResult<Exception?>(aggregateException);
         }
     }
 }

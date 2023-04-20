@@ -68,7 +68,7 @@ namespace OpenMedStack.Autofac.MassTransit
                 .IfNotRegistered(typeof(JsonSerializerSettings));
             builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance();
             builder.Register<IProvideTopic>(
-                    ctx => new EnvironmentTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
+                    ctx => new StaticTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
                 .SingleInstance();
             builder.RegisterType<EnvironmentTopicNameFormatter>().As<IEntityNameFormatter>().SingleInstance();
             builder.RegisterGeneric(typeof(MassTransitCommandSubscriber<>)).As(typeof(ISubscribeCommands<>)).SingleInstance();

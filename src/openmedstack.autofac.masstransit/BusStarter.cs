@@ -29,16 +29,18 @@ namespace OpenMedStack.Autofac.MassTransit
 
         public uint Order => uint.MinValue;
 
-        public Task Setup(CancellationToken cancellationToken)
+        public async Task Setup(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Message bus starting.");
-            return _control.StartAsync(cancellationToken);
+            await _control.StartAsync(cancellationToken);
+            _logger.LogInformation("Message bus started.");
         }
 
-        public Task Shutdown(CancellationToken cancellationToken)
+        public async Task Shutdown(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Message bus shutting down.");
-            return _control.StopAsync(cancellationToken);
+            await _control.StopAsync(cancellationToken);
+            _logger.LogInformation("Message bus shut down.");
         }
 
         public void Dispose()
