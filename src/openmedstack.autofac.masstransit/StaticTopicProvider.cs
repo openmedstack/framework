@@ -12,12 +12,12 @@ namespace OpenMedStack.Autofac.MassTransit
     using System.Collections.Generic;
     using System.Reflection;
 
-    internal class EnvironmentTopicProvider : IProvideTopic
+    internal class StaticTopicProvider : IProvideTopic
     {
         private readonly IProvideTenant _tenantProvider;
         private readonly IDictionary<string, string> _topicMap;
 
-        public EnvironmentTopicProvider(IProvideTenant tenantProvider, IDictionary<string, string>? topicMap = null)
+        public StaticTopicProvider(IProvideTenant tenantProvider, IDictionary<string, string>? topicMap = null)
         {
             _tenantProvider = tenantProvider;
             _topicMap = topicMap ?? new Dictionary<string, string>();
@@ -34,14 +34,17 @@ namespace OpenMedStack.Autofac.MassTransit
         public string Get<T>()
         {
             var type = typeof(T);
-            var fullName = type.FullName ?? "";
+            var fullName = type.FullName ?? type.Name;
             if (_topicMap.TryGetValue(fullName, out var topic))
             {
                 return topic;
             }
 
             var topicAttribute = type.GetCustomAttribute<TopicAttribute>();
-            return topicAttribute != null ? topicAttribute.Topic : fullName;
+            var result = topicAttribute?.Topic ?? fullName;
+            _topicMap.Add(fullName, result);
+
+            return result;
         }
     }
 }

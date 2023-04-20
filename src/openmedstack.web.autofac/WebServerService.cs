@@ -27,6 +27,7 @@
         private readonly IPublishEvents _eventBus;
         private readonly IRouteCommands _commandBus;
         private readonly string _urlBinding;
+        private readonly ILogger<WebServerService<TConfiguration>> _logger;
 
         public WebServerService(TConfiguration manifest, WebStartup<TConfiguration> startup)
         {
@@ -47,10 +48,14 @@
                 .ConfigureServices(
                     x =>
                     {
+                        x.AddSingleton(_manifest);
+                        x.AddSingleton<DeploymentConfiguration>(_manifest);
+                        x.AddSingleton<WebDeploymentConfiguration>(_manifest);
                         x.AddSingleton(_subject);
                         x.AddSingleton<IStartup>(startup);
                     })
                 .UseUrls(urlBindings).Build();
+            _logger = _container.Services.GetRequiredService<ILogger<WebServerService<TConfiguration>>>();
             _eventBus = _container.Services.GetRequiredService<IPublishEvents>();
             _commandBus = _container.Services.GetRequiredService<IRouteCommands>();
         }
@@ -78,6 +83,7 @@
         /// <inheritdoc />
         public virtual async Task Start(CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation("Starting web server...");
             var startupValidations = _container.Services.GetServices<IValidateStartup>();
             var validationTasks = startupValidations.Select(x => x.Validate());
             var startupErrors = (await Task.WhenAll(validationTasks).ConfigureAwait(false)).NonNulls().ToArray();
@@ -86,14 +92,13 @@
                 throw new AggregateException("Startup validation failed", startupErrors);
             }
             var bootstrappers = _container.Services.GetServices<IBootstrapSystem>();
-            var logger = _container.Services.GetRequiredService<ILogger<WebServerService<TConfiguration>>>();
             foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
             {
                 await bootstrapper.Setup(cancellationToken).ConfigureAwait(false);
             }
 
             await _container.StartAsync(cancellationToken).ConfigureAwait(false);
-            logger.LogInformation("Web server bound to: {url}", _urlBinding);
+            _logger.LogInformation("Web server bound to: {url}", _urlBinding);
         }
 
         /// <inheritdoc />

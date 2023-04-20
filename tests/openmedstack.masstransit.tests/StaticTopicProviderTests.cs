@@ -4,13 +4,13 @@ using OpenMedStack;
 using OpenMedStack.Autofac.MassTransit;
 using Xunit;
 
-public class EnvironmentTopicProviderTests
+public class StaticTopicProviderTests
 {
     [Fact]
     public void CanGetTopic()
     {
         var tenantProvider = new ConfigurationTenantProvider(new DeploymentConfiguration { TenantPrefix = "Test" });
-        var provider = new EnvironmentTopicProvider(tenantProvider);
+        var provider = new StaticTopicProvider(tenantProvider);
 
         var topic = provider.GetTenantSpecific<TestEvent>();
 
@@ -21,7 +21,7 @@ public class EnvironmentTopicProviderTests
     public void CanGetCanonicalTopic()
     {
         var tenantProvider = new ConfigurationTenantProvider(new DeploymentConfiguration { TenantPrefix = "Test" });
-        var provider = new EnvironmentTopicProvider(tenantProvider);
+        var provider = new StaticTopicProvider(tenantProvider);
 
         var topic = provider.Get<TestEvent>();
 
