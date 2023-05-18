@@ -10,7 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CloudNative.CloudEvents.NewtonsoftJson" Version="2.6.0" />
-		<PackageReference Include="MassTransit" Version="8.0.14" />
+		<PackageReference Include="MassTransit" Version="8.0.15" />
 	</ItemGroup>
 
 	<ItemGroup>

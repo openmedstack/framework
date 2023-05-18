@@ -2,6 +2,8 @@ namespace OpenMedStack.Autofac
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Encodings.Web;
+    using System.Text.Json;
     using global::Autofac;
     using global::Autofac.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +34,14 @@ namespace OpenMedStack.Autofac
                     }
                     if (_enableConsoleLogger)
                     {
-                        x.AddSimpleConsole(
+                        x.AddJsonConsole(
                             c =>
                             {
-                                c.ColorBehavior = LoggerColorBehavior.Disabled;
+                                c.UseUtcTimestamp = true;
+                                c.JsonWriterOptions = new JsonWriterOptions
+                                {
+                                    Indented = false
+                                };
                                 c.IncludeScopes = true;
                             });
                     }

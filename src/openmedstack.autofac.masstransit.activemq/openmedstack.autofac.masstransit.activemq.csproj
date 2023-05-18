@@ -9,7 +9,7 @@
 	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
-		<PackageReference Include="MassTransit.ActiveMQ" Version="8.0.13" />
+		<PackageReference Include="MassTransit.ActiveMQ" Version="8.0.15" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging.Abstractions;
     using OpenMedStack.Commands;
     using OpenMedStack.Startup;
     using Xunit;
@@ -14,8 +15,11 @@
         public async Task WhenCommandHandlerHasNoTargetEndpointThenReturnsError()
         {
             var configuration = new DeploymentConfiguration();
-            var createFunc = new Func<IEnumerable<IHandleCommands>>(() => new[] {new TestCommandHandler()});
-            var validator = new CommandHandlerRoutingValidator(configuration, createFunc);
+            var createFunc = new Func<IEnumerable<IHandleCommands>>(() => new[] { new TestCommandHandler() });
+            var validator = new CommandHandlerRoutingValidator(
+                configuration,
+                createFunc,
+                NullLogger<CommandHandlerRoutingValidator>.Instance);
 
             var error = await validator.Validate().ConfigureAwait(false);
 
@@ -29,11 +33,14 @@
             {
                 Services = new Dictionary<Regex, Uri>
                 {
-                    {new Regex(".+"), new Uri("http://localhost")}
+                    { new Regex(".+"), new Uri("http://localhost") }
                 }
             };
-            var createFunc = new Func<IEnumerable<IHandleCommands>>(() => new[] {new TestCommandHandler()});
-            var validator = new CommandHandlerRoutingValidator(configuration, createFunc);
+            var createFunc = new Func<IEnumerable<IHandleCommands>>(() => new[] { new TestCommandHandler() });
+            var validator = new CommandHandlerRoutingValidator(
+                configuration,
+                createFunc,
+                NullLogger<CommandHandlerRoutingValidator>.Instance);
 
             var error = await validator.Validate().ConfigureAwait(false);
 

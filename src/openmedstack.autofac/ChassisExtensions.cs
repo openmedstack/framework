@@ -39,9 +39,8 @@ namespace OpenMedStack.Autofac
             where TConfiguration : DeploymentConfiguration
         {
             chassis.Metadata.TryGetValue(LogFilters, out var filters);
-            chassis.Metadata[LogFilters] = filter.Concat(
-                    filters as (string, LogLevel)[] ?? Array.Empty<(string, LogLevel)>())
-                .ToArray();
+            var items = filters as (string, LogLevel)[] ?? Array.Empty<(string, LogLevel)>();
+            chassis.Metadata[LogFilters] = items.Concat(filter).ToArray();
 
             return chassis;
         }
@@ -63,7 +62,7 @@ namespace OpenMedStack.Autofac
                 (configuration, assemblies) => new AutofacService<TConfiguration>(
                     configuration,
                     enableConsoleLogging,
-                    filters as (string, LogLevel)[],
+                    filters as (string, LogLevel)[] ?? Array.Empty<(string, LogLevel)>(),
                     moduleFactory(configuration, assemblies).ToArray()));
         }
 

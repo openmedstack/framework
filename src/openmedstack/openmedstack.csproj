@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\shared.proj"/>
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack</RootNamespace>
 		<PackageId>openmedstack</PackageId>
 		<PackageTags>OpenMedStack Architecture ASAP Analysis Package Calculator</PackageTags>
 		<Description>Core contracts for OpenMedStack based applications. Includes core interfaces and definitions.</Description>
 	</PropertyGroup>
-	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
 		<PackageReference Include="microsoft.extensions.logging.abstractions" Version="6.0.3" />

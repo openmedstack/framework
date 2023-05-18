@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\shared.proj" />
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 
 		<IsPackable>false</IsPackable>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
-	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />

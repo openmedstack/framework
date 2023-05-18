@@ -51,7 +51,7 @@ namespace OpenMedStack
         /// <summary>
         /// Gets or sets the <see cref="Uri"/> of the system service bus.
         /// </summary>
-        public Uri? ServiceBus { get; init; }
+        public Uri? ServiceBus { get; set; }
 
         /// <summary>
         /// Gets or sets configured fail over hosts.
