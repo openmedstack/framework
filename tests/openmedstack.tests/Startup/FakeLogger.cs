@@ -10,7 +10,7 @@ internal class FakeLogger<T> : ILogger<T>
     /// <inheritdoc />
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception, string> formatter)
     {
-        LevelCalled = logLevel;
+        LevelCalled = logLevel > LevelCalled ? logLevel : LevelCalled;
     }
 
     /// <inheritdoc />

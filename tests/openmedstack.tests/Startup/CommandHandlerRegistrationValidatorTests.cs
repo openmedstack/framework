@@ -34,7 +34,7 @@
 
             await validator.Validate().ConfigureAwait(false);
 
-            Assert.Equal(LogLevel.Warning, mock.LevelCalled);
+            Assert.Equal(LogLevel.Error, mock.LevelCalled);
         }
 
         [Fact]
