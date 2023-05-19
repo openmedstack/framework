@@ -62,7 +62,7 @@
             return bus;
         }
 
-        private static void ConfigureJson(this IBusFactoryConfigurator configurator, IComponentContext c)
+        public static void ConfigureJson(this IBusFactoryConfigurator configurator, IComponentContext c)
         {
             var settings = c.Resolve<JsonSerializerSettings>();
             var converters = c.Resolve<IEnumerable<JsonConverter>>().ToArray();

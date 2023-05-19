@@ -60,7 +60,7 @@
                                 s.Password(_configuration.ServiceBusPassword);
                                 s.Username(_configuration.ServiceBusUsername);
                             });
-                        rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        rmq.ConfigureJson(c);
                         rmq.ConfigureBus(c, _configuration, retryPolicy);
                     })
                 .AttachObservers(c);

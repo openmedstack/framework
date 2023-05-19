@@ -56,7 +56,7 @@
                             //    _configuration.ServiceBusPassword,
                             //    TimeSpan.FromHours(8));
                         });
-                    rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                    rmq.ConfigureJson(c);
                     rmq.ConfigureBus(c, _configuration, retryPolicy);
                 }).AttachObservers(c);
         }

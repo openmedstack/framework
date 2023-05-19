@@ -52,7 +52,7 @@
             return Bus.Factory.CreateUsingActiveMq(
                     rmq =>
                     {
-                        rmq.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        rmq.ConfigureJson(c);
                         rmq.Host(
                             _configuration.ServiceBus!.Host,
                             _configuration.ServiceBus.Port,

@@ -48,7 +48,7 @@
             return Bus.Factory.CreateUsingAmazonSqs(
                     sqs =>
                     {
-                        sqs.UseCloudEvents(c.Resolve<JsonSerializerSettings>(), c.Resolve<IProvideTopic>());
+                        sqs.ConfigureJson(c);
                         var environment = _configuration.Environment
                                           ?? throw new Exception("Must set environment name");
                         sqs.Host(

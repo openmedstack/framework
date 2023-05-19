@@ -56,9 +56,7 @@ namespace OpenMedStack.Autofac.MassTransit
             return Bus.Factory.CreateUsingInMemory(
                 sbc =>
                 {
-                    sbc.UseCloudEvents(
-                        c.Resolve<JsonSerializerSettings>(),
-                        c.Resolve<IProvideTopic>());
+                    sbc.ConfigureJson(c);
                     sbc.ConfigureBus(c, _configuration, retryPolicy);
                 }).AttachObservers(c);
         }
