@@ -7,12 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.NEventstore
+namespace OpenMedStack.Autofac.NEventstore;
+
+internal class Constants
 {
-    internal class Constants
-    {
-        public const string CommitSequence = "CommitSequence";
-        public const string SamlToken = "SamlToken";
-        public const string UndispatchedMessageHeader = "UndispatchedMessage.";
-    }
+    public const string CommitSequence = "CommitSequence";
+    public const string SamlToken = "SamlToken";
+    public const string UndispatchedMessageHeader = "UndispatchedMessage.";
 }

@@ -7,16 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
+namespace OpenMedStack;
+
+/// <summary>
+/// Defines the correlation interface.
+/// </summary>
+public interface ICorrelate
 {
     /// <summary>
-    /// Defines the correlation interface.
+    /// Gets the correlation id.
     /// </summary>
-    public interface ICorrelate
-    {
-        /// <summary>
-        /// Gets the correlation id.
-        /// </summary>
-        string? CorrelationId { get; }
-    }
+    string? CorrelationId { get; }
 }

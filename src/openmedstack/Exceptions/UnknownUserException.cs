@@ -7,29 +7,28 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Exceptions
+namespace OpenMedStack.Exceptions;
+
+using System;
+
+/// <summary>
+/// Defines the exception when a user id or claim cannot be verified.
+/// </summary>
+public class UnknownUserException : Exception
 {
-    using System;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnknownUserException"/> class.
+    /// </summary>
+    public UnknownUserException() : base("Unknown user id.")
+    {
+    }
 
     /// <summary>
-    /// Defines the exception when a user id or claim cannot be verified.
+    /// Initializes a new instance of the <see cref="UnknownUserException"/> class.
     /// </summary>
-    public class UnknownUserException : Exception
+    /// <param name="id">The <see cref="string">id</see> which could not be verified.</param>
+    public UnknownUserException(string id)
+        : base(id + " is an unknown user id.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnknownUserException"/> class.
-        /// </summary>
-        public UnknownUserException() : base("Unknown user id.")
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnknownUserException"/> class.
-        /// </summary>
-        /// <param name="id">The <see cref="string">id</see> which could not be verified.</param>
-        public UnknownUserException(string id)
-            : base(id + " is an unknown user id.")
-        {
-        }
     }
 }

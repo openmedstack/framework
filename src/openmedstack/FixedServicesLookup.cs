@@ -7,31 +7,30 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
+namespace OpenMedStack;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class FixedServicesLookup : ILookupServices
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using System.Threading.Tasks;
+    private readonly IDictionary<Regex, Uri> _serviceAddresses;
 
-    public class FixedServicesLookup : ILookupServices
+    public FixedServicesLookup(IEnumerable<KeyValuePair<Regex, Uri>> serviceAddresses)
     {
-        private readonly IDictionary<Regex, Uri> _serviceAddresses;
+        _serviceAddresses = serviceAddresses.ToDictionary(x => x.Key, x => x.Value);
+    }
 
-        public FixedServicesLookup(IEnumerable<KeyValuePair<Regex, Uri>> serviceAddresses)
-        {
-            _serviceAddresses = serviceAddresses.ToDictionary(x => x.Key, x => x.Value);
-        }
+    /// <inheritdoc />
+    public Task<Uri> Lookup(Type type, CancellationToken cancellationToken = default)
+    {
+        var key = _serviceAddresses.Keys.First(x => x.IsMatch(type.FullName!));
+        var address = _serviceAddresses[key];
 
-        /// <inheritdoc />
-        public Task<Uri> Lookup(Type type, CancellationToken cancellationToken = default)
-        {
-            var key = _serviceAddresses.Keys.First(x => x.IsMatch(type.FullName!));
-            var address = _serviceAddresses[key];
-
-            return Task.FromResult(address);
-        }
+        return Task.FromResult(address);
     }
 }

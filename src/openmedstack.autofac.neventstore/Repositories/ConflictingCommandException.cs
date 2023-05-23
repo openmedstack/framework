@@ -1,32 +1,31 @@
-﻿namespace OpenMedStack.Autofac.NEventstore.Repositories
+﻿namespace OpenMedStack.Autofac.NEventstore.Repositories;
+
+using System;
+using System.Runtime.Serialization;
+
+/// <summary>
+///   Represents a command that could not be executed because it conflicted with the command of another user or actor.
+/// </summary>
+[Serializable]
+public class ConflictingCommandException : Exception
 {
-    using System;
-    using System.Runtime.Serialization;
+    /// <summary>
+    ///   Initializes a new instance of the ConflictingCommandException class.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The message that is the cause of the current exception.</param>
+    public ConflictingCommandException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 
     /// <summary>
-    ///   Represents a command that could not be executed because it conflicted with the command of another user or actor.
+    ///   Initializes a new instance of the ConflictingCommandException class.
     /// </summary>
-    [Serializable]
-    public class ConflictingCommandException : Exception
+    /// <param name="info">The SerializationInfo that holds the serialized object data of the exception being thrown.</param>
+    /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
+    protected ConflictingCommandException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
-        /// <summary>
-        ///   Initializes a new instance of the ConflictingCommandException class.
-        /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        /// <param name="innerException">The message that is the cause of the current exception.</param>
-        public ConflictingCommandException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
-
-        /// <summary>
-        ///   Initializes a new instance of the ConflictingCommandException class.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data of the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected ConflictingCommandException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

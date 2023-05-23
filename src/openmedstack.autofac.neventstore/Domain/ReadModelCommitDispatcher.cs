@@ -8,54 +8,53 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.NEventstore.Domain
+namespace OpenMedStack.Autofac.NEventstore.Domain;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NEventStore;
+using NEventStore.PollingClient;
+
+public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using NEventStore;
-    using NEventStore.PollingClient;
+    private readonly ILogger<IReadModelCommitDispatcher> _logger;
+    private readonly IReadModelUpdater _updater;
+    private bool _isDisposed;
 
-    public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
+    public ReadModelCommitDispatcher(ILogger<IReadModelCommitDispatcher> logger, IReadModelUpdater readModelUpdater)
     {
-        private readonly ILogger<IReadModelCommitDispatcher> _logger;
-        private readonly IReadModelUpdater _updater;
-        private bool _isDisposed;
+        _logger = logger;
+        _updater = readModelUpdater;
+    }
 
-        public ReadModelCommitDispatcher(ILogger<IReadModelCommitDispatcher> logger, IReadModelUpdater readModelUpdater)
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _isDisposed = true;
+    }
+
+    /// <inheritdoc />
+    public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+    {
+        if (_isDisposed)
         {
-            _logger = logger;
-            _updater = readModelUpdater;
+            _logger.LogWarning("Dispatching commits with disposed dispatcher");
+            return PollingClient2.HandlingResult.Stop;
         }
 
-        /// <inheritdoc />
-        public void Dispose()
+        try
         {
-            _isDisposed = true;
+            _logger.LogInformation("Updating read models for commit " + commit.CommitId.ToString());
+            var updated = await _updater.Update(commit).ConfigureAwait(false);
+
+            return updated ? PollingClient2.HandlingResult.MoveToNext : PollingClient2.HandlingResult.Retry;
         }
-
-        /// <inheritdoc />
-        public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+        catch (Exception exception)
         {
-            if (_isDisposed)
-            {
-                _logger.LogWarning("Dispatching commits with disposed dispatcher");
-                return PollingClient2.HandlingResult.Stop;
-            }
-
-            try
-            {
-                _logger.LogInformation("Updating read models for commit " + commit.CommitId.ToString());
-                var updated = await _updater.Update(commit).ConfigureAwait(false);
-
-                return updated ? PollingClient2.HandlingResult.MoveToNext : PollingClient2.HandlingResult.Retry;
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, exception.Message);
-                return PollingClient2.HandlingResult.Retry;
-            }
+            _logger.LogError(exception, exception.Message);
+            return PollingClient2.HandlingResult.Retry;
         }
     }
 }

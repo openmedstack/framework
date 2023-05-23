@@ -9,10 +9,9 @@
 
 using System;
 
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+public interface IConstructSagas
 {
-    public interface IConstructSagas
-    {
-        ISaga Build(Type type, string id);
-    }
+    ISaga Build(Type type, string id);
 }

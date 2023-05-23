@@ -1,13 +1,12 @@
-﻿namespace OpenMedStack.Framework.IntegrationTests
-{
-    using System;
-    using OpenMedStack.Events;
+﻿namespace OpenMedStack.Framework.IntegrationTests;
 
-    public record TestEvent : DomainEvent
+using System;
+using OpenMedStack.Events;
+
+public record TestEvent : DomainEvent
+{
+    /// <inheritdoc />
+    public TestEvent() : base(Guid.NewGuid().ToString(), 1, DateTimeOffset.Now)
     {
-        /// <inheritdoc />
-        public TestEvent() : base(Guid.NewGuid().ToString(), 1, DateTimeOffset.Now)
-        {
-        }
     }
 }

@@ -7,20 +7,19 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+using global::MassTransit;
+
+internal class EnvironmentTopicNameFormatter : IEntityNameFormatter
 {
-    using global::MassTransit;
+    private readonly IProvideTopic _topicProvider;
 
-    internal class EnvironmentTopicNameFormatter : IEntityNameFormatter
+    public EnvironmentTopicNameFormatter(IProvideTopic topicProvider)
     {
-        private readonly IProvideTopic _topicProvider;
-
-        public EnvironmentTopicNameFormatter(IProvideTopic topicProvider)
-        {
-            _topicProvider = topicProvider;
-        }
-
-        /// <inheritdoc />
-        public string FormatEntityName<T>() => _topicProvider.GetTenantSpecific<T>();
+        _topicProvider = topicProvider;
     }
+
+    /// <inheritdoc />
+    public string FormatEntityName<T>() => _topicProvider.GetTenantSpecific<T>();
 }

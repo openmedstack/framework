@@ -1,23 +1,22 @@
-﻿namespace OpenMedStack.Domain.Tests
+﻿namespace OpenMedStack.Domain.Tests;
+
+using global::Autofac;
+
+internal class TestModule : Module
 {
-    using global::Autofac;
+    private readonly DeploymentConfiguration _configuration;
 
-    internal class TestModule : Module
+    public TestModule(DeploymentConfiguration configuration)
     {
-        private readonly DeploymentConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public TestModule(DeploymentConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        /// <inheritdoc />
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterInstance(_configuration).SingleInstance();
-            builder.RegisterType<TestDataStore>().AsSelf().SingleInstance();
-            builder.RegisterType<ConfigurationTenantProvider>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterType<DummyTokenValidator>().AsImplementedInterfaces();
-        }
+    /// <inheritdoc />
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterInstance(_configuration).SingleInstance();
+        builder.RegisterType<TestDataStore>().AsSelf().SingleInstance();
+        builder.RegisterType<ConfigurationTenantProvider>().AsImplementedInterfaces().SingleInstance();
+        builder.RegisterType<DummyTokenValidator>().AsImplementedInterfaces();
     }
 }

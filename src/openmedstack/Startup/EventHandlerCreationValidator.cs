@@ -1,39 +1,38 @@
-﻿namespace OpenMedStack.Startup
+﻿namespace OpenMedStack.Startup;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.Events;
+
+public class EventHandlerCreationValidator : IValidateStartup
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.Events;
+    private readonly Func<IEnumerable<IHandleEvents>> _loaderFunc;
+    private readonly ILogger<EventHandlerCreationValidator> _logger;
 
-    public class EventHandlerCreationValidator : IValidateStartup
+    public EventHandlerCreationValidator(
+        Func<IEnumerable<IHandleEvents>> loaderFunc,
+        ILogger<EventHandlerCreationValidator> logger)
     {
-        private readonly Func<IEnumerable<IHandleEvents>> _loaderFunc;
-        private readonly ILogger<EventHandlerCreationValidator> _logger;
+        _loaderFunc = loaderFunc;
+        _logger = logger;
+    }
 
-        public EventHandlerCreationValidator(
-            Func<IEnumerable<IHandleEvents>> loaderFunc,
-            ILogger<EventHandlerCreationValidator> logger)
+    /// <inheritdoc />
+    public Task<Exception?> Validate()
+    {
+        try
         {
-            _loaderFunc = loaderFunc;
-            _logger = logger;
+            var handlers = _loaderFunc().ToArray();
+            _logger.LogInformation("Validated {count} event handlers", handlers.Length);
+            return Task.FromResult<Exception?>(null);
         }
-
-        /// <inheritdoc />
-        public Task<Exception?> Validate()
+        catch (Exception ex)
         {
-            try
-            {
-                var handlers = _loaderFunc().ToArray();
-                _logger.LogInformation("Validated {count} event handlers", handlers.Length);
-                return Task.FromResult<Exception?>(null);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "{error}", ex.Message);
-                return Task.FromResult<Exception?>(ex);
-            }
+            _logger.LogError(ex, "{error}", ex.Message);
+            return Task.FromResult<Exception?>(ex);
         }
     }
 }

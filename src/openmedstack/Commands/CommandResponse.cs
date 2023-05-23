@@ -7,53 +7,52 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Commands
+namespace OpenMedStack.Commands;
+
+/// <summary>
+/// Defines the command response class.
+/// </summary>
+//[Topic("CommandResponse")]
+public class CommandResponse : ICorrelate
 {
     /// <summary>
-    /// Defines the command response class.
+    /// Initializes a new instance of the <see cref="CommandResponse"/> class.
     /// </summary>
-    //[Topic("CommandResponse")]
-    public class CommandResponse : ICorrelate
+    /// <param name="targetAggregate">
+    /// The target aggregate.
+    /// </param>
+    /// <param name="version">
+    /// The version.
+    /// </param>
+    /// <param name="faultMessage">
+    /// The fault message.
+    /// </param>
+    /// <param name="correlationId">
+    /// The correlation id.
+    /// </param>
+    public CommandResponse(string targetAggregate, int version, string? faultMessage, string? correlationId)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandResponse"/> class.
-        /// </summary>
-        /// <param name="targetAggregate">
-        /// The target aggregate.
-        /// </param>
-        /// <param name="version">
-        /// The version.
-        /// </param>
-        /// <param name="faultMessage">
-        /// The fault message.
-        /// </param>
-        /// <param name="correlationId">
-        /// The correlation id.
-        /// </param>
-        public CommandResponse(string targetAggregate, int version, string? faultMessage, string? correlationId)
-        {
-            TargetAggregate = targetAggregate;
-            Version = version;
-            FaultMessage = faultMessage;
-            CorrelationId = correlationId;
-        }
-
-        /// <summary>
-        /// Gets the fault message.
-        /// </summary>
-        public string? FaultMessage { get; }
-
-        /// <summary>
-        /// Gets the id of the receiving aggregate.
-        /// </summary>
-        public string TargetAggregate { get; }
-
-        /// <summary>
-        /// Gets the version of the target aggregate.
-        /// </summary>
-        public int Version { get; }
-
-        /// <inheritdoc />
-        public string? CorrelationId { get; }
+        TargetAggregate = targetAggregate;
+        Version = version;
+        FaultMessage = faultMessage;
+        CorrelationId = correlationId;
     }
+
+    /// <summary>
+    /// Gets the fault message.
+    /// </summary>
+    public string? FaultMessage { get; }
+
+    /// <summary>
+    /// Gets the id of the receiving aggregate.
+    /// </summary>
+    public string TargetAggregate { get; }
+
+    /// <summary>
+    /// Gets the version of the target aggregate.
+    /// </summary>
+    public int Version { get; }
+
+    /// <inheritdoc />
+    public string? CorrelationId { get; }
 }

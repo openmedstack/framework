@@ -1,35 +1,34 @@
-﻿namespace OpenMedStack.Domain.Tests
+﻿namespace OpenMedStack.Domain.Tests;
+
+using System;
+using Xbehave;
+using Xunit;
+
+public static class AggregateRootBaseTests
 {
-    using System;
-    using Xbehave;
-    using Xunit;
-
-    public static class AggregateRootBaseTests
+    public class GivenATestAggregateRoot
     {
-        public class GivenATestAggregateRoot
+        private TestAggregateRoot _aggregate = null!;
+
+        [Background]
+        public void Background()
         {
-            private TestAggregateRoot _aggregate = null!;
+            _aggregate = new TestAggregateRoot(Guid.NewGuid().ToString(), null);
+        }
 
-            [Background]
-            public void Background()
+        [Scenario(DisplayName = "Default event handler registration")]
+        public void WhenApplyingEventThenHasHandler()
+        {
+            "When handling known event".x(() =>
             {
-                _aggregate = new TestAggregateRoot(Guid.NewGuid().ToString(), null);
-            }
+                IAggregate a = _aggregate;
+                a.ApplyEvent(new TestEvent(a.Id, 1, DateTimeOffset.UtcNow));
+            });
 
-            [Scenario(DisplayName = "Default event handler registration")]
-            public void WhenApplyingEventThenHasHandler()
+            "Then it is handled".x(() =>
             {
-                "When handling known event".x(() =>
-                {
-                    IAggregate a = _aggregate;
-                    a.ApplyEvent(new TestEvent(a.Id, 1, DateTimeOffset.UtcNow));
-                });
-
-                "Then it is handled".x(() =>
-                {
-                    Assert.True(_aggregate.EventRaised);
-                });
-            }
+                Assert.True(_aggregate.EventRaised);
+            });
         }
     }
 }

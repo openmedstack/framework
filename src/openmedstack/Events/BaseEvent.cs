@@ -1,27 +1,26 @@
-﻿namespace OpenMedStack.Events
-{
-    using System;
-    
-    public abstract record BaseEvent : Message, ICorrelate
-    {
-        protected BaseEvent(string source, DateTimeOffset timeStamp, string? correlationId = null)
-        :base(timeStamp)
-        {
-            if (timeStamp == DateTimeOffset.MinValue)
-            {
-                throw new ArgumentException(Strings.CannotUseMinTime, nameof(timeStamp));
-            }
+﻿namespace OpenMedStack.Events;
 
-            Source = source;
-            CorrelationId = correlationId;
+using System;
+    
+public abstract record BaseEvent : Message, ICorrelate
+{
+    protected BaseEvent(string source, DateTimeOffset timeStamp, string? correlationId = null)
+        :base(timeStamp)
+    {
+        if (timeStamp == DateTimeOffset.MinValue)
+        {
+            throw new ArgumentException(Strings.CannotUseMinTime, nameof(timeStamp));
         }
 
-        /// <summary>
-        ///     Gets the id of the source instance which raised the event.
-        /// </summary>
-        public string Source { get; }
-        
-        /// <inheritdoc />
-        public string? CorrelationId { get; }
+        Source = source;
+        CorrelationId = correlationId;
     }
+
+    /// <summary>
+    ///     Gets the id of the source instance which raised the event.
+    /// </summary>
+    public string Source { get; }
+        
+    /// <inheritdoc />
+    public string? CorrelationId { get; }
 }

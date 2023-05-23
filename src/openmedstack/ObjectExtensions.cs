@@ -7,25 +7,24 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
-{
-    using System;
+namespace OpenMedStack;
 
+using System;
+
+/// <summary>
+/// Defines extension methods for objects.
+/// </summary>
+public static class ObjectExtensions
+{
     /// <summary>
-    /// Defines extension methods for objects.
+    /// Disposes an object if it is an <see cref="IDisposable"/>.
     /// </summary>
-    public static class ObjectExtensions
+    /// <param name="obj">The object to try to dispose.</param>
+    public static void TryDispose(this object? obj)
     {
-        /// <summary>
-        /// Disposes an object if it is an <see cref="IDisposable"/>.
-        /// </summary>
-        /// <param name="obj">The object to try to dispose.</param>
-        public static void TryDispose(this object? obj)
+        if (obj is IDisposable d)
         {
-            if (obj is IDisposable d)
-            {
-                d.Dispose();
-            }
+            d.Dispose();
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace OpenMedStack.Web.Autofac.Tests
+﻿namespace OpenMedStack.Web.Autofac.Tests;
+
+internal class TestTenantProvider : IProvideTenant
 {
-    internal class TestTenantProvider : IProvideTenant
-    {
-        /// <inheritdoc />
-        public string GetTenantName() => "test";
-    }
+    /// <inheritdoc />
+    public string GetTenantName() => "test";
 }

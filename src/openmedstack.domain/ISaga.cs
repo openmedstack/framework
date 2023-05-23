@@ -1,22 +1,21 @@
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+using System.Collections.Generic;
+using OpenMedStack.Events;
+
+public interface ISaga
 {
-    using System.Collections.Generic;
-    using OpenMedStack.Events;
+    string Id { get; }
 
-    public interface ISaga
-    {
-        string Id { get; }
+    int Version { get; }
 
-        int Version { get; }
+    void Transition(DomainEvent message);
 
-        void Transition(DomainEvent message);
+    IEnumerable<object> GetUncommittedEvents();
 
-        IEnumerable<object> GetUncommittedEvents();
+    void ClearUncommittedEvents();
 
-        void ClearUncommittedEvents();
+    IEnumerable<object> GetUndispatchedMessages();
 
-        IEnumerable<object> GetUndispatchedMessages();
-
-        void ClearUndispatchedMessages();
-    }
+    void ClearUndispatchedMessages();
 }

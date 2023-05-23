@@ -1,35 +1,34 @@
-﻿namespace OpenMedStack.Framework.IntegrationTests
+﻿namespace OpenMedStack.Framework.IntegrationTests;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack;
+using OpenMedStack.Commands;
+using OpenMedStack.Domain;
+
+internal class TestCommandHandler : CommandHandlerBase<TestCommand>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack;
-    using OpenMedStack.Commands;
-    using OpenMedStack.Domain;
-
-    internal class TestCommandHandler : CommandHandlerBase<TestCommand>
+    /// <inheritdoc />
+    public TestCommandHandler(
+        IRepository repository,
+        IValidateTokens tokenValidator,
+        ILogger<TestCommandHandler> logger) : base(repository, tokenValidator, logger)
     {
-        /// <inheritdoc />
-        public TestCommandHandler(
-            IRepository repository,
-            IValidateTokens tokenValidator,
-            ILogger<TestCommandHandler> logger) : base(repository, tokenValidator, logger)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        protected override async Task<CommandResponse> HandleInternal(
-            TestCommand command,
-            IMessageHeaders headers,
-            CancellationToken cancellationToken)
-        {
-            var aggregate = await Get<TestAggregate>(command.AggregateId).ConfigureAwait(false);
+    /// <inheritdoc />
+    protected override async Task<CommandResponse> HandleInternal(
+        TestCommand command,
+        IMessageHeaders headers,
+        CancellationToken cancellationToken)
+    {
+        var aggregate = await Get<TestAggregate>(command.AggregateId).ConfigureAwait(false);
 
-            aggregate.DoSomething();
+        aggregate.DoSomething();
 
-            await Save(aggregate).ConfigureAwait(false);
+        await Save(aggregate).ConfigureAwait(false);
 
-            return command.CreateResponse();
-        }
+        return command.CreateResponse();
     }
 }

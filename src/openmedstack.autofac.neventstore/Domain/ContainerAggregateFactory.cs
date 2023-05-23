@@ -12,25 +12,24 @@ using Autofac;
 using OpenMedStack.Autofac.NEventstore.Repositories;
 using OpenMedStack.Domain;
 
-namespace OpenMedStack.Autofac.NEventstore.Domain
+namespace OpenMedStack.Autofac.NEventstore.Domain;
+
+internal class ContainerAggregateFactory : IConstructAggregates
 {
-    internal class ContainerAggregateFactory : IConstructAggregates
+    private readonly ILifetimeScope _container;
+
+    public ContainerAggregateFactory(ILifetimeScope container)
     {
-        private readonly ILifetimeScope _container;
+        _container = container;
+    }
 
-        public ContainerAggregateFactory(ILifetimeScope container)
-        {
-            _container = container;
-        }
+    public IAggregate Build(Type type, string id, IMemento? snapshot)
+    {
+        var instance = (IAggregate)_container.Resolve(
+            type,
+            new TypedParameter(typeof(string), id),
+            new TypedParameter(typeof(IMemento), snapshot));
 
-        public IAggregate Build(Type type, string id, IMemento? snapshot)
-        {
-            var instance = (IAggregate)_container.Resolve(
-                type,
-                new TypedParameter(typeof(string), id),
-                new TypedParameter(typeof(IMemento), snapshot));
-
-            return instance;
-        }
+        return instance;
     }
 }

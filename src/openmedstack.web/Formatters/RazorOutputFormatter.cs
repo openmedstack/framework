@@ -1,116 +1,115 @@
-﻿namespace OpenMedStack.Web.Formatters
-{
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.Formatters;
-    using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.AspNetCore.Mvc.Razor;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.AspNetCore.Mvc.ViewFeatures;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Net.Http.Headers;
+﻿namespace OpenMedStack.Web.Formatters;
 
-    public class RazorOutputFormatter : TextOutputFormatter
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
+
+public class RazorOutputFormatter : TextOutputFormatter
+{
+    public RazorOutputFormatter()
     {
-        public RazorOutputFormatter()
+        SupportedEncodings.Add(Encoding.UTF8);
+        SupportedEncodings.Add(Encoding.ASCII);
+        SupportedEncodings.Add(Encoding.UTF32);
+        SupportedEncodings.Add(Encoding.Unicode);
+        SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+        SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/xhtml"));
+        SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml"));
+        SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml+xml"));
+    }
+
+    /// <inheritdoc />
+    public override bool CanWriteResult(OutputFormatterCanWriteContext context)
+    {
+        if (!base.CanWriteResult(context))
         {
-            SupportedEncodings.Add(Encoding.UTF8);
-            SupportedEncodings.Add(Encoding.ASCII);
-            SupportedEncodings.Add(Encoding.UTF32);
-            SupportedEncodings.Add(Encoding.Unicode);
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/xhtml"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml+xml"));
+            return false;
         }
 
-        /// <inheritdoc />
-        public override bool CanWriteResult(OutputFormatterCanWriteContext context)
+        var httpContext = context.HttpContext;
+        var viewEngine = httpContext.RequestServices.GetRequiredService<IRazorViewEngine>();
+
+        httpContext.Items.TryGetValue("ModelState", out var modelState);
+        httpContext.Items.TryGetValue("RouteData", out var routeData);
+        httpContext.Items.TryGetValue("ActionDescriptor", out var actionDescriptor);
+        var actionContext = new ActionContext(
+            httpContext,
+            routeData as RouteData ?? new RouteData(),
+            actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
+            modelState as ModelStateDictionary ?? new ModelStateDictionary());
+        if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
         {
-            if (!base.CanWriteResult(context))
-            {
-                return false;
-            }
+            viewName = actionContext.RouteData.Values["action"]!.ToString()!;
+        }
 
-            var httpContext = context.HttpContext;
-            var viewEngine = httpContext.RequestServices.GetRequiredService<IRazorViewEngine>();
+        var result = viewEngine.FindView(actionContext, viewName, false);
 
-            httpContext.Items.TryGetValue("ModelState", out var modelState);
-            httpContext.Items.TryGetValue("RouteData", out var routeData);
-            httpContext.Items.TryGetValue("ActionDescriptor", out var actionDescriptor);
-            var actionContext = new ActionContext(
-                httpContext,
-                routeData as RouteData ?? new RouteData(),
-                actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
-                modelState as ModelStateDictionary ?? new ModelStateDictionary());
+        return result.Success;
+    }
+
+    /// <inheritdoc />
+    public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+    {
+        var httpContext = context.HttpContext;
+        var serviceProvider = httpContext.RequestServices;
+        var viewEngine = serviceProvider.GetRequiredService<IRazorViewEngine>();
+        httpContext.Items.TryGetValue("ModelState", out var modelState);
+        httpContext.Items.TryGetValue("RouteData", out var routeData);
+        httpContext.Items.TryGetValue("ActionDescriptor", out var actionDescriptor);
+        var actionContext = new ActionContext(
+            httpContext,
+            routeData as RouteData ?? new RouteData(),
+            actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
+            modelState as ModelStateDictionary ?? new ModelStateDictionary());
+        try
+        {
             if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
             {
                 viewName = actionContext.RouteData.Values["action"]!.ToString()!;
             }
 
-            var result = viewEngine.FindView(actionContext, viewName, false);
+            var viewEngineResult = viewEngine.FindView(actionContext, viewName, isMainPage: false);
 
-            return result.Success;
-        }
-
-        /// <inheritdoc />
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-        {
-            var httpContext = context.HttpContext;
-            var serviceProvider = httpContext.RequestServices;
-            var viewEngine = serviceProvider.GetRequiredService<IRazorViewEngine>();
-            httpContext.Items.TryGetValue("ModelState", out var modelState);
-            httpContext.Items.TryGetValue("RouteData", out var routeData);
-            httpContext.Items.TryGetValue("ActionDescriptor", out var actionDescriptor);
-            var actionContext = new ActionContext(
-                httpContext,
-                routeData as RouteData ?? new RouteData(),
-                actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
-                modelState as ModelStateDictionary ?? new ModelStateDictionary());
-            try
+            if (!viewEngineResult.Success)
             {
-                if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
-                {
-                    viewName = actionContext.RouteData.Values["action"]!.ToString()!;
-                }
+                throw new InvalidOperationException($"Couldn't find view '{viewName}'");
+            }
 
-                var viewEngineResult = viewEngine.FindView(actionContext, viewName, isMainPage: false);
-
-                if (!viewEngineResult.Success)
-                {
-                    throw new InvalidOperationException($"Couldn't find view '{viewName}'");
-                }
-
-                var view = viewEngineResult.View;
-                viewEngineResult.EnsureSuccessful(Array.Empty<string>());
-                var output = new StreamWriter(httpContext.Response.Body);
-                await using var _ = output.ConfigureAwait(false);
-                var viewContext = new ViewContext(
-                    actionContext,
-                    view,
-                    new ViewDataDictionary(
+            var view = viewEngineResult.View;
+            viewEngineResult.EnsureSuccessful(Array.Empty<string>());
+            var output = new StreamWriter(httpContext.Response.Body);
+            await using var _ = output.ConfigureAwait(false);
+            var viewContext = new ViewContext(
+                actionContext,
+                view,
+                new ViewDataDictionary(
                         metadataProvider: new EmptyModelMetadataProvider(),
                         modelState: actionContext.ModelState)
                     { Model = context.Object },
-                    new TempDataDictionary(
-                        actionContext.HttpContext,
-                        serviceProvider.GetRequiredService<ITempDataProvider>()),
-                    output,
-                    new HtmlHelperOptions());
+                new TempDataDictionary(
+                    actionContext.HttpContext,
+                    serviceProvider.GetRequiredService<ITempDataProvider>()),
+                output,
+                new HtmlHelperOptions());
 
-                await view.RenderAsync(viewContext).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.Message);
-                throw;
-            }
+            await view.RenderAsync(viewContext).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Trace.TraceError(e.Message);
+            throw;
         }
     }
 }

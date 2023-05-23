@@ -1,78 +1,77 @@
-namespace OpenMedStack.Autofac.NEventstore.Domain
+namespace OpenMedStack.Autofac.NEventstore.Domain;
+
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.Events;
+using NEventStore;
+using NEventStore.PollingClient;
+
+public class EventCommitDispatcher : IEventCommitDispatcher
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.Events;
-    using NEventStore;
-    using NEventStore.PollingClient;
+    private readonly ConcurrentDictionary<Type, MethodInfo> _eventPublishMethods =
+        new();
 
-    public class EventCommitDispatcher : IEventCommitDispatcher
+    private readonly ILogger<EventCommitDispatcher> _logger;
+    private readonly Func<IPublishEvents> _eventBus;
+    private readonly MethodInfo _eventBusPublishMethod;
+    private bool _isDisposed;
+
+    public EventCommitDispatcher(
+        ILogger<EventCommitDispatcher> logger,
+        Func<IPublishEvents> eventBus)
     {
-        private readonly ConcurrentDictionary<Type, MethodInfo> _eventPublishMethods =
-            new();
+        _logger = logger;
+        _eventBus = eventBus;
+        _eventBusPublishMethod = typeof(IPublishEvents).GetMethod("Publish")!;
+    }
 
-        private readonly ILogger<EventCommitDispatcher> _logger;
-        private readonly Func<IPublishEvents> _eventBus;
-        private readonly MethodInfo _eventBusPublishMethod;
-        private bool _isDisposed;
-
-        public EventCommitDispatcher(
-            ILogger<EventCommitDispatcher> logger,
-            Func<IPublishEvents> eventBus)
+    public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+    {
+        if (_isDisposed)
         {
-            _logger = logger;
-            _eventBus = eventBus;
-            _eventBusPublishMethod = typeof(IPublishEvents).GetMethod("Publish")!;
+            _logger.LogWarning("Dispatching commits with disposed dispatcher");
+            return PollingClient2.HandlingResult.Stop;
         }
 
-        public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+        if (!commit.Headers.ContainsKey("SagaType") && commit.Events.Count > 0)
         {
-            if (_isDisposed)
+            try
             {
-                _logger.LogWarning("Dispatching commits with disposed dispatcher");
-                return PollingClient2.HandlingResult.Stop;
-            }
+                var token = commit.CheckpointToken;
+                var eventBus = _eventBus();
+                var events = (from evt in commit.Events
+                              where evt.Body is DomainEvent
+                              let eventHeaders =
+                                  new Dictionary<string, object>(evt.Headers) { [Constants.CommitSequence] = token }
+                              let method =
+                                  _eventPublishMethods.GetOrAdd(
+                                      evt.Body.GetType(),
+                                      t => _eventBusPublishMethod.MakeGenericMethod(t))
+                              let result = method.Invoke(eventBus, new[] { evt.Body, eventHeaders, CancellationToken.None })
+                              select (Task)result).ToArray();
 
-            if (!commit.Headers.ContainsKey("SagaType") && commit.Events.Count > 0)
+                _logger.LogInformation("Publishing {count} events for commit {commitId}", events.Length, commit.CommitId);
+
+                await Task.WhenAll(events).ConfigureAwait(false);
+            }
+            catch (Exception exception)
             {
-                try
-                {
-                    var token = commit.CheckpointToken;
-                    var eventBus = _eventBus();
-                    var events = (from evt in commit.Events
-                                  where evt.Body is DomainEvent
-                                  let eventHeaders =
-                                      new Dictionary<string, object>(evt.Headers) { [Constants.CommitSequence] = token }
-                                  let method =
-                                      _eventPublishMethods.GetOrAdd(
-                                          evt.Body.GetType(),
-                                          t => _eventBusPublishMethod.MakeGenericMethod(t))
-                                  let result = method.Invoke(eventBus, new[] { evt.Body, eventHeaders, CancellationToken.None })
-                                  select (Task)result).ToArray();
-
-                    _logger.LogInformation("Publishing {count} events for commit {commitId}", events.Length, commit.CommitId);
-
-                    await Task.WhenAll(events).ConfigureAwait(false);
-                }
-                catch (Exception exception)
-                {
-                    _logger.LogError(exception, exception.Message);
-                    return PollingClient2.HandlingResult.Retry;
-                }
+                _logger.LogError(exception, exception.Message);
+                return PollingClient2.HandlingResult.Retry;
             }
-
-            return PollingClient2.HandlingResult.MoveToNext;
         }
 
-        public void Dispose()
-        {
-            _isDisposed = true;
-        }
+        return PollingClient2.HandlingResult.MoveToNext;
+    }
+
+    public void Dispose()
+    {
+        _isDisposed = true;
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace OpenMedStack.Domain.Tests
+﻿namespace OpenMedStack.Domain.Tests;
+
+internal class TestDataStore
 {
-    internal class TestDataStore
-    {
-        public int Updates { get; set; }
-        public int Commands { get; set; }
-    }
+    public int Updates { get; set; }
+    public int Commands { get; set; }
 }

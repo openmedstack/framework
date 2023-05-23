@@ -1,10 +1,9 @@
-﻿namespace OpenMedStack.Autofac.NEventStore.Sql.Tests
-{
-    using OpenMedStack;
+﻿namespace OpenMedStack.Autofac.NEventStore.Sql.Tests;
 
-    internal class DummyTokenValidator : IValidateTokens
-    {
-        /// <inheritdoc />
-        public IdentityToken? Validate(string? token) => null;
-    }
+using OpenMedStack;
+
+internal class DummyTokenValidator : IValidateTokens
+{
+    /// <inheritdoc />
+    public IdentityToken? Validate(string? token) => null;
 }

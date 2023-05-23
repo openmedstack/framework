@@ -1,29 +1,28 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CloudEventExtensions.cs" company="Reimers.dk">
-//   Copyright © Reimers.dk
+//   Copyright ï¿½ Reimers.dk
 // </copyright>
 // <summary>
 //   Defines the CloudEventExtensions type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit.CloudEvents
-{
-    using System;
-    using CloudNative.CloudEvents;
+namespace OpenMedStack.Autofac.MassTransit.CloudEvents;
 
-    internal static class CloudEventExtensions
+using System;
+using CloudNative.CloudEvents;
+
+internal static class CloudEventExtensions
+{
+    public static Uri? GetUri(this CloudEvent cloudEvent, string attribute)
     {
-        public static Uri? GetUri(this CloudEvent cloudEvent, string attribute)
-        {
-            var value = cloudEvent[attribute];
-            return value == null ? null : new Uri(value.ToString()!, UriKind.RelativeOrAbsolute);
-        }
+        var value = cloudEvent[attribute];
+        return value == null ? null : new Uri(value.ToString()!, UriKind.RelativeOrAbsolute);
+    }
         
-        public static Guid? GetGuid(this CloudEvent cloudEvent, string attribute)
-        {
-            var value = cloudEvent[attribute];
-            return value == null ? default : Guid.Parse(value.ToString()!);
-        }
+    public static Guid? GetGuid(this CloudEvent cloudEvent, string attribute)
+    {
+        var value = cloudEvent[attribute];
+        return value == null ? default : Guid.Parse(value.ToString()!);
     }
 }

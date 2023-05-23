@@ -1,8 +1,7 @@
-﻿namespace OpenMedStack.Web.Autofac.Tests
+﻿namespace OpenMedStack.Web.Autofac.Tests;
+
+internal class DummyTokenValidator : IValidateTokens
 {
-    internal class DummyTokenValidator : IValidateTokens
-    {
-        /// <inheritdoc />
-        public IdentityToken? Validate(string? token) => null;
-    }
+    /// <inheritdoc />
+    public IdentityToken? Validate(string? token) => null;
 }

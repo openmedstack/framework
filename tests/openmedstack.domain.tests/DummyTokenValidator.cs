@@ -1,10 +1,9 @@
-﻿namespace OpenMedStack.Domain.Tests
-{
-    using OpenMedStack;
+﻿namespace OpenMedStack.Domain.Tests;
 
-    internal class DummyTokenValidator : IValidateTokens
-    {
-        /// <inheritdoc />
-        public IdentityToken? Validate(string? token) => null;
-    }
+using OpenMedStack;
+
+internal class DummyTokenValidator : IValidateTokens
+{
+    /// <inheritdoc />
+    public IdentityToken? Validate(string? token) => null;
 }

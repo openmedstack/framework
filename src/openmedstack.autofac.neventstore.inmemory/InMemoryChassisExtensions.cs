@@ -7,20 +7,19 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.NEventstore.InMemory
+namespace OpenMedStack.Autofac.NEventstore.InMemory;
+
+public static class InMemoryChassisExtensions
 {
-    public static class InMemoryChassisExtensions
+    /// <summary>
+    /// Registers in memory storage of events.
+    /// </summary>
+    /// <param name="chassis"></param>
+    /// <returns>A configured instance of the <see cref="Chassis{TConfiguration}"/>.</returns>
+    public static Chassis<TConfiguration> UsingInMemoryEventStore<TConfiguration>(
+        this Chassis<TConfiguration> chassis)
+        where TConfiguration : DeploymentConfiguration
     {
-        /// <summary>
-        /// Registers in memory storage of events.
-        /// </summary>
-        /// <param name="chassis"></param>
-        /// <returns>A configured instance of the <see cref="Chassis{TConfiguration}"/>.</returns>
-        public static Chassis<TConfiguration> UsingInMemoryEventStore<TConfiguration>(
-            this Chassis<TConfiguration> chassis)
-            where TConfiguration : DeploymentConfiguration
-        {
-            return chassis.AddAutofacModules((_, _) => new InMemoryEventStoreModule());
-        }
+        return chassis.AddAutofacModules((_, _) => new InMemoryEventStoreModule());
     }
 }

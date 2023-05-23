@@ -1,19 +1,18 @@
-namespace OpenMedStack.Autofac.NEventstore
+namespace OpenMedStack.Autofac.NEventstore;
+
+using System.Threading.Tasks;
+using OpenMedStack.Domain;
+
+public abstract class InMemoryCheckpointTracker : ITrackCheckpoints
 {
-    using System.Threading.Tasks;
-    using OpenMedStack.Domain;
+    private long _latest;
 
-    public abstract class InMemoryCheckpointTracker : ITrackCheckpoints
+    /// <inheritdoc />
+    public Task<long> GetLatest() => Task.FromResult(_latest);
+
+    public Task SetLatest(long value)
     {
-        private long _latest;
-
-        /// <inheritdoc />
-        public Task<long> GetLatest() => Task.FromResult(_latest);
-
-        public Task SetLatest(long value)
-        {
-            _latest = value;
-            return Task.CompletedTask;
-        }
+        _latest = value;
+        return Task.CompletedTask;
     }
 }

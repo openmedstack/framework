@@ -1,10 +1,9 @@
-namespace OpenMedStack.Autofac.NEventstore
-{
-    using global::Autofac;
-    using NEventStore;
+namespace OpenMedStack.Autofac.NEventstore;
 
-    public static class WireupExtensions
-    {
-        public static Wireup LinkToAutofac(this Wireup wireup, ContainerBuilder builder) => new ContainerWireup(wireup, builder);
-    }
+using global::Autofac;
+using NEventStore;
+
+public static class WireupExtensions
+{
+    public static Wireup LinkToAutofac(this Wireup wireup, ContainerBuilder builder) => new ContainerWireup(wireup, builder);
 }

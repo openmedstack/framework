@@ -1,6 +1,5 @@
-namespace OpenMedStack.Autofac.NEventstore.Domain
+namespace OpenMedStack.Autofac.NEventstore.Domain;
+
+public interface IReadModelCommitDispatcher : ICommitDispatcher
 {
-    public interface IReadModelCommitDispatcher : ICommitDispatcher
-    {
-    }
 }

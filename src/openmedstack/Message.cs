@@ -7,18 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
-{
-    using System;
+namespace OpenMedStack;
 
+using System;
+
+/// <summary>
+/// The abstract message definition
+/// </summary>
+public abstract record Message(DateTimeOffset Timestamp)
+{
     /// <summary>
-    /// The abstract message definition
+    /// Gets the time stamp of the message.
     /// </summary>
-    public abstract record Message(DateTimeOffset Timestamp)
-    {
-        /// <summary>
-        /// Gets the time stamp of the message.
-        /// </summary>
-        public DateTimeOffset Timestamp { get; } = Timestamp;
-    }
+    public DateTimeOffset Timestamp { get; } = Timestamp;
 }

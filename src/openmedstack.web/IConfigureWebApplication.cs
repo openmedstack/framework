@@ -1,12 +1,11 @@
-﻿namespace OpenMedStack.Web
+﻿namespace OpenMedStack.Web;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+public interface IConfigureWebApplication
 {
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.Extensions.DependencyInjection;
+    void ConfigureServices(IServiceCollection serviceCollection);
 
-    public interface IConfigureWebApplication
-    {
-        void ConfigureServices(IServiceCollection serviceCollection);
-
-        void ConfigureApplication(IApplicationBuilder appBuilder);
-    }
+    void ConfigureApplication(IApplicationBuilder appBuilder);
 }

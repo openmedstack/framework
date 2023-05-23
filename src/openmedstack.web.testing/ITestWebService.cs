@@ -1,9 +1,8 @@
-﻿namespace OpenMedStack.Web.Testing
-{
-    using System.Net.Http;
+﻿namespace OpenMedStack.Web.Testing;
 
-    public interface ITestWebService : IService
-    {
-        HttpClient CreateClient();
-    }
+using System.Net.Http;
+
+public interface ITestWebService : IService
+{
+    HttpClient CreateClient();
 }

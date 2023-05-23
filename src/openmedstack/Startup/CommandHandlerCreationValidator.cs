@@ -1,39 +1,38 @@
-﻿namespace OpenMedStack.Startup
+﻿namespace OpenMedStack.Startup;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.Commands;
+
+public class CommandHandlerCreationValidator : IValidateStartup
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.Commands;
+    private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
+    private readonly ILogger<CommandHandlerCreationValidator> _logger;
 
-    public class CommandHandlerCreationValidator : IValidateStartup
+    public CommandHandlerCreationValidator(
+        Func<IEnumerable<IHandleCommands>> loaderFunc,
+        ILogger<CommandHandlerCreationValidator> logger)
     {
-        private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
-        private readonly ILogger<CommandHandlerCreationValidator> _logger;
+        _loaderFunc = loaderFunc;
+        _logger = logger;
+    }
 
-        public CommandHandlerCreationValidator(
-            Func<IEnumerable<IHandleCommands>> loaderFunc,
-            ILogger<CommandHandlerCreationValidator> logger)
+    /// <inheritdoc />
+    public Task<Exception?> Validate()
+    {
+        try
         {
-            _loaderFunc = loaderFunc;
-            _logger = logger;
+            var handlers = _loaderFunc().ToArray();
+            _logger.LogInformation("Validated {count} command handlers", handlers.Length);
+            return Task.FromResult<Exception?>(null);
         }
-
-        /// <inheritdoc />
-        public Task<Exception?> Validate()
+        catch (Exception ex)
         {
-            try
-            {
-                var handlers = _loaderFunc().ToArray();
-                _logger.LogInformation("Validated {count} command handlers", handlers.Length);
-                return Task.FromResult<Exception?>(null);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to validate command handlers");
-                return Task.FromResult<Exception?>(ex);
-            }
+            _logger.LogError(ex, "Failed to validate command handlers");
+            return Task.FromResult<Exception?>(ex);
         }
     }
 }

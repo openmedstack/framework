@@ -7,56 +7,55 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+using System;
+using global::Autofac;
+using global::MassTransit;
+using Module = global::Autofac.Module;
+
+/// <summary>
+/// Defines the Autofac module for configuring message endpoints.
+/// </summary>
+public class InMemoryMassTransitModule<TConfiguration> : Module
+    where TConfiguration : DeploymentConfiguration
 {
-    using System;
-    using global::Autofac;
-    using global::MassTransit;
-    using Module = global::Autofac.Module;
+    private readonly TConfiguration _configuration;
 
     /// <summary>
-    /// Defines the Autofac module for configuring message endpoints.
+    /// Initializes a new instance of the <see cref="InMemoryMassTransitModule{T}"/> class.
     /// </summary>
-    public class InMemoryMassTransitModule<TConfiguration> : Module
-        where TConfiguration : DeploymentConfiguration
+    /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
+    public InMemoryMassTransitModule(TConfiguration configuration)
     {
-        private readonly TConfiguration _configuration;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InMemoryMassTransitModule{T}"/> class.
-        /// </summary>
-        /// <param name="configuration">The <see cref="TConfiguration"/> containing the configuration values.</param>
-        public InMemoryMassTransitModule(TConfiguration configuration)
+        if (string.IsNullOrWhiteSpace(configuration.QueueName))
         {
-            if (string.IsNullOrWhiteSpace(configuration.QueueName))
+            throw new ArgumentException("Queue name missing", nameof(configuration));
+        }
+
+        _configuration = configuration;
+    }
+
+    /// <inheritdoc />
+    protected override void Load(ContainerBuilder builder)
+    {
+        base.Load(builder);
+        builder.RegisterBusDependencies(_configuration);
+        builder.Register(
+                c => CreateInMemory(c, Retry.Interval(_configuration.RetryCount, _configuration.RetryInterval)))
+            .As<IBusControl>()
+            .As<IBus>()
+            .As<IPublishEndpoint>()
+            .SingleInstance();
+    }
+
+    private IBusControl CreateInMemory(IComponentContext c, IRetryPolicy retryPolicy)
+    {
+        return Bus.Factory.CreateUsingInMemory(
+            sbc =>
             {
-                throw new ArgumentException("Queue name missing", nameof(configuration));
-            }
-
-            _configuration = configuration;
-        }
-
-        /// <inheritdoc />
-        protected override void Load(ContainerBuilder builder)
-        {
-            base.Load(builder);
-            builder.RegisterBusDependencies(_configuration);
-            builder.Register(
-                    c => CreateInMemory(c, Retry.Interval(_configuration.RetryCount, _configuration.RetryInterval)))
-                .As<IBusControl>()
-                .As<IBus>()
-                .As<IPublishEndpoint>()
-                .SingleInstance();
-        }
-
-        private IBusControl CreateInMemory(IComponentContext c, IRetryPolicy retryPolicy)
-        {
-            return Bus.Factory.CreateUsingInMemory(
-                sbc =>
-                {
-                    sbc.ConfigureJson(c);
-                    sbc.ConfigureBus(c, _configuration, retryPolicy);
-                }).AttachObservers(c);
-        }
+                sbc.ConfigureJson(c);
+                sbc.ConfigureBus(c, _configuration, retryPolicy);
+            }).AttachObservers(c);
     }
 }

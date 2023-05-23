@@ -7,21 +7,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.NEventstore.Sql
-{
-    using System.Data.Common;
-    using NEventStore.Persistence.Sql;
+namespace OpenMedStack.Autofac.NEventstore.Sql;
 
-    public static class SqlChassisExtensions
+using System.Data.Common;
+using NEventStore.Persistence.Sql;
+
+public static class SqlChassisExtensions
+{
+    public static Chassis<TConfiguration> UsingSqlEventStore<TConfiguration, TDialect>(
+        this Chassis<TConfiguration> chassis,
+        DbProviderFactory dbProviderFactory)
+        where TConfiguration : DeploymentConfiguration
+        where TDialect : ISqlDialect
     {
-        public static Chassis<TConfiguration> UsingSqlEventStore<TConfiguration, TDialect>(
-            this Chassis<TConfiguration> chassis,
-            DbProviderFactory dbProviderFactory)
-            where TConfiguration : DeploymentConfiguration
-            where TDialect : ISqlDialect
-        {
-            return chassis.AddAutofacModules(
-                (c, _) => new SqlEventStoreModule<TDialect>(c.ConnectionString, dbProviderFactory));
-        }
+        return chassis.AddAutofacModules(
+            (c, _) => new SqlEventStoreModule<TDialect>(c.ConnectionString, dbProviderFactory));
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace OpenMedStack.Startup
-{
-    using System;
-    using System.Threading.Tasks;
+﻿namespace OpenMedStack.Startup;
 
-    public interface IValidateStartup
-    {
-        Task<Exception?> Validate();
-    }
+using System;
+using System.Threading.Tasks;
+
+public interface IValidateStartup
+{
+    Task<Exception?> Validate();
 }

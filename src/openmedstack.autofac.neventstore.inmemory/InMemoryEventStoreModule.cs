@@ -7,27 +7,26 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.NEventstore.InMemory
-{
-    using global::Autofac;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.NEventStore;
-    using OpenMedStack.NEventStore.Persistence;
-    using OpenMedStack.NEventStore.Serialization;
+namespace OpenMedStack.Autofac.NEventstore.InMemory;
 
-    public class InMemoryEventStoreModule : Module
+using global::Autofac;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.NEventStore;
+using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Serialization;
+
+public class InMemoryEventStoreModule : Module
+{
+    protected override void Load(ContainerBuilder builder)
     {
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.Register(
-                    ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
-                        .UsingInMemoryPersistence()
-                        .UsingJsonSerialization()
-                        .LinkToAutofac(builder)
-                        .Build())
-                .As<IStoreEvents>()
-                .SingleInstance();
-            builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
-        }
+        builder.Register(
+                ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
+                    .UsingInMemoryPersistence()
+                    .UsingJsonSerialization()
+                    .LinkToAutofac(builder)
+                    .Build())
+            .As<IStoreEvents>()
+            .SingleInstance();
+        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
     }
 }

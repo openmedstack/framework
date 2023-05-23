@@ -1,4 +1,3 @@
-namespace OpenMedStack.Domain
-{
-    public interface ITrackCommandCheckpoints : ITrackCheckpoints { }
-}
+namespace OpenMedStack.Domain;
+
+public interface ITrackCommandCheckpoints : ITrackCheckpoints { }

@@ -1,12 +1,11 @@
 using System;
 
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+public class HandlerForDomainEventNotFoundException : Exception
 {
-    public class HandlerForDomainEventNotFoundException : Exception
+    public HandlerForDomainEventNotFoundException(string message)
+        : base(message)
     {
-        public HandlerForDomainEventNotFoundException(string message)
-            : base(message)
-        {
-        }
     }
 }

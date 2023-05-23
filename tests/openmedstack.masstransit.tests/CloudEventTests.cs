@@ -1,44 +1,44 @@
-namespace openmedstack.masstransit.tests
+namespace openmedstack.masstransit.tests;
+
+using System;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Autofac;
+using CloudNative.CloudEvents.NewtonsoftJson;
+using OpenMedStack;
+using OpenMedStack.Autofac;
+using OpenMedStack.Autofac.MassTransit;
+using Xunit;
+
+public class CloudEventTests
 {
-    using System;
-    using System.Diagnostics;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Autofac;
-    using CloudNative.CloudEvents.NewtonsoftJson;
-    using OpenMedStack;
-    using OpenMedStack.Autofac;
-    using OpenMedStack.Autofac.MassTransit;
-    using Xunit;
-
-    public class CloudEventTests
+    [Fact]
+    public async Task CanRoundTrip()
     {
-        [Fact]
-        public async Task CanRoundTrip()
-        {
-            using var tokenSource =
-                new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
-            var waitHandle = new ManualResetEventSlim(false);
-            var configuration = new DeploymentConfiguration { TenantPrefix = "Test", QueueName = "test" };
-            var chassis = Chassis.From(configuration)
-                .DefinedIn(typeof(TestEvent).Assembly)
-                .UsingInMemoryMassTransit()
-                .AddAutofacModules((_, _) => new BusTestModule(waitHandle))
-                .Build();
-            await using var __ = chassis.ConfigureAwait(false);
-            chassis.Start();
-            var publishTask = chassis.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow), tokenSource.Token);
-            var handled = waitHandle.Wait(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
-            await publishTask.ConfigureAwait(false);
+        using var tokenSource =
+            new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
+        var waitHandle = new ManualResetEventSlim(false);
+        var configuration = new DeploymentConfiguration { TenantPrefix = "Test", QueueName = "test" };
+        var chassis = Chassis.From(configuration)
+            .DefinedIn(typeof(TestEvent).Assembly)
+            .UsingInMemoryMassTransit()
+            .AddAutofacModules((_, _) => new BusTestModule(waitHandle))
+            .Build();
+        await using var __ = chassis.ConfigureAwait(false);
+        chassis.Start();
+        var publishTask = chassis.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow), tokenSource.Token);
+        var handled = waitHandle.Wait(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
+        await publishTask.ConfigureAwait(false);
 
-            Assert.True(handled);
-        }
+        Assert.True(handled);
+    }
 
-        [Fact]
-        public void CanDeserializeFromWire()
-        {
-            const string json = @"{
+    [Fact]
+    public void CanDeserializeFromWire()
+    {
+        const string json = @"{
 ""specversion"": ""1.0"",
 ""id"": ""53739e1e-3997-4872-88cf-8d9ddc9f02a1"",
 ""source"": ""http://localhost"",
@@ -54,28 +54,27 @@ namespace openmedstack.masstransit.tests
 }
         }";
 
-            var deserializer = new JsonEventFormatter<TestEvent>();
-            var deserialized = deserializer.DecodeStructuredModeMessage(Encoding.UTF8.GetBytes(json), null, null);
+        var deserializer = new JsonEventFormatter<TestEvent>();
+        var deserialized = deserializer.DecodeStructuredModeMessage(Encoding.UTF8.GetBytes(json), null, null);
 
-            Assert.NotNull(deserialized);
-        }
+        Assert.NotNull(deserialized);
+    }
+}
+
+internal class BusTestModule : Module
+{
+    private readonly ManualResetEventSlim _waitHandle;
+
+    public BusTestModule(ManualResetEventSlim waitHandle)
+    {
+        _waitHandle = waitHandle;
     }
 
-    internal class BusTestModule : Module
+    /// <inheritdoc />
+    protected override void Load(ContainerBuilder builder)
     {
-        private readonly ManualResetEventSlim _waitHandle;
+        base.Load(builder);
 
-        public BusTestModule(ManualResetEventSlim waitHandle)
-        {
-            _waitHandle = waitHandle;
-        }
-
-        /// <inheritdoc />
-        protected override void Load(ContainerBuilder builder)
-        {
-            base.Load(builder);
-
-            builder.RegisterInstance(_waitHandle);
-        }
+        builder.RegisterInstance(_waitHandle);
     }
 }

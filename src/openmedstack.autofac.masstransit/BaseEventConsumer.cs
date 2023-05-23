@@ -7,37 +7,36 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
+using global::MassTransit;
+using OpenMedStack.Events;
+
+using Microsoft.Extensions.Logging;
+
+[ExcludeFromCodeCoverage]
+internal class BaseEventConsumer<T> : IConsumer<T>
+    where T : BaseEvent
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using global::MassTransit;
-    using OpenMedStack.Events;
+    private readonly ILogger<BaseEventConsumer<T>> _logger;
+    private readonly IHandleEvents<T>[] _messageHandlers;
 
-    using Microsoft.Extensions.Logging;
-
-    [ExcludeFromCodeCoverage]
-    internal class BaseEventConsumer<T> : IConsumer<T>
-        where T : BaseEvent
+    public BaseEventConsumer(IEnumerable<IHandleEvents<T>> messageHandlers, ILogger<BaseEventConsumer<T>> logger)
     {
-        private readonly ILogger<BaseEventConsumer<T>> _logger;
-        private readonly IHandleEvents<T>[] _messageHandlers;
+        _logger = logger;
+        _messageHandlers = messageHandlers.ToArray();
+    }
 
-        public BaseEventConsumer(IEnumerable<IHandleEvents<T>> messageHandlers, ILogger<BaseEventConsumer<T>> logger)
-        {
-            _logger = logger;
-            _messageHandlers = messageHandlers.ToArray();
-        }
+    public async Task Consume(ConsumeContext<T> context)
+    {
+        var headers = new OpenMedStack.MessageHeaders(context.Headers.GetAll());
+        var handleTasks = _messageHandlers.Select(handler => handler.Handle(context.Message, headers, context.CancellationToken));
+        await Task.WhenAll(handleTasks).ConfigureAwait(false);
 
-        public async Task Consume(ConsumeContext<T> context)
-        {
-            var headers = new OpenMedStack.MessageHeaders(context.Headers.GetAll());
-            var handleTasks = _messageHandlers.Select(handler => handler.Handle(context.Message, headers, context.CancellationToken));
-            await Task.WhenAll(handleTasks).ConfigureAwait(false);
-
-            _logger.LogDebug("Consumed {typeofT} with {messageHandlerLength} handler(s).", typeof(T), _messageHandlers.Length);
-        }
+        _logger.LogDebug("Consumed {typeofT} with {messageHandlerLength} handler(s).", typeof(T), _messageHandlers.Length);
     }
 }

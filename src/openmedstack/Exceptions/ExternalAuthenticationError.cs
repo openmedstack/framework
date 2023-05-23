@@ -7,18 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Exceptions
-{
-    using System;
+namespace OpenMedStack.Exceptions;
 
-    /// <summary>
-    /// Defines the exception when an external user authentication fails.
-    /// </summary>
-    public class ExternalAuthenticationError : Exception
+using System;
+
+/// <summary>
+/// Defines the exception when an external user authentication fails.
+/// </summary>
+public class ExternalAuthenticationError : Exception
+{
+    public ExternalAuthenticationError(Exception innerException)
+        : base("External authentication failed", innerException)
     {
-        public ExternalAuthenticationError(Exception innerException)
-            : base("External authentication failed", innerException)
-        {
-        }
     }
 }

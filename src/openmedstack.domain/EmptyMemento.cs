@@ -7,18 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+public class EmptyMemento : IMemento
 {
-    public class EmptyMemento : IMemento
+    public EmptyMemento(string id, int version)
     {
-        public EmptyMemento(string id, int version)
-        {
-            Id = id;
-            Version = version;
-        }
-
-        public string Id { get; }
-
-        public int Version { get; }
+        Id = id;
+        Version = version;
     }
+
+    public string Id { get; }
+
+    public int Version { get; }
 }

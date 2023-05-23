@@ -1,50 +1,49 @@
-﻿namespace OpenMedStack.Autofac.NEventstore.Sql
+﻿namespace OpenMedStack.Autofac.NEventstore.Sql;
+
+using System;
+using System.Data;
+using System.Data.Common;
+using NEventStore.Persistence;
+using NEventStore.Persistence.Sql;
+
+public class OpenMedStackConnectionFactory : IConnectionFactory
 {
-    using System;
-    using System.Data;
-    using System.Data.Common;
-    using NEventStore.Persistence;
-    using NEventStore.Persistence.Sql;
+    private readonly DbProviderFactory _providerFactory;
+    private readonly string _connectionString;
 
-    public class OpenMedStackConnectionFactory : IConnectionFactory
+    public OpenMedStackConnectionFactory(DbProviderFactory providerFactory, string connectionString)
     {
-        private readonly DbProviderFactory _providerFactory;
-        private readonly string _connectionString;
+        _providerFactory = providerFactory;
+        _connectionString = connectionString;
+    }
 
-        public OpenMedStackConnectionFactory(DbProviderFactory providerFactory, string connectionString)
+    public Type GetDbProviderFactoryType() => _providerFactory.GetType();
+
+    public IDbConnection Open() => Open(_connectionString);
+
+    protected virtual IDbConnection Open(string connectionString) => OpenConnection(
+        connectionString);
+
+    protected virtual IDbConnection OpenConnection(string connectionString)
+    {
+        var factory = _providerFactory;
+        var connection = factory.CreateConnection();
+        if (connection == null)
         {
-            _providerFactory = providerFactory;
-            _connectionString = connectionString;
+            throw new ConfigurationErrorsException("Bad Connection");
         }
 
-        public Type GetDbProviderFactoryType() => _providerFactory.GetType();
+        connection.ConnectionString = connectionString;
 
-        public IDbConnection Open() => Open(_connectionString);
-
-        protected virtual IDbConnection Open(string connectionString) => OpenConnection(
-            connectionString);
-
-        protected virtual IDbConnection OpenConnection(string connectionString)
+        try
         {
-            var factory = _providerFactory;
-            var connection = factory.CreateConnection();
-            if (connection == null)
-            {
-                throw new ConfigurationErrorsException("Bad Connection");
-            }
-
-            connection.ConnectionString = connectionString;
-
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception e)
-            {
-                throw new StorageUnavailableException(e.Message, e);
-            }
-
-            return connection;
+            connection.Open();
         }
+        catch (Exception e)
+        {
+            throw new StorageUnavailableException(e.Message, e);
+        }
+
+        return connection;
     }
 }

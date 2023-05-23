@@ -7,16 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.ReadModels
+namespace OpenMedStack.ReadModels;
+
+/// <summary>
+/// Defines the interface for read model objects.
+/// </summary>
+public interface IReadModel
 {
     /// <summary>
-    /// Defines the interface for read model objects.
+    /// Gets the version number of the latest update.
     /// </summary>
-    public interface IReadModel
-    {
-        /// <summary>
-        /// Gets the version number of the latest update.
-        /// </summary>
-        int Version { get; }
-    }
+    int Version { get; }
 }

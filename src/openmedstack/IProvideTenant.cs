@@ -1,7 +1,6 @@
-﻿namespace OpenMedStack
+﻿namespace OpenMedStack;
+
+public interface IProvideTenant
 {
-    public interface IProvideTenant
-    {
-        string GetTenantName();
-    }
+    string GetTenantName();
 }

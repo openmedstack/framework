@@ -1,9 +1,8 @@
-namespace OpenMedStack.Autofac.MassTransit.CloudEvents
-{
-    using System.Net.Mime;
+namespace OpenMedStack.Autofac.MassTransit.CloudEvents;
 
-    public interface IConfigurator
-    {
-        IConfigurator WithContentType(ContentType contentType);
-    }
+using System.Net.Mime;
+
+public interface IConfigurator
+{
+    IConfigurator WithContentType(ContentType contentType);
 }

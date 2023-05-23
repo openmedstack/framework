@@ -7,26 +7,25 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
+namespace OpenMedStack;
+
+/// <summary>
+/// Defines the enumeration of response expectations.
+/// </summary>
+public enum ResponseExpectation
 {
     /// <summary>
-    /// Defines the enumeration of response expectations.
+    /// A response is always expected.
     /// </summary>
-    public enum ResponseExpectation
-    {
-        /// <summary>
-        /// A response is always expected.
-        /// </summary>
-        Always = 0,
+    Always = 0,
 
-        /// <summary>
-        /// No response is expected.
-        /// </summary>
-        Never = 1,
+    /// <summary>
+    /// No response is expected.
+    /// </summary>
+    Never = 1,
 
-        /// <summary>
-        /// Only error responses are expected.
-        /// </summary>
-        Error = 2
-    }
+    /// <summary>
+    /// Only error responses are expected.
+    /// </summary>
+    Error = 2
 }

@@ -1,55 +1,54 @@
-﻿namespace OpenMedStack.Web.Autofac
+﻿namespace OpenMedStack.Web.Autofac;
+
+using System;
+using System.Linq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.Autofac;
+
+public static class ChassisExtensions
 {
-    using System;
-    using System.Linq;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.Autofac;
+    private const string LogFilters = "LogFilters";
 
-    public static class ChassisExtensions
+    public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        Action<IApplicationBuilder> configuration)
+        where TConfiguration : WebDeploymentConfiguration =>
+        chassis.UsingWebServer(new DelegateWebApplicationConfiguration(null, configuration));
+
+    public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        Action<IServiceCollection> configuration)
+        where TConfiguration : WebDeploymentConfiguration =>
+        chassis.UsingWebServer(new DelegateWebApplicationConfiguration(configuration));
+
+    public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        IConfigureWebApplication configuration)
+        where TConfiguration : WebDeploymentConfiguration
     {
-        private const string LogFilters = "LogFilters";
+        return UsingWebServer(chassis, _ => configuration);
+    }
 
-        public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
-            this Chassis<TConfiguration> chassis,
-            Action<IApplicationBuilder> configuration)
-            where TConfiguration : WebDeploymentConfiguration =>
-            chassis.UsingWebServer(new DelegateWebApplicationConfiguration(null, configuration));
-
-        public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
-            this Chassis<TConfiguration> chassis,
-            Action<IServiceCollection> configuration)
-            where TConfiguration : WebDeploymentConfiguration =>
-            chassis.UsingWebServer(new DelegateWebApplicationConfiguration(configuration));
-
-        public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
-            this Chassis<TConfiguration> chassis,
-            IConfigureWebApplication configuration)
-            where TConfiguration : WebDeploymentConfiguration
-        {
-            return UsingWebServer(chassis, _ => configuration);
-        }
-
-        public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
-            this Chassis<TConfiguration> chassis,
-            Func<TConfiguration, IConfigureWebApplication> configuration)
-            where TConfiguration : WebDeploymentConfiguration
-        {
-            var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(
-                OpenMedStack.Autofac.ChassisExtensions.EnableConsoleLogging,
-                true);
-            chassis.Metadata.TryGetValue(LogFilters, out var filters);
-            return chassis.UsingCustomBuilder(
-                (c, a) => new WebServerService<TConfiguration>(
+    public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        Func<TConfiguration, IConfigureWebApplication> configuration)
+        where TConfiguration : WebDeploymentConfiguration
+    {
+        var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(
+            OpenMedStack.Autofac.ChassisExtensions.EnableConsoleLogging,
+            true);
+        chassis.Metadata.TryGetValue(LogFilters, out var filters);
+        return chassis.UsingCustomBuilder(
+            (c, a) => new WebServerService<TConfiguration>(
+                c,
+                new WebStartup<TConfiguration>(
+                    enableConsoleLogging,
                     c,
-                    new WebStartup<TConfiguration>(
-                        enableConsoleLogging,
-                        c,
-                        c.Urls,
-                        configuration(c),
-                        filters as (string, LogLevel)[],
-                        chassis.GetModules(chassis.Configuration, a).ToArray())));
-        }
+                    c.Urls,
+                    configuration(c),
+                    filters as (string, LogLevel)[],
+                    chassis.GetModules(chassis.Configuration, a).ToArray())));
     }
 }

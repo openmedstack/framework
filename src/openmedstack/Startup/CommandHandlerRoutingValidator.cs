@@ -1,71 +1,70 @@
-﻿namespace OpenMedStack.Startup
+﻿namespace OpenMedStack.Startup;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack.Commands;
+
+public class CommandHandlerRoutingValidator : IValidateStartup
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack.Commands;
+    private readonly DeploymentConfiguration _configuration;
+    private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
+    private readonly ILogger<CommandHandlerRoutingValidator> _logger;
 
-    public class CommandHandlerRoutingValidator : IValidateStartup
+    public CommandHandlerRoutingValidator(
+        DeploymentConfiguration configuration,
+        Func<IEnumerable<IHandleCommands>> loaderFunc,
+        ILogger<CommandHandlerRoutingValidator> logger)
     {
-        private readonly DeploymentConfiguration _configuration;
-        private readonly Func<IEnumerable<IHandleCommands>> _loaderFunc;
-        private readonly ILogger<CommandHandlerRoutingValidator> _logger;
+        _configuration = configuration;
+        _loaderFunc = loaderFunc;
+        _logger = logger;
+    }
 
-        public CommandHandlerRoutingValidator(
-            DeploymentConfiguration configuration,
-            Func<IEnumerable<IHandleCommands>> loaderFunc,
-            ILogger<CommandHandlerRoutingValidator> logger)
+    /// <inheritdoc />
+    public Task<Exception?> Validate()
+    {
+        IEnumerable<IHandleCommands> handlers;
+        try
         {
-            _configuration = configuration;
-            _loaderFunc = loaderFunc;
-            _logger = logger;
+            handlers = _loaderFunc();
+        }
+        catch
+        {
+            return Task.FromResult<Exception?>(null);
         }
 
-        /// <inheritdoc />
-        public Task<Exception?> Validate()
+        var errors = (from handler in handlers
+                      from commandType in handler.GetType()
+                          .GetInterfaces()
+                          .Where(t => t.IsGenericType)
+                          .Select(t => t.GetGenericArguments())
+                          .Where(x => x.Length == 1)
+                          .Select(x => x[0])
+                          .Where(t => typeof(DomainCommand).IsAssignableFrom(t))
+                      where !_configuration.Services.Any(x => x.Key.IsMatch(commandType.FullName!))
+                      select new Exception($"{commandType.FullName} is not handled by any registered endpoint."))
+            .ToList();
+
+        if (errors.Count > 0)
         {
-            IEnumerable<IHandleCommands> handlers;
-            try
+            foreach (var error in errors)
             {
-                handlers = _loaderFunc();
+                _logger.LogError(error, "{error}", error.Message);
             }
-            catch
-            {
-                return Task.FromResult<Exception?>(null);
-            }
-
-            var errors = (from handler in handlers
-                          from commandType in handler.GetType()
-                              .GetInterfaces()
-                              .Where(t => t.IsGenericType)
-                              .Select(t => t.GetGenericArguments())
-                              .Where(x => x.Length == 1)
-                              .Select(x => x[0])
-                              .Where(t => typeof(DomainCommand).IsAssignableFrom(t))
-                          where !_configuration.Services.Any(x => x.Key.IsMatch(commandType.FullName!))
-                          select new Exception($"{commandType.FullName} is not handled by any registered endpoint."))
-                .ToList();
-
-            if (errors.Count > 0)
-            {
-                foreach (var error in errors)
-                {
-                    _logger.LogError(error, "{error}", error.Message);
-                }
-            }
-            else
-            {
-                _logger.LogInformation("Validated command handler routing");
-            }
-
-            return errors.Count switch
-            {
-                0 => Task.FromResult<Exception?>(null),
-                1 => Task.FromResult<Exception?>(errors[0]),
-                _ => Task.FromResult<Exception?>(new AggregateException(errors)),
-            };
         }
+        else
+        {
+            _logger.LogInformation("Validated command handler routing");
+        }
+
+        return errors.Count switch
+        {
+            0 => Task.FromResult<Exception?>(null),
+            1 => Task.FromResult<Exception?>(errors[0]),
+            _ => Task.FromResult<Exception?>(new AggregateException(errors)),
+        };
     }
 }

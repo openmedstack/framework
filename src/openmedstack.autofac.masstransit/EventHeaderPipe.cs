@@ -11,29 +11,28 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MassTransit;
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+internal class EventHeaderPipe : IPipe<PublishContext>
 {
-    internal class EventHeaderPipe : IPipe<PublishContext>
+    private readonly IDictionary<string, object> _headers;
+
+    public EventHeaderPipe(IDictionary<string, object>? headers)
     {
-        private readonly IDictionary<string, object> _headers;
+        _headers = headers ?? new Dictionary<string, object>();
+    }
 
-        public EventHeaderPipe(IDictionary<string, object>? headers)
+    public Task Send(PublishContext context)
+    {
+        foreach (var (key, value) in _headers)
         {
-            _headers = headers ?? new Dictionary<string, object>();
+            context.Headers.Set(key, value);
         }
 
-        public Task Send(PublishContext context)
-        {
-            foreach (var (key, value) in _headers)
-            {
-                context.Headers.Set(key, value);
-            }
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
-
-        public void Probe(ProbeContext context)
-        {
-        }
+    public void Probe(ProbeContext context)
+    {
     }
 }

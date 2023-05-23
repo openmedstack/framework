@@ -1,9 +1,8 @@
-namespace OpenMedStack.Domain
-{
-    public interface IMemento
-    {
-        string Id { get; }
+namespace OpenMedStack.Domain;
 
-        int Version { get; }
-    }
+public interface IMemento
+{
+    string Id { get; }
+
+    int Version { get; }
 }

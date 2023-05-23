@@ -7,44 +7,43 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using global::MassTransit;
+
+using Microsoft.Extensions.Logging;
+
+internal class BusStarter : IBootstrapSystem, IDisposable
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using global::MassTransit;
+    private readonly IBusControl _control;
+    private readonly ILogger<BusStarter> _logger;
 
-    using Microsoft.Extensions.Logging;
-
-    internal class BusStarter : IBootstrapSystem, IDisposable
+    public BusStarter(IBusControl control, ILogger<BusStarter> logger)
     {
-        private readonly IBusControl _control;
-        private readonly ILogger<BusStarter> _logger;
+        _control = control;
+        _logger = logger;
+    }
 
-        public BusStarter(IBusControl control, ILogger<BusStarter> logger)
-        {
-            _control = control;
-            _logger = logger;
-        }
+    public uint Order => uint.MinValue;
 
-        public uint Order => uint.MinValue;
+    public async Task Setup(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Message bus starting.");
+        await _control.StartAsync(cancellationToken);
+        _logger.LogInformation("Message bus started.");
+    }
 
-        public async Task Setup(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Message bus starting.");
-            await _control.StartAsync(cancellationToken);
-            _logger.LogInformation("Message bus started.");
-        }
+    public async Task Shutdown(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Message bus shutting down.");
+        await _control.StopAsync(cancellationToken);
+        _logger.LogInformation("Message bus shut down.");
+    }
 
-        public async Task Shutdown(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Message bus shutting down.");
-            await _control.StopAsync(cancellationToken);
-            _logger.LogInformation("Message bus shut down.");
-        }
-
-        public void Dispose()
-        {
-        }
+    public void Dispose()
+    {
     }
 }

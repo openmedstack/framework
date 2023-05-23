@@ -1,28 +1,27 @@
-namespace openmedstack.masstransit.tests
+namespace openmedstack.masstransit.tests;
+
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using OpenMedStack;
+using OpenMedStack.Events;
+
+internal class TestEventConsumer : EventHandlerBase<TestEvent>
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using OpenMedStack;
-    using OpenMedStack.Events;
+    private readonly ManualResetEventSlim _waitHandle;
 
-    internal class TestEventConsumer : EventHandlerBase<TestEvent>
+    public TestEventConsumer(ManualResetEventSlim waitHandle, ILogger<TestEventConsumer> logger) : base(logger)
     {
-        private readonly ManualResetEventSlim _waitHandle;
+        _waitHandle = waitHandle;
+    }
 
-        public TestEventConsumer(ManualResetEventSlim waitHandle, ILogger<TestEventConsumer> logger) : base(logger)
-        {
-            _waitHandle = waitHandle;
-        }
-
-        /// <inheritdoc />
-        protected override Task HandleInternal(
-            TestEvent domainEvent,
-            IMessageHeaders headers,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            _waitHandle.Set();
-            return Task.CompletedTask;
-        }
+    /// <inheritdoc />
+    protected override Task HandleInternal(
+        TestEvent domainEvent,
+        IMessageHeaders headers,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        _waitHandle.Set();
+        return Task.CompletedTask;
     }
 }

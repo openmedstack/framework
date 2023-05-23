@@ -7,35 +7,34 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
+namespace OpenMedStack;
+
+using System;
+
+/// <summary>
+/// Defines the factory interface.
+/// </summary>
+/// <typeparam name="TResult">The <see cref="Type"/> of the instance to create.</typeparam>
+public interface IFactory<out TResult> : IDisposable
 {
-    using System;
-
     /// <summary>
-    /// Defines the factory interface.
+    /// The create method.
     /// </summary>
-    /// <typeparam name="TResult">The <see cref="Type"/> of the instance to create.</typeparam>
-    public interface IFactory<out TResult> : IDisposable
-    {
-        /// <summary>
-        /// The create method.
-        /// </summary>
-        /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>
-        TResult Create();
-    }
+    /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>
+    TResult Create();
+}
 
+/// <summary>
+/// Defines the parameterized factory interface.
+/// </summary>
+/// <typeparam name="TParameter">The <see cref="Type"/> of the creation parameter.</typeparam>
+/// <typeparam name="TResult">The <see cref="Type"/> of the instance to create.</typeparam>
+public interface IFactory<in TParameter, out TResult> : IDisposable
+{
     /// <summary>
-    /// Defines the parameterized factory interface.
+    /// The create method.
     /// </summary>
-    /// <typeparam name="TParameter">The <see cref="Type"/> of the creation parameter.</typeparam>
-    /// <typeparam name="TResult">The <see cref="Type"/> of the instance to create.</typeparam>
-    public interface IFactory<in TParameter, out TResult> : IDisposable
-    {
-        /// <summary>
-        /// The create method.
-        /// </summary>
-        /// <param name="parameter">The creation parameter.</param>
-        /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>
-        TResult Create(TParameter parameter);
-    }
+    /// <param name="parameter">The creation parameter.</param>
+    /// <returns>An instance of <see cref="Type"/>. The instance will not be null.</returns>
+    TResult Create(TParameter parameter);
 }

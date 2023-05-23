@@ -1,10 +1,9 @@
-namespace OpenMedStack.Autofac.NEventstore.Domain
-{
-    using System.Threading.Tasks;
-    using NEventStore;
+namespace OpenMedStack.Autofac.NEventstore.Domain;
 
-    public interface IReadModelUpdater
-    {
-        Task<bool> Update(ICommit commit);
-    }
+using System.Threading.Tasks;
+using NEventStore;
+
+public interface IReadModelUpdater
+{
+    Task<bool> Update(ICommit commit);
 }

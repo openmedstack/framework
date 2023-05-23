@@ -1,10 +1,9 @@
-﻿namespace OpenMedStack.Framework.IntegrationTests
-{
-    using OpenMedStack;
+﻿namespace OpenMedStack.Framework.IntegrationTests;
 
-    internal class DummyTokenValidator : IValidateTokens
-    {
-        /// <inheritdoc />
-        public IdentityToken? Validate(string? token) => null;
-    }
+using OpenMedStack;
+
+internal class DummyTokenValidator : IValidateTokens
+{
+    /// <inheritdoc />
+    public IdentityToken? Validate(string? token) => null;
 }

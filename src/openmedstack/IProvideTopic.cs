@@ -7,27 +7,26 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack
+namespace OpenMedStack;
+
+using System;
+
+/// <summary>
+/// Defines the topic provider interface
+/// </summary>
+public interface IProvideTopic
 {
-    using System;
+    /// <summary>
+    /// Gets the topic for the provided <see cref="Message"/>.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="Type"/> of the message</typeparam>
+    /// <returns>The topic as a <see cref="string"/>.</returns>
+    string GetTenantSpecific<T>();
 
     /// <summary>
-    /// Defines the topic provider interface
+    /// Gets the non-tenant specific topic for the provided <see cref="Message"/>.
     /// </summary>
-    public interface IProvideTopic
-    {
-        /// <summary>
-        /// Gets the topic for the provided <see cref="Message"/>.
-        /// </summary>
-        /// <typeparam name="T">The <see cref="Type"/> of the message</typeparam>
-        /// <returns>The topic as a <see cref="string"/>.</returns>
-        string GetTenantSpecific<T>();
-
-        /// <summary>
-        /// Gets the non-tenant specific topic for the provided <see cref="Message"/>.
-        /// </summary>
-        /// <typeparam name="T">The <see cref="Type"/> of the message</typeparam>
-        /// <returns>The topic as a <see cref="string"/>.</returns>
-        string Get<T>();
-    }
+    /// <typeparam name="T">The <see cref="Type"/> of the message</typeparam>
+    /// <returns>The topic as a <see cref="string"/>.</returns>
+    string Get<T>();
 }

@@ -1,21 +1,20 @@
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+using System;
+using System.Collections.Generic;
+using OpenMedStack.Events;
+
+public interface IAggregate : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using OpenMedStack.Events;
+    string Id { get; }
 
-    public interface IAggregate : IDisposable
-    {
-        string Id { get; }
+    int Version { get; }
 
-        int Version { get; }
+    void ApplyEvent(DomainEvent @event);
 
-        void ApplyEvent(DomainEvent @event);
+    ICollection<DomainEvent> GetUncommittedEvents();
 
-        ICollection<DomainEvent> GetUncommittedEvents();
+    void ClearUncommittedEvents();
 
-        void ClearUncommittedEvents();
-
-        IMemento GetSnapshot();
-    }
+    IMemento GetSnapshot();
 }

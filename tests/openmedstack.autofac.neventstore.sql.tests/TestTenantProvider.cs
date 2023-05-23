@@ -1,10 +1,9 @@
-﻿namespace OpenMedStack.Autofac.NEventStore.Sql.Tests
-{
-    using OpenMedStack;
+﻿namespace OpenMedStack.Autofac.NEventStore.Sql.Tests;
 
-    internal class TestTenantProvider : IProvideTenant
-    {
-        /// <inheritdoc />
-        public string GetTenantName() => "test";
-    }
+using OpenMedStack;
+
+internal class TestTenantProvider : IProvideTenant
+{
+    /// <inheritdoc />
+    public string GetTenantName() => "test";
 }

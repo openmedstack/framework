@@ -7,44 +7,43 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OpenMedStack.Autofac.MassTransit
+namespace OpenMedStack.Autofac.MassTransit;
+
+using System.Collections.Generic;
+using System.Reflection;
+
+internal class StaticTopicProvider : IProvideTopic
 {
-    using System.Collections.Generic;
-    using System.Reflection;
+    private readonly IProvideTenant _tenantProvider;
+    private readonly IDictionary<string, string> _topicMap;
 
-    internal class StaticTopicProvider : IProvideTopic
+    public StaticTopicProvider(IProvideTenant tenantProvider, IDictionary<string, string>? topicMap = null)
     {
-        private readonly IProvideTenant _tenantProvider;
-        private readonly IDictionary<string, string> _topicMap;
+        _tenantProvider = tenantProvider;
+        _topicMap = topicMap ?? new Dictionary<string, string>();
+    }
 
-        public StaticTopicProvider(IProvideTenant tenantProvider, IDictionary<string, string>? topicMap = null)
+    /// <inheritdoc />
+    public string GetTenantSpecific<T>()
+    {
+        var tenant = _tenantProvider.GetTenantName();
+        return tenant + Get<T>();
+    }
+
+    /// <inheritdoc />
+    public string Get<T>()
+    {
+        var type = typeof(T);
+        var fullName = type.FullName ?? type.Name;
+        if (_topicMap.TryGetValue(fullName, out var topic))
         {
-            _tenantProvider = tenantProvider;
-            _topicMap = topicMap ?? new Dictionary<string, string>();
+            return topic;
         }
 
-        /// <inheritdoc />
-        public string GetTenantSpecific<T>()
-        {
-            var tenant = _tenantProvider.GetTenantName();
-            return tenant + Get<T>();
-        }
+        var topicAttribute = type.GetCustomAttribute<TopicAttribute>();
+        var result = topicAttribute?.Topic ?? fullName;
+        _topicMap.Add(fullName, result);
 
-        /// <inheritdoc />
-        public string Get<T>()
-        {
-            var type = typeof(T);
-            var fullName = type.FullName ?? type.Name;
-            if (_topicMap.TryGetValue(fullName, out var topic))
-            {
-                return topic;
-            }
-
-            var topicAttribute = type.GetCustomAttribute<TopicAttribute>();
-            var result = topicAttribute?.Topic ?? fullName;
-            _topicMap.Add(fullName, result);
-
-            return result;
-        }
+        return result;
     }
 }

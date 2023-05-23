@@ -1,79 +1,78 @@
-namespace OpenMedStack.Domain
+namespace OpenMedStack.Domain;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public sealed class ConventionEventRouter : IRouteEvents
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    private readonly IDictionary<Type, Action<object>> _handlers = new Dictionary<Type, Action<object>>();
+    private readonly bool _throwOnApplyNotFound;
 
-    public sealed class ConventionEventRouter : IRouteEvents
+    public ConventionEventRouter(bool throwOnApplyNotFound, object handlerSource)
     {
-        private readonly IDictionary<Type, Action<object>> _handlers = new Dictionary<Type, Action<object>>();
-        private readonly bool _throwOnApplyNotFound;
+        _throwOnApplyNotFound = throwOnApplyNotFound;
+        Register(handlerSource);
+    }
 
-        public ConventionEventRouter(bool throwOnApplyNotFound, object handlerSource)
+    public void Register<T>(Action<T> handler)
+    {
+        if (handler == null)
         {
-            _throwOnApplyNotFound = throwOnApplyNotFound;
-            Register(handlerSource);
+            throw new ArgumentNullException(nameof(handler));
         }
 
-        public void Register<T>(Action<T> handler)
-        {
-            if (handler == null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+        Register(typeof(T), @event => handler((T) @event));
+    }
 
-            Register(typeof(T), @event => handler((T) @event));
+    public void Register(object handlerSource)
+    {
+        if (handlerSource is null)
+        {
+            throw new ArgumentNullException(nameof(handlerSource));
         }
 
-        public void Register(object handlerSource)
+        var handlers = from m in HandlerCache.Instance.GetHandlers(handlerSource.GetType())
+                       select new KeyValuePair<Type, Action<object>>(
+                           m.messageType,
+                           x => m.method.Invoke(handlerSource, new[] {x}));
+        foreach (var handler in handlers)
         {
-            if (handlerSource is null)
-            {
-                throw new ArgumentNullException(nameof(handlerSource));
-            }
+            _handlers.Add(handler);
+        }
+    }
 
-            var handlers = from m in HandlerCache.Instance.GetHandlers(handlerSource.GetType())
-                select new KeyValuePair<Type, Action<object>>(
-                    m.messageType,
-                    x => m.method.Invoke(handlerSource, new[] {x}));
-            foreach (var handler in handlers)
-            {
-                _handlers.Add(handler);
-            }
+    public void Dispatch(object eventMessage)
+    {
+        if (eventMessage == null)
+        {
+            throw new ArgumentNullException(nameof(eventMessage));
         }
 
-        public void Dispatch(object eventMessage)
+        if (_handlers.TryGetValue(eventMessage.GetType(), out var action))
         {
-            if (eventMessage == null)
+            action(eventMessage);
+        }
+        else
+        {
+            if (!_throwOnApplyNotFound)
             {
-                throw new ArgumentNullException(nameof(eventMessage));
+                return;
             }
 
-            if (_handlers.TryGetValue(eventMessage.GetType(), out var action))
-            {
-                action(eventMessage);
-            }
-            else
-            {
-                if (!_throwOnApplyNotFound)
-                {
-                    return;
-                }
-
-                throw new HandlerForDomainEventNotFoundException(
-                    $"Aggregate of type '{GetType().Name}' raised an event of type '{eventMessage.GetType().Name}' but not handler could be found to handle the message.");
-            }
+            throw new HandlerForDomainEventNotFoundException(
+                $"Aggregate of type '{GetType().Name}' raised an event of type '{eventMessage.GetType().Name}' but not handler could be found to handle the message.");
         }
+    }
 
-        private void Register(Type messageType, Action<object> handler)
-        {
-            _handlers[messageType] = handler;
-        }
+    private void Register(Type messageType, Action<object> handler)
+    {
+        _handlers[messageType] = handler;
+    }
 
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            _handlers.Clear();
-        }
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _handlers.Clear();
     }
 }
