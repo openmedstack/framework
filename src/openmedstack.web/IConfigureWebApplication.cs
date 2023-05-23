@@ -1,4 +1,4 @@
-﻿namespace OpenMedStack.Web.Autofac
+﻿namespace OpenMedStack.Web
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;

@@ -6,8 +6,6 @@
     using global::MassTransit.AmazonSqsTransport;
     using OpenMedStack.Autofac.MassTransit;
     using System.Diagnostics.Contracts;
-    using Newtonsoft.Json;
-    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.

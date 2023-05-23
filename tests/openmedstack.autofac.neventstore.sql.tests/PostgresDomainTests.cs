@@ -5,7 +5,6 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging.Abstractions;
     using Npgsql;
     using OpenMedStack;
     using OpenMedStack.Autofac.MassTransit.ActiveMq;
@@ -45,7 +44,7 @@
                 .UsingNEventStore()
                 .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.1))
                 .UsingMassTransitOverActiveMq()
-                .UsingSqlEventStore(NpgsqlFactory.Instance, new PostgreSqlDialect(NullLogger.Instance))
+                .UsingSqlEventStore<DeploymentConfiguration, PostgreSqlDialect>(NpgsqlFactory.Instance)
                 .Build(new TestModule());
         }
 

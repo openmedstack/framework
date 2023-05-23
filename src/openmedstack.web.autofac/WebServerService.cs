@@ -32,8 +32,7 @@
         public WebServerService(TConfiguration manifest, WebStartup<TConfiguration> startup)
         {
             _manifest = manifest;
-            var urlBindings = startup.UrlBindings.ToArray();
-            _urlBinding = string.Join(", ", urlBindings);
+            _urlBinding = string.Join(", ", startup.UrlBindings);
             _container = new WebHostBuilder().UseSetting(WebHostDefaults.ApplicationKey, _manifest.Name)
                 .UseContentRoot(_manifest.ContentRoot ?? Directory.GetCurrentDirectory())
                 .UseKestrel(
@@ -54,7 +53,7 @@
                         x.AddSingleton(_subject);
                         x.AddSingleton<IStartup>(startup);
                     })
-                .UseUrls(urlBindings).Build();
+                .UseUrls(startup.UrlBindings).Build();
             _logger = _container.Services.GetRequiredService<ILogger<WebServerService<TConfiguration>>>();
             _eventBus = _container.Services.GetRequiredService<IPublishEvents>();
             _commandBus = _container.Services.GetRequiredService<IRouteCommands>();

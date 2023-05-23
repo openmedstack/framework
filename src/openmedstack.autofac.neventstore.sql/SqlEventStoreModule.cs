@@ -18,25 +18,25 @@ namespace OpenMedStack.Autofac.NEventstore.Sql
     using OpenMedStack.NEventStore.Persistence.Sql;
     using OpenMedStack.NEventStore.Serialization;
 
-    public class SqlEventStoreModule : Module
+    public sealed class SqlEventStoreModule<TDialect> : Module
+        where TDialect : ISqlDialect
     {
         private readonly string _connectionString;
         private readonly DbProviderFactory _dbProviderFactory;
-        private readonly ISqlDialect _dialect;
 
-        public SqlEventStoreModule(string connectionString, DbProviderFactory dbProviderFactory, ISqlDialect dialect)
+        public SqlEventStoreModule(string connectionString, DbProviderFactory dbProviderFactory)
         {
             _connectionString = connectionString;
             _dbProviderFactory = dbProviderFactory;
-            _dialect = dialect;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<TDialect>().As<ISqlDialect>().SingleInstance();
             builder.Register(
                     ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
                         .UsingSqlPersistence(_dbProviderFactory, _connectionString)
-                        .WithDialect(_dialect)
+                        .WithDialect(ctx.Resolve<ISqlDialect>())
                         .UsingJsonSerialization()
                         .LinkToAutofac(builder)
                         .Build())

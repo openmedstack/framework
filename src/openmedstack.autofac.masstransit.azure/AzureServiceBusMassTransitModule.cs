@@ -3,9 +3,7 @@
     using System.Diagnostics.Contracts;
     using global::Autofac;
     using global::MassTransit;
-    using Newtonsoft.Json;
     using OpenMedStack.Autofac.MassTransit;
-    using OpenMedStack.Autofac.MassTransit.CloudEvents;
 
     /// <summary>
     /// Defines the Autofac module for configuring message endpoints.

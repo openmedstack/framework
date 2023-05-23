@@ -1,7 +1,6 @@
 ﻿namespace OpenMedStack.Web.Autofac
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
@@ -10,17 +9,7 @@
 
     public static class ChassisExtensions
     {
-        private const string UrlBindingKey = "WebUrlBindings";
         private const string LogFilters = "LogFilters";
-
-        public static Chassis<TConfiguration> BindToUrls<TConfiguration>(
-            this Chassis<TConfiguration> chassis,
-            params string[] urls)
-            where TConfiguration : WebDeploymentConfiguration
-        {
-            chassis.GetUrlBindings().AddRange(urls);
-            return chassis;
-        }
 
         public static Chassis<TConfiguration> UsingWebServer<TConfiguration>(
             this Chassis<TConfiguration> chassis,
@@ -47,7 +36,6 @@
             Func<TConfiguration, IConfigureWebApplication> configuration)
             where TConfiguration : WebDeploymentConfiguration
         {
-            var bindings = chassis.GetUrlBindings();
             var enableConsoleLogging = (bool)chassis.Metadata.GetOrDefault(
                 OpenMedStack.Autofac.ChassisExtensions.EnableConsoleLogging,
                 true);
@@ -58,21 +46,10 @@
                     new WebStartup<TConfiguration>(
                         enableConsoleLogging,
                         c,
-                        bindings.Distinct().ToArray(),
+                        c.Urls,
                         configuration(c),
                         filters as (string, LogLevel)[],
                         chassis.GetModules(chassis.Configuration, a).ToArray())));
-        }
-
-        private static List<string> GetUrlBindings<TConfiguration>(this Chassis<TConfiguration> chassis)
-            where TConfiguration : WebDeploymentConfiguration
-        {
-            if (!chassis.Metadata.ContainsKey(UrlBindingKey))
-            {
-                chassis.Metadata.Add(UrlBindingKey, new List<string>());
-            }
-
-            return ((List<string>)chassis.Metadata[UrlBindingKey]);
         }
     }
 }

@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.sh = build.sh
 		build_mac.sh = build_mac.sh
 		push.sh = push.sh
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.autofac.masstransit.azure", "src\openmedstack.autofac.masstransit.azure\openmedstack.autofac.masstransit.azure.csproj", "{302AE1E9-22C8-4F0A-B878-6D3234C2CD64}"
@@ -53,8 +54,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.web.autofac", "src\openmedstack.web.autofac\openmedstack.web.autofac.csproj", "{696306BC-0240-4A07-8090-E2B12F4DA12D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.masstransit.tests", "tests\openmedstack.masstransit.tests\openmedstack.masstransit.tests.csproj", "{5B4C22DC-CEC3-4951-B114-8A257476DED7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "openmedstack.masstransit.rabbitmq.tests", "tests\openmedstack.masstransit.rabbitmq.tests\openmedstack.masstransit.rabbitmq.tests.csproj", "{F590D463-DC56-4451-9D8B-76F1B778D83E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -388,22 +387,6 @@ Global
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x64.Build.0 = Release|Any CPU
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.Build.0 = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|ARM.Build.0 = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|x64.Build.0 = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Debug|x86.Build.0 = Debug|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|ARM.ActiveCfg = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|ARM.Build.0 = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|x64.ActiveCfg = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|x64.Build.0 = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|x86.ActiveCfg = Release|Any CPU
-		{F590D463-DC56-4451-9D8B-76F1B778D83E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -415,7 +398,6 @@ Global
 		{C895C0C3-E6FF-4BFF-B839-E12C83522497} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 		{EF008584-2070-4D4A-BBB2-DFFEB82E861E} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
-		{F590D463-DC56-4451-9D8B-76F1B778D83E} = {2B806C05-866E-4CE0-A5C6-71D099F591D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AD33AA5D-51E6-4BEC-826D-25B7DFDE3718}

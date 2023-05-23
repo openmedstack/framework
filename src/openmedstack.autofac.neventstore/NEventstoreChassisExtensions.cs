@@ -1,6 +1,5 @@
 ﻿namespace OpenMedStack.Autofac.NEventstore
 {
-    using Microsoft.Extensions.Configuration;
     using OpenMedStack.Autofac.NEventstore.Modules;
     using OpenMedStack.Domain;
     using OpenMedStack.Events;

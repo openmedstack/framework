@@ -2,13 +2,11 @@ namespace OpenMedStack.Autofac
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.Encodings.Web;
     using System.Text.Json;
     using global::Autofac;
     using global::Autofac.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Console;
 
     internal class ConsoleLogModule : Module
     {

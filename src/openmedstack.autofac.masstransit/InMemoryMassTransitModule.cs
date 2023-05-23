@@ -12,8 +12,6 @@ namespace OpenMedStack.Autofac.MassTransit
     using System;
     using global::Autofac;
     using global::MassTransit;
-    using Newtonsoft.Json;
-    using OpenMedStack.Autofac.MassTransit.CloudEvents;
     using Module = global::Autofac.Module;
 
     /// <summary>

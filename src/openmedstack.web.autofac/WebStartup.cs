@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reactive.Subjects;
     using global::Autofac;
@@ -34,7 +33,7 @@
             (string, LogLevel)[]? filters = null,
             params IModule[] modules)
         {
-            UrlBindings = new ReadOnlyCollection<string>(urlBindings.ToArray());
+            UrlBindings = urlBindings.ToArray();
             _enableConsoleLogging = enableConsoleLogging;
             _deploymentConfiguration = deploymentConfiguration;
             _webappConfiguration = builder;
@@ -42,7 +41,7 @@
             _modules = modules;
         }
 
-        public IReadOnlyCollection<string> UrlBindings { get; }
+        public string[] UrlBindings { get; }
 
         public long? MaxRequestSize { get; } = 1024 * 1024;
 

@@ -6,7 +6,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using OpenMedStack.Commands;
     using OpenMedStack.Events;
-    using OpenMedStack.Web.Autofac;
 
     internal class TestStartup : IConfigureWebApplication
     {

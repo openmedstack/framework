@@ -1,5 +1,4 @@
-﻿
-namespace OpenMedStack.Autofac.NEventstore.Repositories
+﻿namespace OpenMedStack.Autofac.NEventstore.Repositories
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
     using NEventStore.Persistence;
     using OpenMedStack.Events;
 
-    public class DefaultEventStoreRepository : IRepository
+    internal sealed class DefaultEventStoreRepository : IRepository
     {
         private const string AggregateTypeHeader = "AggregateType";
         private readonly IDetectConflicts _conflictDetector;
@@ -35,7 +34,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             _logger = logger;
         }
 
-        public virtual Task<TAggregate> GetById<TAggregate>(string id, CancellationToken cancellationToken)
+        public Task<TAggregate> GetById<TAggregate>(string id, CancellationToken cancellationToken)
             where TAggregate : class, IAggregate =>
             GetById<TAggregate>(id, int.MaxValue, cancellationToken);
 
@@ -64,7 +63,7 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
             CancellationToken cancellationToken = default)
         {
             var commitId = Guid.NewGuid();
-            var headers = PrepareHeaders(aggregate, updateHeaders ?? (_ => { }));
+            var headers = PrepareHeaders(aggregate, updateHeaders);
 
             var stream = await PrepareStream(_tenantId.GetTenantName(), aggregate, headers, cancellationToken)
                 .ConfigureAwait(false);
@@ -75,8 +74,10 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
                 aggregate.ClearUncommittedEvents();
 
                 _logger.LogDebug(
-                    $"Saved aggregate of type {aggregate.GetType()} with id {aggregate.Id} at version {aggregate.Version}");
-
+                    "Saved aggregate of type {type} with id {id} at version {version}",
+                    aggregate.GetType(),
+                    aggregate.Id,
+                    aggregate.Version);
             }
             catch (DuplicateCommitException ex)
             {
@@ -169,10 +170,14 @@ namespace OpenMedStack.Autofac.NEventstore.Repositories
 
         private static Dictionary<string, object> PrepareHeaders(
             IAggregate aggregate,
-            Action<IDictionary<string, object>> updateHeaders)
+            Action<IDictionary<string, object>>? updateHeaders = null)
         {
             var dictionary = new Dictionary<string, object> { { AggregateTypeHeader, aggregate.GetType().FullName! } };
-            updateHeaders?.Invoke(dictionary);
+            if (updateHeaders != null)
+            {
+                updateHeaders.Invoke(dictionary);
+            }
+
             return dictionary;
         }
 
