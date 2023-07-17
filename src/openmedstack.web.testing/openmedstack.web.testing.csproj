@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\shared.proj" />
   <PropertyGroup>
     <RootNamespace>OpenMedStack.Web.Testing</RootNamespace>
     <PackageId>OpenMedStack.Web.Testing</PackageId>
@@ -7,11 +8,10 @@
     <Description>Workflow definition for ASP.NET Core applications based on ASP.NET Core pipeline.</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.11" Condition="'$(TargetFramework)' == 'net6.0'" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.4" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.9" Condition="'$(TargetFramework)' == 'net7.0'" />
   </ItemGroup>
 
   <ItemGroup>

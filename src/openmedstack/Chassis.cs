@@ -163,7 +163,7 @@ public class Chassis<TConfiguration> : IAsyncDisposable, IObservable<BaseEvent>
     }
 
     private static IService BuildService(DeploymentConfiguration manifest, IEnumerable<Assembly> assemblies) =>
-        throw new NotImplementedException(Strings.ChassisBuilderNotConfigured);
+        throw new MustImplementException();
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
@@ -257,6 +257,14 @@ public class Chassis<TConfiguration> : IAsyncDisposable, IObservable<BaseEvent>
         {
             await _service.ConfigureAwait(false);
             _service.Dispose();
+        }
+    }
+
+    private class MustImplementException : Exception
+    {
+        public MustImplementException() : base(
+            Strings.ChassisBuilderNotConfigured)
+        {
         }
     }
 }

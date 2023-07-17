@@ -8,7 +8,10 @@ using OpenMedStack.Commands;
 public class TestCommandHandler : IHandleCommands<TestCommand>
 {
     /// <inheritdoc />
-    public Task<CommandResponse> Handle(TestCommand command, IMessageHeaders headers, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<CommandResponse> Handle(
+        TestCommand command,
+        IMessageHeaders headers,
+        CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc />
     public void Dispose()

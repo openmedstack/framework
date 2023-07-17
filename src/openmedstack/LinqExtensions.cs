@@ -32,7 +32,7 @@ public static class LinqExtensions
     /// <param name="sequence">The sequence to extend.</param>
     /// <param name="items">The items to add to the sequence.</param>
     /// <typeparam name="T">The <see cref="Type"/> of items in the sequence.</typeparam>
-    /// <returns>The extended <see cref="IEnumerable"/>.</returns>
+    /// <returns>The extended <see cref="IEnumerable{T}"/>.</returns>
     public static IEnumerable<T> Concat<T>(this IEnumerable<T> sequence, params T[] items) => sequence.Concat(items.AsEnumerable());
 
     /// <summary>Removes <c>null</c> items in the sequence.</summary>
@@ -45,6 +45,12 @@ public static class LinqExtensions
         return sequence.Where(x => x != null).Select(x => x!);
     }
 
+    /// <summary>
+    /// Adds a sequence of items to the collection.
+    /// </summary>
+    /// <param name="collection">The <see cref="ICollection{T}"/> to extend.</param>
+    /// <param name="items">The items to add.</param>
+    /// <typeparam name="T">The <see cref="Type"/> of item to add.</typeparam>
     public static void AddRange<T>(
         this ICollection<T> collection,
         IEnumerable<T> items)
@@ -55,6 +61,12 @@ public static class LinqExtensions
         }
     }
 
+    /// <summary>
+    /// Adds a sequence of items to the collection.
+    /// </summary>
+    /// <param name="collection">The <see cref="ICollection{T}"/> to extend.</param>
+    /// <param name="items">The items to add.</param>
+    /// <typeparam name="T">The <see cref="Type"/> of item to add.</typeparam>
     public static void AddRange<T>(
         this ICollection<T> collection,
         params T[] items)
@@ -62,6 +74,12 @@ public static class LinqExtensions
         AddRange(collection, items.AsEnumerable());
     }
 
+    /// <summary>
+    /// Removes all items matching the predicate from the collection.
+    /// </summary>
+    /// <param name="collection">The source collection.</param>
+    /// <param name="predicate">The filter predicate.</param>
+    /// <typeparam name="T">The <see cref="Type"/> of item to add.</typeparam>
     public static void RemoveAll<T>(
         this ICollection<T> collection,
         Func<T, bool> predicate)
@@ -73,6 +91,13 @@ public static class LinqExtensions
         }
     }
 
+    /// <summary>
+    /// Returns a constrained sequence of items that do not match the predicate.
+    /// </summary>
+    /// <param name="sequence">The source sequence.</param>
+    /// <param name="predicate">The predicate to filter items.</param>
+    /// <typeparam name="T">The <see cref="Type"/> of item to add.</typeparam>
+    /// <returns>A result <see cref="IEnumerable{T}"/> containing items that do not match the predicate.</returns>
     public static IEnumerable<T> ExceptWhere<T>(
         this IEnumerable<T> sequence,
         Func<T, bool> predicate) =>

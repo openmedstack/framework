@@ -38,10 +38,9 @@ public sealed class SqlEventStoreModule<TDialect> : Module
                     .UsingSqlPersistence(_dbProviderFactory, _connectionString)
                     .WithDialect(ctx.Resolve<ISqlDialect>())
                     .UsingJsonSerialization()
-                    .LinkToAutofac(builder)
                     .Build())
             .As<IStoreEvents>()
             .SingleInstance();
-        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
+        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>().SingleInstance();
     }
 }

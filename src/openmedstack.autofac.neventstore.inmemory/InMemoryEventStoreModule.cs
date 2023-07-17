@@ -23,10 +23,9 @@ public class InMemoryEventStoreModule : Module
                 ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
                     .UsingInMemoryPersistence()
                     .UsingJsonSerialization()
-                    .LinkToAutofac(builder)
                     .Build())
             .As<IStoreEvents>()
             .SingleInstance();
-        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>();
+        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>().SingleInstance();
     }
 }

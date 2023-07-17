@@ -26,7 +26,9 @@ public static class NEventstoreChassisExtensions
     /// <param name="pollingInterval">The <see cref="TimeSpan"/> between polls.</param>
     /// <returns>The updated <see cref="Chassis{TConfiguration}"/> instance.</returns>
     public static Chassis<TConfiguration> UsingSingleEventDispatcher<TEventTracker, TCommandTracker,
-                                                                     TReadModelTracker, TConfiguration>(this Chassis<TConfiguration> chassis, TimeSpan pollingInterval)
+                                                                     TReadModelTracker, TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        TimeSpan pollingInterval)
         where TEventTracker : ITrackEventCheckpoints
         where TCommandTracker : ITrackCommandCheckpoints
         where TReadModelTracker : ITrackReadModelCheckpoints
@@ -44,7 +46,9 @@ public static class NEventstoreChassisExtensions
     /// <param name="pollingInterval">The <see cref="TimeSpan"/> between polls.</param>
     /// <returns>The updated <see cref="Chassis{TConfiguration}"/> instance.</returns>
     public static Chassis<TConfiguration> UsingSeparateEventDispatcher<TEventTracker, TCommandTracker,
-                                                                       TReadModelTracker, TConfiguration>(this Chassis<TConfiguration> chassis, TimeSpan pollingInterval)
+                                                                       TReadModelTracker, TConfiguration>(
+        this Chassis<TConfiguration> chassis,
+        TimeSpan pollingInterval)
         where TEventTracker : ITrackEventCheckpoints
         where TCommandTracker : ITrackCommandCheckpoints
         where TReadModelTracker : ITrackReadModelCheckpoints
@@ -54,7 +58,6 @@ public static class NEventstoreChassisExtensions
                     a,
                     pollingInterval))
             .AddAutofacModules((_, _) => new SeparatePollingClientModule(pollingInterval));
-
 
     /// <summary>
     /// Registers in memory dispatcher types for NEventStore.
