@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\shared.proj" />
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack.Autofac.NEventstore</RootNamespace>
 		<PackageId>OpenMedStack.Autofac.NEventstore</PackageId>
 		<PackageTags>OpenMedStack Architecture EventStore</PackageTags>
 		<Description>Autofac bindings for OpenMedStack based applications.</Description>
 	</PropertyGroup>
-	<Import Project="..\..\shared.proj" />
 	<ItemGroup>
 	  <PackageReference Include="openmedstack.neventstore.pollingclient" Version="1.4.0" />
 	</ItemGroup>

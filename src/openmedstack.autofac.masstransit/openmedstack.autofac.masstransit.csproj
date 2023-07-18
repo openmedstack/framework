@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\shared.proj" />
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack.Autofac.MassTransit</RootNamespace>
 		<PackageId>OpenMedStack.Autofac.MassTransit</PackageId>
 		<PackageTags>OpenMedStack Architecture Messaging MassTransit</PackageTags>
 		<Description>Autofac bindings for OpenMedStack based applications.</Description>
 	</PropertyGroup>
-	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
 		<PackageReference Include="CloudNative.CloudEvents.NewtonsoftJson" Version="2.6.0" />

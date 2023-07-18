@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\shared.proj" />
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack.Domain</RootNamespace>
 		<PackageId>OpenMedStack.Domain</PackageId>
-		<PackageTags>OpenMedStack Architecture Domain</PackageTags>
+		<PackageTags>OpenMedStack Architecture Domain DDD</PackageTags>
 		<Description>Core domain model types for OpenMedStack based applications.</Description>
 	</PropertyGroup>
-	<Import Project="..\..\shared.proj" />
 
 	<ItemGroup>
 		<ProjectReference Include="..\openmedstack\openmedstack.csproj" />

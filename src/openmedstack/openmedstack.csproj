@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack</RootNamespace>
 		<PackageId>openmedstack</PackageId>
-		<PackageTags>OpenMedStack Architecture ASAP Analysis Package Calculator</PackageTags>
+		<PackageTags>OpenMedStack Architecture</PackageTags>
 		<Description>Core contracts for OpenMedStack based applications. Includes core interfaces and definitions.</Description>
 	</PropertyGroup>
 

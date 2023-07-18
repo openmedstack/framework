@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\shared.proj" />
   <PropertyGroup>
     <RootNamespace>OpenMedStack.Autofac.NEventstore.Sql</RootNamespace>
     <PackageId>OpenMedStack.Autofac.NEventstore.Sql</PackageId>
     <PackageTags>OpenMedStack Architecture EventStore SQL</PackageTags>
     <Description>Autofac bindings for OpenMedStack based applications.</Description>
   </PropertyGroup>
-  <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
     <ProjectReference Include="..\openmedstack.autofac.neventstore\openmedstack.autofac.neventstore.csproj" />

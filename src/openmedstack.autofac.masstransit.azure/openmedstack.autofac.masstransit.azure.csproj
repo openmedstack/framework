@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\shared.proj" />
   <PropertyGroup>
     <RootNamespace>OpenMedStack.Autofac.MassTransit.Azure</RootNamespace>
     <PackageId>OpenMedStack.Autofac.MassTransit.Azure</PackageId>
     <PackageTags>OpenMedStack Architecture Messaging MassTransit Azure</PackageTags>
     <Description>Autofac bindings for OpenMedStack based applications.</Description>
   </PropertyGroup>
-  <Import Project="..\..\shared.proj" />
 
   <ItemGroup>
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.16" />
