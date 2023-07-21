@@ -66,7 +66,7 @@ public partial class FeatureSteps : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _aggregate.Dispose();
-        await Service.DisposeAsync();
+        await Service.DisposeAsync().ConfigureAwait(false);
     }
 
     [When(@"performing action")]

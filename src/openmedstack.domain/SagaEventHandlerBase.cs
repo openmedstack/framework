@@ -20,21 +20,21 @@ using OpenMedStack.Events;
 /// </summary>
 /// <typeparam name="TSaga">The <see cref="ISaga"/> which will handle the event.</typeparam>
 /// <typeparam name="TBaseEvent">The <see cref="DomainEvent"/> to handle.</typeparam>
-public abstract class SagaDomainEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TBaseEvent>
+public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TBaseEvent>
     where TSaga : class, ISaga
     where TBaseEvent : BaseEvent
 {
     private readonly ISagaRepository _sagaRepository;
-    private readonly ILogger<SagaDomainEventHandlerBase<TSaga, TBaseEvent>> _logger;
+    private readonly ILogger<SagaEventHandlerBase<TSaga, TBaseEvent>> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SagaDomainEventHandlerBase{TSaga,TDomainEvent}"/> class.
+    /// Initializes a new instance of the <see cref="SagaEventHandlerBase{TSaga,TBaseEvent}"/> class.
     /// </summary>
     /// <param name="sagaRepository"></param>
     /// <param name="logger">The logger.</param>
-    protected SagaDomainEventHandlerBase(
+    protected SagaEventHandlerBase(
         ISagaRepository sagaRepository,
-        ILogger<SagaDomainEventHandlerBase<TSaga, TBaseEvent>> logger)
+        ILogger<SagaEventHandlerBase<TSaga, TBaseEvent>> logger)
     {
         _sagaRepository = sagaRepository;
         _logger = logger;

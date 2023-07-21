@@ -61,7 +61,7 @@ public partial class FeatureSteps : IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        await _webServerService.DisposeAsync();
+        await _webServerService.DisposeAsync().ConfigureAwait(false);
     }
 
     [Given(@"an event subscription")]

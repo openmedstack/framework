@@ -32,14 +32,14 @@ internal class BusStarter : IBootstrapSystem, IDisposable
     public async Task Setup(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Message bus starting.");
-        await _control.StartAsync(cancellationToken);
+        await _control.StartAsync(cancellationToken).ConfigureAwait(false);
         _logger.LogInformation("Message bus started.");
     }
 
     public async Task Shutdown(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Message bus shutting down.");
-        await _control.StopAsync(cancellationToken);
+        await _control.StopAsync(cancellationToken).ConfigureAwait(false);
         _logger.LogInformation("Message bus shut down.");
     }
 

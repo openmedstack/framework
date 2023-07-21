@@ -45,14 +45,14 @@ public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
 
         try
         {
-            _logger.LogInformation("Updating read models for commit " + commit.CommitId.ToString());
+            _logger.LogInformation("Updating read models for commit {commitId}", commit.CommitId.ToString());
             var updated = await _updater.Update(commit).ConfigureAwait(false);
 
             return updated ? HandlingResult.MoveToNext : HandlingResult.Retry;
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, exception.Message);
+            _logger.LogError(exception, "{error}", exception.Message);
             return HandlingResult.Retry;
         }
     }

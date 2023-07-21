@@ -170,7 +170,7 @@ public class Chassis<TConfiguration> : IAsyncDisposable, IObservable<BaseEvent>
     {
         try
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             if (_disposed)
             {
                 return;

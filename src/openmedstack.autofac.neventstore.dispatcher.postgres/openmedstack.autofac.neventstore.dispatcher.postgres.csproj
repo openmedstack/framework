@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\shared.proj" />
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <RootNamespace>OpenMedStack.Autofac.NEventStore.Dispatcher.Postgres</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>openmedstack.autofac.nevenstore.dispatcher.postgres</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\openmedstack.autofac.neventstore\openmedstack.autofac.neventstore.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="openmedstack.neventstore.postgresclient" Version="1.5.0" />
+    </ItemGroup>
+
+</Project>
