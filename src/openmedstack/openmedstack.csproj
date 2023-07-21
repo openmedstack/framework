@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\..\shared.proj"/>
+	<Import Project="..\..\shared.proj" />
 	<PropertyGroup>
 		<RootNamespace>OpenMedStack</RootNamespace>
 		<PackageId>openmedstack</PackageId>

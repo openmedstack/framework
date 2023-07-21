@@ -3,8 +3,8 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using NEventStore.Persistence;
 using NEventStore.Persistence.Sql;
+using OpenMedStack.NEventStore.Abstractions;
 
 public class OpenMedStackConnectionFactory : IConnectionFactory
 {

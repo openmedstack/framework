@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac.NEventstore.Domain;
 using OpenMedStack.Domain;
-using NEventStore;
-using NEventStore.PollingClient;
-using NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 
 internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBootstrapSystem
     where TCheckpointTracker : class, ITrackCheckpoints where TCommitDispatcher : class, ICommitDispatcher
@@ -58,7 +56,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
         return Task.CompletedTask;
     }
 
-    private async Task<PollingClient2.HandlingResult> HandleCommit(ICommit commit, CancellationToken cancellationToken)
+    private async Task<HandlingResult> HandleCommit(ICommit commit, CancellationToken cancellationToken)
     {
         try
         {
@@ -70,7 +68,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
         {
             _errorCount++;
             _logger.LogError(ex.Message);
-            return _errorCount > 3 ? PollingClient2.HandlingResult.Stop : PollingClient2.HandlingResult.Retry;
+            return _errorCount > 3 ? HandlingResult.Stop : HandlingResult.Retry;
         }
     }
 }

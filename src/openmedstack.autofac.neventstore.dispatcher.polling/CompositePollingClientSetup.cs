@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac.NEventstore.Domain;
 using OpenMedStack.Domain;
-using OpenMedStack.NEventStore;
-using OpenMedStack.NEventStore.PollingClient;
-using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 
 internal class CompositePollingClientSetup : IBootstrapSystem
 {
@@ -38,7 +36,7 @@ internal class CompositePollingClientSetup : IBootstrapSystem
             pollingInterval == default ? TimeSpan.FromMilliseconds(500) : pollingInterval);
     }
 
-    private async Task<PollingClient2.HandlingResult> HandleCommit(
+    private async Task<HandlingResult> HandleCommit(
         ICommit commit,
         CancellationToken cancellationToken)
     {
@@ -50,7 +48,7 @@ internal class CompositePollingClientSetup : IBootstrapSystem
                     var (checkpointTracker, commitDispatcher) = tuple;
                     if (commit.CheckpointToken <= await checkpointTracker.GetLatest().ConfigureAwait(false))
                     {
-                        return PollingClient2.HandlingResult.MoveToNext;
+                        return HandlingResult.MoveToNext;
                     }
 
                     return await commitDispatcher.Dispatch(commit, cancellationToken).ConfigureAwait(false);
@@ -60,20 +58,20 @@ internal class CompositePollingClientSetup : IBootstrapSystem
                     _errorCount++;
                     _logger.LogError("{error}", ex.Message);
                     return _errorCount >= 3
-                        ? PollingClient2.HandlingResult.Stop
-                        : PollingClient2.HandlingResult.Retry;
+                        ? HandlingResult.Stop
+                        : HandlingResult.Retry;
                 }
             });
         var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        if (results.Any(x => x == PollingClient2.HandlingResult.Stop))
+        if (results.Any(x => x == HandlingResult.Stop))
         {
-            return PollingClient2.HandlingResult.Stop;
+            return HandlingResult.Stop;
         }
 
-        return results.Any(x => x == PollingClient2.HandlingResult.Retry)
-            ? PollingClient2.HandlingResult.Retry
-            : PollingClient2.HandlingResult.MoveToNext;
+        return results.Any(x => x == HandlingResult.Retry)
+            ? HandlingResult.Retry
+            : HandlingResult.MoveToNext;
     }
 
     /// <inheritdoc />

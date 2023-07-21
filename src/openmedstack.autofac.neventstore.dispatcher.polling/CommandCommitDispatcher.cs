@@ -3,14 +3,18 @@ namespace OpenMedStack.Autofac.NEventstore.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Commands;
-using NEventStore;
-using NEventStore.PollingClient;
+using OpenMedStack.NEventStore.Abstractions;
+
+internal class Constants
+{
+    public const string CommitSequence = "CommitSequence";
+    public const string UndispatchedMessageHeader = "UndispatchedMessage.";
+}
 
 public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
     where TConfiguration : DeploymentConfiguration
@@ -45,12 +49,12 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
     }
 
     /// <inheritdoc />
-    public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+    public async Task<HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
     {
         if (_isDisposed)
         {
             _logger.LogWarning("Dispatching commits with disposed dispatcher");
-            return PollingClient2.HandlingResult.Stop;
+            return HandlingResult.Stop;
         }
 
         var commands = (from header in commit.Headers
@@ -69,10 +73,12 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
                                     _commandSendMethods.GetOrAdd(
                                         command.GetType(),
                                         t => _commandBusSendMethod.MakeGenericMethod(t))
-                                let result = method.Invoke(commandBus, new[] { command, commandHeaders, tokenSource.Token })
+                                let result = method.Invoke(
+                                    commandBus,
+                                    new[] { command, commandHeaders, tokenSource.Token })
                                 select (Task<CommandResponse>)result).ToArray();
 
-            _logger.LogInformation($"Dispatched {commandTasks.Length} commands for commit {commit.CommitId}");
+            _logger.LogInformation("Dispatched {commandTasks.Length} commands for commit {commitId}", commit.CommitId);
             try
             {
                 var commandResults = await Task.WhenAll(commandTasks).ConfigureAwait(false);
@@ -82,26 +88,29 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
                     .ToArray();
                 if (faults.Length > 0)
                 {
-                    _logger.LogError($"Failed to send {faults.Length} commands.");
+                    _logger.LogError("Failed to send {amount} commands.", faults.Length);
 
                     foreach (var fault in faults)
                     {
                         _logger.LogError(
-                            $"Target: {fault.Key.TargetAggregate}, Version: {fault.Key.Version}, Errors: {string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage))}");
+                            "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
+                            fault.Key.TargetAggregate,
+                            fault.Key.Version,
+                            string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
                     }
 
-                    return PollingClient2.HandlingResult.Retry;
+                    return HandlingResult.Retry;
                 }
 
-                return PollingClient2.HandlingResult.MoveToNext;
+                return HandlingResult.MoveToNext;
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
-                return PollingClient2.HandlingResult.Retry;
+                return HandlingResult.Retry;
             }
         }
 
-        return PollingClient2.HandlingResult.MoveToNext;
+        return HandlingResult.MoveToNext;
     }
 }

@@ -6,14 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Domain;
-using NEventStore;
-using NEventStore.PollingClient;
-using NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
+using OpenMedStack.NEventStore.PollingClient;
 
 internal sealed class AsyncPollingClient : IDisposable
 {
     private readonly CancellationTokenSource _tokenSource = new();
-    private readonly Func<ICommit, CancellationToken, Task<PollingClient2.HandlingResult>> _commitCallback;
+    private readonly Func<ICommit, CancellationToken, Task<HandlingResult>> _commitCallback;
     private readonly IPersistStreams _persistStreams;
     private readonly ILogger<AsyncPollingClient> _logger;
     private readonly TimeSpan _waitInterval;
@@ -25,7 +24,7 @@ internal sealed class AsyncPollingClient : IDisposable
 
     public AsyncPollingClient(
         IPersistStreams persistStreams,
-        Func<ICommit, CancellationToken, Task<PollingClient2.HandlingResult>> callback,
+        Func<ICommit, CancellationToken, Task<HandlingResult>> callback,
         ILogger<AsyncPollingClient> logger,
         TimeSpan waitInterval = default)
     {
@@ -35,7 +34,7 @@ internal sealed class AsyncPollingClient : IDisposable
         _logger = logger;
     }
 
-    public async Task ConfigurePollingFunction(string? bucketId = null, CancellationToken cancellationToken = default)
+    public async Task ConfigurePollingFunction(string bucketId, CancellationToken cancellationToken = default)
     {
         if (_pollingThread != null)
         {
@@ -43,15 +42,13 @@ internal sealed class AsyncPollingClient : IDisposable
         }
 
         var latest = await _checkpointToken.GetLatest().ConfigureAwait(false);
-        _pollingFunc = bucketId == null
-            ? () => _persistStreams.GetFrom(latest, _tokenSource.Token)
-            : () => _persistStreams.GetFrom(
+        _pollingFunc = () => _persistStreams.GetFrom(
                 bucketId,
                 latest,
                 cancellationToken);
     }
 
-    public async Task StartFrom(ITrackCheckpoints checkpointToken, string? bucketId = null, CancellationToken cancellationToken = default)
+    public async Task StartFrom(ITrackCheckpoints checkpointToken, string bucketId, CancellationToken cancellationToken = default)
     {
         if (_pollingThread != null)
         {
@@ -109,13 +106,13 @@ internal sealed class AsyncPollingClient : IDisposable
 
                 switch (await _commitCallback(commit,_tokenSource.Token).ConfigureAwait(false))
                 {
-                    case PollingClient2.HandlingResult.Retry:
+                    case HandlingResult.Retry:
                         _logger.LogError("Commit callback ask retry for checkpointToken {commitCheckpoint} - last dispatched {checkpointToken}", commit.CheckpointToken, _checkpointToken);
                         continue;
-                    case PollingClient2.HandlingResult.Stop:
+                    case HandlingResult.Stop:
                         Stop();
                         return true;
-                    case PollingClient2.HandlingResult.MoveToNext:
+                    case HandlingResult.MoveToNext:
                         await _checkpointToken.SetLatest(commit.CheckpointToken).ConfigureAwait(false);
                         continue;
                 }

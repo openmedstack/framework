@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Domain;
 using NEventStore;
-using NEventStore.Persistence;
 using OpenMedStack.Events;
+using OpenMedStack.NEventStore.Abstractions;
 
 internal sealed class DefaultEventStoreRepository : IRepository
 {

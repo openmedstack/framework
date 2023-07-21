@@ -9,6 +9,7 @@ using Npgsql;
 using OpenMedStack;
 using OpenMedStack.Autofac.MassTransit.ActiveMq;
 using OpenMedStack.Autofac.NEventstore;
+using openmedstack.autofac.neventstore.dispatcher.polling;
 using OpenMedStack.Autofac.NEventstore.Sql;
 using OpenMedStack.NEventStore.Persistence.Sql.SqlDialects;
 using Xunit;

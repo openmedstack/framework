@@ -3,14 +3,12 @@ namespace OpenMedStack.Autofac.NEventstore.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Events;
-using NEventStore;
-using NEventStore.PollingClient;
+using OpenMedStack.NEventStore.Abstractions;
 
 public class EventCommitDispatcher : IEventCommitDispatcher
 {
@@ -31,12 +29,12 @@ public class EventCommitDispatcher : IEventCommitDispatcher
         _eventBusPublishMethod = typeof(IPublishEvents).GetMethod("Publish")!;
     }
 
-    public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+    public async Task<HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
     {
         if (_isDisposed)
         {
             _logger.LogWarning("Dispatching commits with disposed dispatcher");
-            return PollingClient2.HandlingResult.Stop;
+            return HandlingResult.Stop;
         }
 
         if (!commit.Headers.ContainsKey("SagaType") && commit.Events.Count > 0)
@@ -63,11 +61,11 @@ public class EventCommitDispatcher : IEventCommitDispatcher
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
-                return PollingClient2.HandlingResult.Retry;
+                return HandlingResult.Retry;
             }
         }
 
-        return PollingClient2.HandlingResult.MoveToNext;
+        return HandlingResult.MoveToNext;
     }
 
     public void Dispose()

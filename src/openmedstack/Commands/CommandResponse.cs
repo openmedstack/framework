@@ -30,7 +30,7 @@ public class CommandResponse : ICorrelate
     /// <param name="correlationId">
     /// The correlation id.
     /// </param>
-    public CommandResponse(string targetAggregate, int version, string? faultMessage, string? correlationId)
+    public CommandResponse(string targetAggregate, int version, string? faultMessage = null, string? correlationId = null)
     {
         TargetAggregate = targetAggregate;
         Version = version;

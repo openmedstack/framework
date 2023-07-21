@@ -12,7 +12,7 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory;
 using global::Autofac;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.NEventStore;
-using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 using OpenMedStack.NEventStore.Serialization;
 
 public class InMemoryEventStoreModule : Module

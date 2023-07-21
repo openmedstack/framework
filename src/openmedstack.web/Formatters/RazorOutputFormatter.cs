@@ -24,10 +24,10 @@ public class RazorOutputFormatter : TextOutputFormatter
         SupportedEncodings.Add(Encoding.ASCII);
         SupportedEncodings.Add(Encoding.UTF32);
         SupportedEncodings.Add(Encoding.Unicode);
-        SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-        SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/xhtml"));
-        SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml"));
-        SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/xhtml+xml"));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/html"));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/xhtml"));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xhtml"));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xhtml+xml"));
     }
 
     /// <inheritdoc />
@@ -49,7 +49,8 @@ public class RazorOutputFormatter : TextOutputFormatter
             routeData as RouteData ?? new RouteData(),
             actionDescriptor as ActionDescriptor ?? new ActionDescriptor(),
             modelState as ModelStateDictionary ?? new ModelStateDictionary());
-        if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
+        if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject)
+         || viewObject is not string viewName)
         {
             viewName = actionContext.RouteData.Values["action"]!.ToString()!;
         }
@@ -75,7 +76,8 @@ public class RazorOutputFormatter : TextOutputFormatter
             modelState as ModelStateDictionary ?? new ModelStateDictionary());
         try
         {
-            if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject) || viewObject is not string viewName)
+            if (!actionContext.RouteData.Values.TryGetValue("view", out var viewObject)
+             || viewObject is not string viewName)
             {
                 viewName = actionContext.RouteData.Values["action"]!.ToString()!;
             }

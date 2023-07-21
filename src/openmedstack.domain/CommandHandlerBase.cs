@@ -10,7 +10,6 @@
 namespace OpenMedStack.Domain;
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenMedStack.Commands;
@@ -120,26 +119,22 @@ public abstract class CommandHandlerBase<T> : IHandleCommands<T>
     /// </summary>
     /// <typeparam name="TAggregate">The requested aggregate as the latest persisted version.</typeparam>
     /// <param name="id">The id of the aggregate.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the async operation.</param>
     /// <returns>The instance of the aggregate, or null if the aggregate does not exist.</returns>
     protected Task<TAggregate> Get<TAggregate>(string id, CancellationToken cancellationToken = default)
-        where TAggregate : class, IAggregate
-    {
-        Contract.Requires(!string.IsNullOrWhiteSpace(id));
-        Contract.Ensures(Contract.Result<Task<TAggregate>>() != null);
-
-        return _repository.GetById<TAggregate>(id, cancellationToken);
-    }
+        where TAggregate : class, IAggregate =>
+        _repository.GetById<TAggregate>(id, cancellationToken);
 
     /// <summary>
     /// Saves the passed aggregate in the repository.
     /// </summary>
     /// <typeparam name="TAggregate">The <see cref="Type"/> of the aggregate to save.</typeparam>
     /// <param name="aggregate">The <see cref="AggregateRootBase{T}"/> to save.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the async operation.</param>
     /// <returns></returns>
-    protected Task Save<TAggregate>(TAggregate aggregate)
+    protected Task Save<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken)
         where TAggregate : class, IAggregate =>
-        _repository.Save(aggregate);
+        _repository.Save(aggregate, cancellationToken: cancellationToken);
 
     /// <summary>
     /// Disposes the command handler.

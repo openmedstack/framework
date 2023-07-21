@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\openmedstack.autofac.masstransit.activemq\openmedstack.autofac.masstransit.activemq.csproj" />
+        <ProjectReference Include="..\..\src\openmedstack.autofac.neventstore.dispatcher.polling\openmedstack.autofac.neventstore.dispatcher.polling.csproj" />
         <ProjectReference Include="..\..\src\openmedstack.autofac.neventstore.sql\openmedstack.autofac.neventstore.sql.csproj" />
     </ItemGroup>
 

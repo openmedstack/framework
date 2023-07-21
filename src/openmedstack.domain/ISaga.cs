@@ -9,7 +9,7 @@ public interface ISaga
 
     int Version { get; }
 
-    void Transition(DomainEvent message);
+    void Transition(BaseEvent message);
 
     IEnumerable<object> GetUncommittedEvents();
 

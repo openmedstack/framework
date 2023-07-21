@@ -20,60 +20,6 @@ public static class NEventstoreChassisExtensions
         chassis.AddAutofacModules((_, a) => new EventStoreModule(() => GetDetector(chassis), a.ToArray()));
 
     /// <summary>
-    /// Registers dispatcher types for NEventStore.
-    /// </summary>
-    /// <param name="chassis">The <see cref="Chassis{TConfiguration}"/> to register for.</param>
-    /// <param name="pollingInterval">The <see cref="TimeSpan"/> between polls.</param>
-    /// <returns>The updated <see cref="Chassis{TConfiguration}"/> instance.</returns>
-    public static Chassis<TConfiguration> UsingSingleEventDispatcher<TEventTracker, TCommandTracker,
-                                                                     TReadModelTracker, TConfiguration>(
-        this Chassis<TConfiguration> chassis,
-        TimeSpan pollingInterval)
-        where TEventTracker : ITrackEventCheckpoints
-        where TCommandTracker : ITrackCommandCheckpoints
-        where TReadModelTracker : ITrackReadModelCheckpoints
-        where TConfiguration : DeploymentConfiguration =>
-        chassis.AddAutofacModules(
-                (_, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                    a,
-                    pollingInterval))
-            .AddAutofacModules((_, _) => new CompositePollingClientModule(pollingInterval));
-
-    /// <summary>
-    /// Registers dispatcher types for NEventStore.
-    /// </summary>
-    /// <param name="chassis">The <see cref="Chassis{TConfiguration}"/> to register for.</param>
-    /// <param name="pollingInterval">The <see cref="TimeSpan"/> between polls.</param>
-    /// <returns>The updated <see cref="Chassis{TConfiguration}"/> instance.</returns>
-    public static Chassis<TConfiguration> UsingSeparateEventDispatcher<TEventTracker, TCommandTracker,
-                                                                       TReadModelTracker, TConfiguration>(
-        this Chassis<TConfiguration> chassis,
-        TimeSpan pollingInterval)
-        where TEventTracker : ITrackEventCheckpoints
-        where TCommandTracker : ITrackCommandCheckpoints
-        where TReadModelTracker : ITrackReadModelCheckpoints
-        where TConfiguration : DeploymentConfiguration =>
-        chassis.AddAutofacModules(
-                (_, a) => new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                    a,
-                    pollingInterval))
-            .AddAutofacModules((_, _) => new SeparatePollingClientModule(pollingInterval));
-
-    /// <summary>
-    /// Registers in memory dispatcher types for NEventStore.
-    /// </summary>
-    /// <param name="chassis">The <see cref="Chassis{TConfiguration}"/> to register for.</param>
-    /// <param name="pollingInterval">The <see cref="TimeSpan"/> between polls.</param>
-    /// <returns>The updated <see cref="Chassis{TConfiguration}"/> instance.</returns>
-    public static Chassis<TConfiguration> UsingInMemoryEventDispatcher<TConfiguration>(
-        this Chassis<TConfiguration> chassis,
-        TimeSpan pollingInterval)
-        where TConfiguration : DeploymentConfiguration =>
-        chassis
-            .UsingSingleEventDispatcher<InMemoryEventCheckpointTracker, InMemoryCommandCheckpointTracker,
-                InMemoryReadModelCheckpointTracker, TConfiguration>(pollingInterval);
-
-    /// <summary>
     /// Configures how to handle event conflicts.
     /// </summary>
     /// <typeparam name="TCommitted">The <see cref="Type"/> of the committed event.</typeparam>

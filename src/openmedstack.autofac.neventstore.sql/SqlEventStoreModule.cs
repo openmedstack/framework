@@ -14,7 +14,7 @@ using global::Autofac;
 using global::NEventStore;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.NEventStore;
-using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 using OpenMedStack.NEventStore.Persistence.Sql;
 using OpenMedStack.NEventStore.Serialization;
 

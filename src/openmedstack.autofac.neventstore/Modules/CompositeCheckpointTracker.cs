@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenMedStack.Domain;
 
-internal class CompositeCheckpointTracker : ITrackCheckpoints
+public class CompositeCheckpointTracker : ITrackCheckpoints
 {
     private readonly ITrackCheckpoints[] _trackers;
 

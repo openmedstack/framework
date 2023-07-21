@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.web.autofac", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "openmedstack.masstransit.tests", "tests\openmedstack.masstransit.tests\openmedstack.masstransit.tests.csproj", "{5B4C22DC-CEC3-4951-B114-8A257476DED7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "openmedstack.autofac.neventstore.dispatcher.polling", "src\openmedstack.autofac.neventstore.dispatcher.polling\openmedstack.autofac.neventstore.dispatcher.polling.csproj", "{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -387,6 +389,22 @@ Global
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x64.Build.0 = Release|Any CPU
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B4C22DC-CEC3-4951-B114-8A257476DED7}.Release|x86.Build.0 = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|ARM.Build.0 = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|x64.Build.0 = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Debug|x86.Build.0 = Debug|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|ARM.Build.0 = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|x64.ActiveCfg = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|x64.Build.0 = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|x86.ActiveCfg = Release|Any CPU
+		{8C1BD19C-75DD-4AA1-9FB0-B4B0405C0598}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

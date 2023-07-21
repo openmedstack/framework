@@ -14,8 +14,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NEventStore;
-using NEventStore.PollingClient;
+using OpenMedStack.NEventStore.Abstractions;
 
 public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
 {
@@ -36,12 +35,12 @@ public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
     }
 
     /// <inheritdoc />
-    public async Task<PollingClient2.HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
+    public async Task<HandlingResult> Dispatch(ICommit commit, CancellationToken cancellationToken)
     {
         if (_isDisposed)
         {
             _logger.LogWarning("Dispatching commits with disposed dispatcher");
-            return PollingClient2.HandlingResult.Stop;
+            return HandlingResult.Stop;
         }
 
         try
@@ -49,12 +48,12 @@ public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
             _logger.LogInformation("Updating read models for commit " + commit.CommitId.ToString());
             var updated = await _updater.Update(commit).ConfigureAwait(false);
 
-            return updated ? PollingClient2.HandlingResult.MoveToNext : PollingClient2.HandlingResult.Retry;
+            return updated ? HandlingResult.MoveToNext : HandlingResult.Retry;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, exception.Message);
-            return PollingClient2.HandlingResult.Retry;
+            return HandlingResult.Retry;
         }
     }
 }

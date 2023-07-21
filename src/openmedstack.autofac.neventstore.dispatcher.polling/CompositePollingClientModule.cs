@@ -5,7 +5,7 @@ using global::Autofac;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac.NEventstore.Domain;
 using OpenMedStack.Domain;
-using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 
 internal class CompositePollingClientModule : Module
 {

@@ -34,7 +34,7 @@ public static class BufferExtensions
 
         var ms = new MemoryStream();
         await using var _ = ms.ConfigureAwait(false);
-        await input!.CopyToAsync(ms, 8192, cancellationToken).ConfigureAwait(false);
+        await input.CopyToAsync(ms, 8192, cancellationToken).ConfigureAwait(false);
         return ms.ToArray();
     }
 

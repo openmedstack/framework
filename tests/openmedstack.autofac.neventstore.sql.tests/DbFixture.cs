@@ -3,7 +3,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using OpenMedStack;
-using OpenMedStack.NEventStore.Persistence;
+using OpenMedStack.NEventStore.Abstractions;
 
 internal class DbFixture : IBootstrapSystem
 {

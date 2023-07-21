@@ -1,7 +1,7 @@
 namespace OpenMedStack.Autofac.NEventstore.Domain;
 
 using System.Threading.Tasks;
-using NEventStore;
+using OpenMedStack.NEventStore.Abstractions;
 
 public interface IReadModelUpdater
 {

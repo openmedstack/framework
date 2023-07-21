@@ -31,7 +31,7 @@ internal class TestCommandHandler : CommandHandlerBase<TestCommand>
 
             aggregate.DoSomething();
 
-            await Save(aggregate).ConfigureAwait(false);
+            await Save(aggregate, cancellationToken).ConfigureAwait(false);
 
             return command.CreateResponse();
         }

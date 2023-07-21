@@ -9,10 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Events;
-using NEventStore;
+using OpenMedStack.NEventStore.Abstractions;
 using OpenMedStack.ReadModels;
 
-internal sealed class ReadModelUpdater : IReadModelUpdater
+public sealed class ReadModelUpdater : IReadModelUpdater
 {
     private readonly ILogger<ReadModelUpdater> _logger;
     private readonly ConcurrentDictionary<Type, MethodInfo> _updateMethods = new();
@@ -23,12 +23,14 @@ internal sealed class ReadModelUpdater : IReadModelUpdater
         _logger = logger;
         var updaters = readModelUpdaters.ToArray();
 
-        _logger.LogDebug($"Read model updater created with {updaters.Length} updaters.");
+        _logger.LogDebug("Read model updater created with {count} updaters.", updaters.Length);
 
         var pairs = GroupUpdaters(updaters);
         _readModelUpdaters = new ConcurrentDictionary<Type, IEnumerable<object>>(pairs);
 
-        _logger.LogDebug($"Read model updaters defined for {string.Join(Environment.NewLine, _readModelUpdaters.Keys.Select(x => x.Name))}");
+        _logger.LogDebug(
+            "Read model updaters defined for {names}",
+            string.Join(Environment.NewLine, _readModelUpdaters.Keys.Select(x => x.Name)));
     }
 
     public async Task<bool> Update(ICommit commit)
@@ -43,17 +45,26 @@ internal sealed class ReadModelUpdater : IReadModelUpdater
                                             let headers =
                                                 new MessageHeaders(
                                                     evt.Headers.Concat(
-                                                        new KeyValuePair<string, object>(Constants.CommitSequence, commit.CheckpointToken)))
+                                                        new KeyValuePair<string, object>(
+                                                            Constants.CommitSequence,
+                                                            commit.CheckpointToken)))
                                             let method =
                                                 _updateMethods.GetOrAdd(
                                                     bodyType,
-                                                    t => typeof(IUpdateReadModel<>).MakeGenericType(t).GetMethod("Update")!)
-                                            from updater in _readModelUpdaters.GetOrAdd(bodyType, _ => Array.Empty<IUpdateReadModel>())
-                                            let result = method.Invoke(updater, new[] { evt.Body, headers, CancellationToken.None })
+                                                    t => typeof(IUpdateReadModel<>).MakeGenericType(t)
+                                                        .GetMethod("Update")!)
+                                            from updater in _readModelUpdaters.GetOrAdd(
+                                                bodyType,
+                                                _ => Array.Empty<IUpdateReadModel>())
+                                            let result = method.Invoke(
+                                                updater,
+                                                new[] { evt.Body, headers, CancellationToken.None })
                                             select (Task)result).ToArray();
 
                 _logger.LogDebug(
-                    $"Invoking {updateReadModelTasks.Length} read model updaters for commit {commit.CommitId}");
+                    "Invoking {amount} read model updaters for commit {commitId}",
+                    updateReadModelTasks.Length,
+                    commit.CommitId);
 
                 await Task.WhenAll(updateReadModelTasks).ConfigureAwait(false);
                 return true;
@@ -70,7 +81,7 @@ internal sealed class ReadModelUpdater : IReadModelUpdater
     {
         var type = body.GetType();
 
-        _logger.LogDebug($"Event of type {type} raised");
+        _logger.LogDebug("Event of type {type} raised", type);
 
         return type;
     }
@@ -82,13 +93,17 @@ internal sealed class ReadModelUpdater : IReadModelUpdater
                       where updaterInterface.IsGenericType
                       where typeof(IUpdateReadModel<>).IsAssignableFrom(updaterInterface.GetGenericTypeDefinition())
                       let eventType = updaterInterface.GetGenericArguments()[0]
-                      group updater by eventType into eventGroups
+                      group updater by eventType
+                      into eventGroups
                       select new KeyValuePair<Type, IEnumerable<object>>(eventGroups.Key, eventGroups.ToArray()))
             .ToArray();
 
         foreach (var pair in groups)
         {
-            _logger.LogDebug($@"{pair.Key.Name} updates: {string.Join(Environment.NewLine, pair.Value.Select(x => x.GetType().Name))}");
+            _logger.LogDebug(
+                "{key} updates: {types}",
+                pair.Key.Name,
+                string.Join(Environment.NewLine, pair.Value.Select(x => x.GetType().Name)));
         }
 
         return groups;
