@@ -17,7 +17,6 @@ namespace openmedstack.autofac.neventstore.dispatcher.polling
 
     public static class PollingChassisExtensions
     {
-
         /// <summary>
         /// Registers dispatcher types for NEventStore.
         /// </summary>
@@ -33,11 +32,11 @@ namespace openmedstack.autofac.neventstore.dispatcher.polling
             where TReadModelTracker : ITrackReadModelCheckpoints
             where TConfiguration : DeploymentConfiguration =>
             chassis.AddAutofacModules(
-                    (_, a) =>
-                        new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                            a,
-                            pollingInterval))
-                .AddAutofacModules((_, __) => new CompositePollingClientModule(pollingInterval));
+                (_, a) =>
+                    new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
+                        a,
+                        pollingInterval),
+                (_, __) => new CompositePollingClientModule(pollingInterval));
 
         /// <summary>
         /// Registers dispatcher types for NEventStore.
@@ -54,11 +53,11 @@ namespace openmedstack.autofac.neventstore.dispatcher.polling
             where TReadModelTracker : ITrackReadModelCheckpoints
             where TConfiguration : DeploymentConfiguration =>
             chassis.AddAutofacModules(
-                    (_, a) =>
-                        new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                            a,
-                            pollingInterval))
-                .AddAutofacModules((_, __) => new SeparatePollingClientModule(pollingInterval));
+                (_, a) =>
+                    new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
+                        a,
+                        pollingInterval),
+                (_, __) => new SeparatePollingClientModule(pollingInterval));
 
         /// <summary>
         /// Registers in memory dispatcher types for NEventStore.

@@ -79,7 +79,7 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
                                     new[] { command, commandHeaders, tokenSource.Token })
                                 select (Task<CommandResponse>)result).ToArray();
 
-            _logger.LogInformation("Dispatched {commandTasks.Length} commands for commit {commitId}", commit.CommitId);
+            _logger.LogInformation("Dispatched {count} commands for commit {commitId}", commandTasks.Length, commit.CommitId);
             try
             {
                 var commandResults = await Task.WhenAll(commandTasks).ConfigureAwait(false);
@@ -87,23 +87,24 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
                 var faults = commandResults.Where(x => !string.IsNullOrWhiteSpace(x.FaultMessage))
                     .GroupBy(x => new { x.TargetAggregate, x.Version })
                     .ToArray();
-                if (faults.Length > 0)
+                if (faults.Length <= 0)
                 {
-                    _logger.LogError("Failed to send {amount} commands.", faults.Length);
-
-                    foreach (var fault in faults)
-                    {
-                        _logger.LogError(
-                            "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
-                            fault.Key.TargetAggregate,
-                            fault.Key.Version,
-                            string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
-                    }
-
-                    return HandlingResult.Retry;
+                    return HandlingResult.MoveToNext;
                 }
 
-                return HandlingResult.MoveToNext;
+                _logger.LogError("Failed to send {amount} commands.", faults.Length);
+
+                foreach (var fault in faults)
+                {
+                    _logger.LogError(
+                        "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
+                        fault.Key.TargetAggregate,
+                        fault.Key.Version,
+                        string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
+                }
+
+                return HandlingResult.Retry;
+
             }
             catch (Exception exception)
             {
