@@ -50,7 +50,6 @@ public class ActiveMqMassTransitModule<TConfiguration> : Module
         return Bus.Factory.CreateUsingActiveMq(
                 rmq =>
                 {
-                    rmq.ConfigureJson(c);
                     rmq.Host(
                         _configuration.ServiceBus!.Host,
                         _configuration.ServiceBus.Port,

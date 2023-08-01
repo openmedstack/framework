@@ -11,3 +11,12 @@ internal record TestEvent : DomainEvent
     {
     }
 }
+
+internal record TestEvent2 : DomainEvent
+{
+    /// <inheritdoc />
+    public TestEvent2(string source, int version, DateTimeOffset timeStamp, string? correlationId = null)
+        : base(source, version, timeStamp, correlationId)
+    {
+    }
+}

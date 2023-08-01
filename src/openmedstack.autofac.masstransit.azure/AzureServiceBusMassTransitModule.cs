@@ -54,7 +54,6 @@
                             //    _configuration.ServiceBusPassword,
                             //    TimeSpan.FromHours(8));
                         });
-                    rmq.ConfigureJson(c);
                     rmq.ConfigureBus(c, _configuration, retryPolicy);
                 }).AttachObservers(c);
         }

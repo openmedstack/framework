@@ -11,3 +11,12 @@ internal record TestCommand : DomainCommand
     {
     }
 }
+
+internal record TestCommand2 : DomainCommand
+{
+    /// <inheritdoc />
+    public TestCommand2(string aggregateId, int version, DateTimeOffset timeStamp, string? correlationId = null)
+        : base(aggregateId, version, timeStamp, correlationId)
+    {
+    }
+}

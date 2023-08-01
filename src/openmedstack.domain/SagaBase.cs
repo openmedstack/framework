@@ -44,7 +44,7 @@ public abstract class SagaBase : ISaga, IEquatable<ISaga>
     public virtual bool Equals(ISaga? other) => other?.Id == Id;
 
     /// <inheritdoc />
-    public void Transition(BaseEvent message)
+    public virtual void Transition(BaseEvent message)
     {
         _eventRouter.Dispatch(message);
 

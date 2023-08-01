@@ -24,14 +24,15 @@ public static class NEventstoreChassisExtensions
     /// </summary>
     /// <typeparam name="TCommitted">The <see cref="Type"/> of the committed event.</typeparam>
     /// <typeparam name="TUncommitted">The <see cref="Type"/> of the uncommitted event.</typeparam>
+    /// <typeparam name="TConfiguration">The <see cref="Type"/> of the system configuration.</typeparam>
     /// <param name="chassis">The <see cref="Chassis{TConfiguration}"/> to configure.</param>
     /// <param name="handler">The <see cref="Func{TCommitted,TUncommited,TResult}"/> to use for handling event conflicts.</param>
     /// <returns>A configured instance of the <see cref="Chassis{TConfiguration}"/>.</returns>
     public static Chassis<TConfiguration> ResolvingConflictsWith<TCommitted, TUncommitted, TConfiguration>(
         this Chassis<TConfiguration> chassis,
         Func<TCommitted, TUncommitted, bool> handler)
-        where TCommitted : DomainEvent
-        where TUncommitted : DomainEvent
+        where TCommitted : BaseEvent
+        where TUncommitted : BaseEvent
         where TConfiguration : DeploymentConfiguration
     {
         var detector = GetDetector(chassis);

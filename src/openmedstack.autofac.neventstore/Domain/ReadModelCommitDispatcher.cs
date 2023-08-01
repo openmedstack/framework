@@ -18,11 +18,11 @@ using OpenMedStack.NEventStore.Abstractions;
 
 public class ReadModelCommitDispatcher : IReadModelCommitDispatcher
 {
-    private readonly ILogger<IReadModelCommitDispatcher> _logger;
+    private readonly ILogger<ReadModelCommitDispatcher> _logger;
     private readonly IReadModelUpdater _updater;
     private bool _isDisposed;
 
-    public ReadModelCommitDispatcher(ILogger<IReadModelCommitDispatcher> logger, IReadModelUpdater readModelUpdater)
+    public ReadModelCommitDispatcher(ILogger<ReadModelCommitDispatcher> logger, IReadModelUpdater readModelUpdater)
     {
         _logger = logger;
         _updater = readModelUpdater;

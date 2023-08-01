@@ -153,7 +153,6 @@ internal sealed class DefaultEventStoreRepository : IRepository
     {
         var stream = await OpenStream(bucketId, aggregate.Id, aggregate.Version, null, cancellationToken)
             .ConfigureAwait(false);
-        // _eventStore.CreateStream(bucketId, aggregate.Id).ConfigureAwait(false);
 
         foreach (var (key, value) in headers)
         {
@@ -173,10 +172,7 @@ internal sealed class DefaultEventStoreRepository : IRepository
         Action<IDictionary<string, object>>? updateHeaders = null)
     {
         var dictionary = new Dictionary<string, object> { { AggregateTypeHeader, aggregate.GetType().FullName! } };
-        if (updateHeaders != null)
-        {
-            updateHeaders.Invoke(dictionary);
-        }
+        updateHeaders?.Invoke(dictionary);
 
         return dictionary;
     }

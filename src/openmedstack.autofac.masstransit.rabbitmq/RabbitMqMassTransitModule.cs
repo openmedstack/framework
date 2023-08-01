@@ -58,7 +58,6 @@
                                 s.Password(_configuration.ServiceBusPassword);
                                 s.Username(_configuration.ServiceBusUsername);
                             });
-                        rmq.ConfigureJson(c);
                         rmq.ConfigureBus(c, _configuration, retryPolicy);
                     })
                 .AttachObservers(c);

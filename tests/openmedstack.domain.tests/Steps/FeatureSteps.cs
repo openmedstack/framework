@@ -67,6 +67,7 @@ public partial class FeatureSteps : IAsyncDisposable
     {
         _aggregate.Dispose();
         await Service.DisposeAsync().ConfigureAwait(false);
+        GC.SuppressFinalize(this);
     }
 
     [When(@"performing action")]

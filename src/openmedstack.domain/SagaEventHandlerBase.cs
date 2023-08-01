@@ -16,10 +16,10 @@ using Microsoft.Extensions.Logging;
 using OpenMedStack.Events;
 
 /// <summary>
-/// Defines the abstract base class for handling <see cref="DomainEvent"/> in a saga.
+/// Defines the abstract base class for handling <see cref="BaseEvent"/> in a saga.
 /// </summary>
 /// <typeparam name="TSaga">The <see cref="ISaga"/> which will handle the event.</typeparam>
-/// <typeparam name="TBaseEvent">The <see cref="DomainEvent"/> to handle.</typeparam>
+/// <typeparam name="TBaseEvent">The <see cref="BaseEvent"/> to handle.</typeparam>
 public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TBaseEvent>
     where TSaga : class, ISaga
     where TBaseEvent : BaseEvent
@@ -41,7 +41,7 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
     }
 
     /// <inheritdoc />
-    public async Task Handle(TBaseEvent domainEvent, IMessageHeaders headers, CancellationToken cancellationToken)
+    public virtual async Task Handle(TBaseEvent domainEvent, IMessageHeaders headers, CancellationToken cancellationToken)
     {
         _logger.LogDebug("Handling saga notification of type {typeName}", typeof(TBaseEvent).FullName);
 
@@ -56,15 +56,15 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
         _logger.LogDebug("Transitioning with {eventName}", typeof(TBaseEvent).Name);
         saga.Transition(newMessage);
 
-        _logger.LogDebug("Saving saga");
+        _logger.LogDebug("Saving saga {id} at version {version}", saga.Id, saga.Version);
         await _sagaRepository.Save(saga, cancellationToken: cancellationToken).ConfigureAwait(false);
         await AfterHandle(newMessage, headers, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Performs an action before the <see cref="DomainEvent"/> is handled by the <see cref="ISaga"/>.
+    /// Performs an action before the <see cref="BaseEvent"/> is handled by the <see cref="ISaga"/>.
     /// </summary>
-    /// <param name="message">The <see cref="DomainEvent"/> to handle.</param>
+    /// <param name="message">The <see cref="BaseEvent"/> to handle.</param>
     /// <param name="headers">The <see cref="IMessageHeaders"/> related to the <see cref="DomainEvent"/>.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the async operation.</param>
     /// <returns>The handling operation as a <see cref="Task"/>.</returns>
@@ -74,9 +74,9 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
         CancellationToken cancellationToken) => Task.FromResult(message);
 
     /// <summary>
-    /// Performs an action after the <see cref="DomainEvent"/> is handled by the <see cref="ISaga"/>.
+    /// Performs an action after the <see cref="BaseEvent"/> is handled by the <see cref="ISaga"/>.
     /// </summary>
-    /// <param name="message">The <see cref="DomainEvent"/> to handle.</param>
+    /// <param name="message">The <see cref="BaseEvent"/> to handle.</param>
     /// <param name="headers">The <see cref="IMessageHeaders"/> related to the <see cref="DomainEvent"/>.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the async operation.</param>
     /// <returns>The handling operation as a <see cref="Task"/>.</returns>
@@ -86,9 +86,7 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
         CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-    }
+    public abstract void Dispose();
 
     /// <inheritdoc />
     public bool CanHandle(Type type) => typeof(TBaseEvent).IsAssignableFrom(type);

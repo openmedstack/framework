@@ -16,7 +16,6 @@ Aggregate root functionality verification
 
     Scenario: When executing action twice, then read store is updated twice.
         When performing action
-        And processing is finished
         And performing action
         And processing is finished
         Then data store is updated 2 times

@@ -97,14 +97,14 @@ internal class DomainModule<TConfiguration> : Module
         builder.RegisterTypes(commandConsumers).AsSelf().AsImplementedInterfaces();
 
         var messageHandlerTypes = _sourceAssemblies.SelectMany(a => a.GetTypes())
-            .Where(t => !t.IsAbstract && t.GetInterfaces().Any(IsDomainEventHandler))
+            .Where(t => !t.IsAbstract && t.GetInterfaces().Any(IsBaseEventHandler))
             .ToArray();
 
         builder.RegisterTypes(messageHandlerTypes).AsSelf().AsImplementedInterfaces();
 
         var eventHandlers = messageHandlerTypes
             .SelectMany(t => t.GetInterfaces())
-            .Where(IsDomainEventHandler)
+            .Where(IsBaseEventHandler)
             .Select(t => t.GetGenericArguments()[0])
             .Distinct()
             .Select(t => typeof(BaseEventConsumer<>).MakeGenericType(t))
@@ -113,6 +113,6 @@ internal class DomainModule<TConfiguration> : Module
         builder.RegisterTypes(eventHandlers).AsSelf().AsImplementedInterfaces();
     }
 
-    private static bool IsDomainEventHandler(Type t) =>
+    private static bool IsBaseEventHandler(Type t) =>
         t.IsGenericType && typeof(IHandleEvents<>).IsAssignableFrom(t.GetGenericTypeDefinition());
 }

@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <Import Project="..\..\shared.proj" />
+
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <RootNamespace>OpenMedStack.Domain.Tests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
-
-    <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />

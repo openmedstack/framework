@@ -19,7 +19,7 @@ internal class TestEventConsumer : EventHandlerBase<TestEvent>
     protected override Task HandleInternal(
         TestEvent domainEvent,
         IMessageHeaders headers,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         _waitHandle.Set();
         return Task.CompletedTask;

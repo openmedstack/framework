@@ -16,11 +16,12 @@ public class CloudEventSerializer : IMessageSerializer
         _jsonSerializer = serializer;
         _topicProvider = topicProvider;
     }
-        
+
     /// <inheritdoc />
     public MessageBody GetMessageBody<T>(SendContext<T> context)
         where T : class
-    {var topic = _topicProvider.Get<T>();
+    {
+        var topic = _topicProvider.Get<T>();
 
         var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
         {
@@ -79,9 +80,5 @@ public class CloudEventSerializer : IMessageSerializer
         return new BytesMessageBody(bytes.ToArray());
     }
 
-    public ContentType ContentType
-    {
-        get;
-        set;
-    } = new("application/cloudevents+json");
+    public ContentType ContentType { get; set; } = new("application/cloudevents+json");
 }

@@ -40,5 +40,5 @@ public interface IProvide<in TKey, TItem> : IDisposable
     /// <param name="key">The key of the item to fetch.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the asynchronous operation.</param>
     /// <returns>A <see cref="Task"/> encapsulating the fetch operation.</returns>
-    Task<TItem> Fetch(TKey key, CancellationToken cancellationToken = default);
+    Task<TItem?> Fetch(TKey key, CancellationToken cancellationToken = default);
 }

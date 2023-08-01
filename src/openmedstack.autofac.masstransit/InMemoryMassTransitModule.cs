@@ -52,10 +52,11 @@ public class InMemoryMassTransitModule<TConfiguration> : Module
     private IBusControl CreateInMemory(IComponentContext c, IRetryPolicy retryPolicy)
     {
         return Bus.Factory.CreateUsingInMemory(
-            sbc =>
-            {
-                sbc.ConfigureJson(c);
-                sbc.ConfigureBus(c, _configuration, retryPolicy);
-            }).AttachObservers(c);
+                sbc =>
+                {
+                    sbc.PrefetchCount = 1;
+                    sbc.ConfigureBus(c, _configuration, retryPolicy);
+                })
+            .AttachObservers(c);
     }
 }

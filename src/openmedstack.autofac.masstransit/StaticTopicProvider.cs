@@ -9,7 +9,9 @@
 
 namespace OpenMedStack.Autofac.MassTransit;
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 internal class StaticTopicProvider : IProvideTopic
@@ -34,7 +36,7 @@ internal class StaticTopicProvider : IProvideTopic
     public string Get<T>()
     {
         var type = typeof(T);
-        var fullName = type.FullName ?? type.Name;
+        var fullName = PrettyName(type);
         if (_topicMap.TryGetValue(fullName, out var topic))
         {
             return topic;
@@ -42,8 +44,19 @@ internal class StaticTopicProvider : IProvideTopic
 
         var topicAttribute = type.GetCustomAttribute<TopicAttribute>();
         var result = topicAttribute?.Topic ?? fullName;
-        _topicMap.Add(fullName, result);
+        return _topicMap.TryAdd(fullName, result) ? result : _topicMap[fullName];
+    }
 
-        return result;
+    private static string PrettyName(Type type)
+    {
+        if (type.GetGenericArguments().Length == 0)
+        {
+            return type.FullName ?? type.Name;
+        }
+
+        var genericArguments = type.GetGenericArguments();
+        var typeDefinition = type.FullName ?? type.Name;
+        var unmangledName = typeDefinition[..typeDefinition.IndexOf("`", StringComparison.Ordinal)];
+        return $"{unmangledName}<{string.Join(",", genericArguments.Select(PrettyName))}>";
     }
 }
