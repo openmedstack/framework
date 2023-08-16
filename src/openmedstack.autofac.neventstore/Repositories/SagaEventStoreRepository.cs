@@ -67,7 +67,7 @@ public class SagaEventStoreRepository : ISagaRepository
     private TSaga BuildSaga<TSaga>(string sagaId, IEventStream stream) where TSaga : class, ISaga
     {
         var saga = (TSaga)_factory.Build(typeof(TSaga), sagaId);
-        foreach (var message in stream.CommittedEvents.Select(x => x.Body).OfType<DomainEvent>().ToArray())
+        foreach (var message in stream.CommittedEvents.Select(x => x.Body).OfType<BaseEvent>().ToArray())
         {
             saga.Transition(message);
         }
