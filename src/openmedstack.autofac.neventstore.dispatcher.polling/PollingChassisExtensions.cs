@@ -34,8 +34,7 @@ namespace openmedstack.autofac.neventstore.dispatcher.polling
             chassis.AddAutofacModules(
                 (_, a) =>
                     new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                        a,
-                        pollingInterval),
+                        a),
                 (_, __) => new CompositePollingClientModule(pollingInterval));
 
         /// <summary>
@@ -55,8 +54,7 @@ namespace openmedstack.autofac.neventstore.dispatcher.polling
             chassis.AddAutofacModules(
                 (_, a) =>
                     new CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration>(
-                        a,
-                        pollingInterval),
+                        a),
                 (_, __) => new SeparatePollingClientModule(pollingInterval));
 
         /// <summary>

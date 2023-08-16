@@ -1,6 +1,5 @@
 ﻿namespace OpenMedStack.Autofac.NEventstore.Modules;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,17 +16,14 @@ internal class CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModel
     where TConfiguration : DeploymentConfiguration
 {
     private readonly Assembly[] _assemblies;
-    private readonly TimeSpan _pollingInterval;
 
     /// <summary>
     /// Initializes a new instance of an <see cref="EventStoreModule"/> class.
     /// </summary>
     /// <param name="assemblies">The assemblies to scan for read model updaters.</param>
-    /// <param name="pollingInterval">The time between event polling</param>
-    public CommitDispatcherModule(IEnumerable<Assembly> assemblies, TimeSpan pollingInterval)
+    public CommitDispatcherModule(IEnumerable<Assembly> assemblies)
     {
         _assemblies = assemblies.DistinctBy((a, b) => a.FullName == b.FullName).ToArray();
-        _pollingInterval = pollingInterval;
     }
 
     /// <inheritdoc />

@@ -61,58 +61,58 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
         var commands = (from header in commit.Headers
                         where header.Key.StartsWith(Constants.UndispatchedMessageHeader)
                         select header).ToArray();
-        if (commands.Length > 0)
+        if (commands.Length <= 0)
         {
-            using var tokenSource = new CancellationTokenSource(_configuration.Timeout);
-            var commandBus = _commandBus();
-            var commandHeaders = commit.Headers
-                .Where(x => !x.Key.StartsWith(Constants.UndispatchedMessageHeader))
-                .ToDictionary(x => x.Key, x => x.Value);
-            var commandTasks = (from cmd in commands
-                                let command = cmd.Value
-                                let method =
-                                    _commandSendMethods.GetOrAdd(
-                                        command.GetType(),
-                                        t => _commandBusSendMethod.MakeGenericMethod(t))
-                                let result = method.Invoke(
-                                    commandBus,
-                                    new[] { command, commandHeaders, tokenSource.Token })
-                                select (Task<CommandResponse>)result).ToArray();
-
-            _logger.LogInformation("Dispatched {count} commands for commit {commitId}", commandTasks.Length, commit.CommitId);
-            try
-            {
-                var commandResults = await Task.WhenAll(commandTasks).ConfigureAwait(false);
-
-                var faults = commandResults.Where(x => !string.IsNullOrWhiteSpace(x.FaultMessage))
-                    .GroupBy(x => new { x.TargetAggregate, x.Version })
-                    .ToArray();
-                if (faults.Length <= 0)
-                {
-                    return HandlingResult.MoveToNext;
-                }
-
-                _logger.LogError("Failed to send {amount} commands.", faults.Length);
-
-                foreach (var fault in faults)
-                {
-                    _logger.LogError(
-                        "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
-                        fault.Key.TargetAggregate,
-                        fault.Key.Version,
-                        string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
-                }
-
-                return HandlingResult.Retry;
-
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, exception.Message);
-                return HandlingResult.Retry;
-            }
+            return HandlingResult.MoveToNext;
         }
 
-        return HandlingResult.MoveToNext;
+        using var tokenSource = new CancellationTokenSource(_configuration.Timeout);
+        var commandBus = _commandBus();
+        var commandHeaders = commit.Headers
+            .Where(x => !x.Key.StartsWith(Constants.UndispatchedMessageHeader))
+            .ToDictionary(x => x.Key, x => x.Value);
+        var commandTasks = (from cmd in commands
+                            let command = cmd.Value
+                            let method =
+                                _commandSendMethods.GetOrAdd(
+                                    command.GetType(),
+                                    t => _commandBusSendMethod.MakeGenericMethod(t))
+                            let result = method.Invoke(
+                                commandBus,
+                                new[] { command, commandHeaders, tokenSource.Token })
+                            select (Task<CommandResponse>)result).ToArray();
+
+        _logger.LogInformation("Dispatched {count} commands for commit {commitId}", commandTasks.Length, commit.CommitId);
+        try
+        {
+            var commandResults = await Task.WhenAll(commandTasks).ConfigureAwait(false);
+
+            var faults = commandResults.Where(x => !string.IsNullOrWhiteSpace(x.FaultMessage))
+                .GroupBy(x => new { x.TargetAggregate, x.Version })
+                .ToArray();
+            if (faults.Length <= 0)
+            {
+                return HandlingResult.MoveToNext;
+            }
+
+            _logger.LogError("Failed to send {amount} commands.", faults.Length);
+
+            foreach (var fault in faults)
+            {
+                _logger.LogError(
+                    "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
+                    fault.Key.TargetAggregate,
+                    fault.Key.Version,
+                    string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
+            }
+
+            return HandlingResult.Retry;
+
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, exception.Message);
+            return HandlingResult.Retry;
+        }
     }
 }

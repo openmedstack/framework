@@ -86,7 +86,10 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
         CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <inheritdoc />
-    public abstract void Dispose();
+    public virtual void Dispose()
+    {
+        GC.SuppressFinalize(this);
+    }
 
     /// <inheritdoc />
     public bool CanHandle(Type type) => typeof(TBaseEvent).IsAssignableFrom(type);
