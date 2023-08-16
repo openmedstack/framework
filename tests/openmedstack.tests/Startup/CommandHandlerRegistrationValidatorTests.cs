@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Commands;
 using OpenMedStack.Startup;
-using Moq;
 using Xunit;
 
 public class CommandHandlerRegistrationValidatorTests
@@ -51,7 +50,7 @@ public class CommandHandlerRegistrationValidatorTests
         var validator = new CommandHandlerRegistrationValidator(
             configuration,
             createFunc,
-            new Mock<ILogger<CommandHandlerRegistrationValidator>>().Object);
+            NSubstitute.Substitute.For<ILogger<CommandHandlerRegistrationValidator>>());
 
         var error = await validator.Validate().ConfigureAwait(false);
 
