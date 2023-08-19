@@ -52,14 +52,17 @@ public abstract class SagaBase : ISaga, IEquatable<ISaga>
         ++Version;
     }
 
-    IEnumerable<object> ISaga.GetUncommittedEvents() => _uncommitted;
+    /// <inheritdoc />
+    IEnumerable<BaseEvent> ISaga.GetUncommittedEvents() => _uncommitted;
 
+    /// <inheritdoc />
     void ISaga.ClearUncommittedEvents()
     {
         _uncommitted.Clear();
     }
 
-    IEnumerable<object> ISaga.GetUndispatchedMessages() => _undispatched;
+    /// <inheritdoc />
+    IEnumerable<DomainCommand> ISaga.GetUndispatchedMessages() => _undispatched;
 
     void ISaga.ClearUndispatchedMessages()
     {

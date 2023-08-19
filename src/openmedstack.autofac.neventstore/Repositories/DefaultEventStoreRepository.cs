@@ -179,7 +179,9 @@ internal sealed class DefaultEventStoreRepository : IRepository
 
     private bool ThrowOnConflict(IEventStream stream, int skip)
     {
-        var committedEvents = stream.CommittedEvents.Skip(skip).Select(x => x.Body);
-        return _conflictDetector.ConflictsWith(stream.UncommittedEvents.Select(x => x.Body), committedEvents);
+        var committedEvents = stream.CommittedEvents.Skip(skip).Select(x => x.Body).OfType<BaseEvent>();
+        return _conflictDetector.ConflictsWith(
+            stream.UncommittedEvents.Select(x => x.Body).OfType<BaseEvent>(),
+            committedEvents);
     }
 }

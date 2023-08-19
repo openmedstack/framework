@@ -6,11 +6,22 @@ using System.Linq;
 using System.Reflection;
 using Stateless;
 
+/// <summary>
+/// Defines the type cache for state machines.
+/// </summary>
+/// <typeparam name="TState">The <see cref="Type"/> of state.</typeparam>
+/// <typeparam name="TTrigger">The <see cref="Type"/> of trigger.</typeparam>
 public class StateMachineTypeCache<TState, TTrigger>
 {
     private readonly ConcurrentDictionary<Type, MethodInfo> _fireMethods = new();
     private readonly ConcurrentDictionary<Type, object> _parameters = new();
 
+    /// <summary>
+    /// Gets the parameter instance.
+    /// </summary>
+    /// <param name="messageType">The <see cref="Type"/> of message.</param>
+    /// <param name="trigger">The trigger.</param>
+    /// <returns></returns>
     public object GetParameterInstance(Type messageType, TTrigger trigger)
     {
         return _parameters.GetOrAdd(messageType, static (t, tr) =>
@@ -22,6 +33,11 @@ public class StateMachineTypeCache<TState, TTrigger>
         }, trigger);
     }
 
+    /// <summary>
+    /// Gets the state machine fire method to invoke.
+    /// </summary>
+    /// <param name="messageType">The message type.</param>
+    /// <returns>The fire <see cref="MethodInfo"/>.</returns>
     public MethodInfo GetFireMethod(Type messageType)
     {
         return _fireMethods.GetOrAdd(messageType, static (t, smt) =>

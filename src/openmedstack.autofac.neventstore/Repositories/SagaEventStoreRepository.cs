@@ -18,7 +18,11 @@ public class SagaEventStoreRepository : ISagaRepository
     private readonly IConstructSagas _factory;
     private readonly ILogger<SagaEventStoreRepository> _logger;
 
-    public SagaEventStoreRepository(IProvideTenant tenantId, IStoreEvents eventStore, IConstructSagas factory, ILogger<SagaEventStoreRepository> logger)
+    public SagaEventStoreRepository(
+        IProvideTenant tenantId,
+        IStoreEvents eventStore,
+        IConstructSagas factory,
+        ILogger<SagaEventStoreRepository> logger)
     {
         _tenantId = tenantId;
         _eventStore = eventStore;
@@ -26,18 +30,23 @@ public class SagaEventStoreRepository : ISagaRepository
         _logger = logger;
     }
 
-    public async Task<TSaga> GetById<TSaga>(string sagaId) where TSaga : class, ISaga
+    public async Task<TSaga> GetById<TSaga>(string sagaId, CancellationToken cancellationToken = default)
+        where TSaga : ISaga
     {
         var eventStream = await OpenStream(_tenantId.GetTenantName(), sagaId).ConfigureAwait(false);
         return BuildSaga<TSaga>(sagaId, eventStream);
     }
 
-    public async Task Save(ISaga saga, Action<IDictionary<string, object>>? updateHeaders, CancellationToken cancellationToken)
+    public async Task Save(
+        ISaga saga,
+        Action<IDictionary<string, object>>? updateHeaders,
+        CancellationToken cancellationToken)
     {
         if (saga == null)
         {
             throw new ArgumentNullException(nameof(saga), "Saga cannot be null");
         }
+
         var commitId = Guid.NewGuid();
         var headers = PrepareHeaders(saga, updateHeaders);
         var eventStream = await PrepareStream(_tenantId.GetTenantName(), saga, headers).ConfigureAwait(false);
@@ -50,33 +59,42 @@ public class SagaEventStoreRepository : ISagaRepository
     {
     }
 
-    private async Task<IEventStream> OpenStream(string bucketId, string sagaId, int maxVersion = int.MaxValue, CancellationToken cancellationToken = default)
+    private async Task<IEventStream> OpenStream(
+        string bucketId,
+        string sagaId,
+        int maxVersion = int.MaxValue,
+        CancellationToken cancellationToken = default)
     {
         IEventStream eventStream;
         try
         {
-            eventStream = await _eventStore.OpenStream(bucketId, sagaId, 0, maxVersion, cancellationToken).ConfigureAwait(false);
+            eventStream = await _eventStore.OpenStream(bucketId, sagaId, 0, maxVersion, cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (StreamNotFoundException)
         {
             eventStream = await _eventStore.CreateStream(bucketId, sagaId).ConfigureAwait(false);
         }
+
         return eventStream;
     }
 
-    private TSaga BuildSaga<TSaga>(string sagaId, IEventStream stream) where TSaga : class, ISaga
+    private TSaga BuildSaga<TSaga>(string sagaId, IEventStream stream) where TSaga : ISaga
     {
-        var saga = (TSaga)_factory.Build(typeof(TSaga), sagaId);
+        var saga = _factory.Build<TSaga>(sagaId);
         foreach (var message in stream.CommittedEvents.Select(x => x.Body).OfType<BaseEvent>().ToArray())
         {
             saga.Transition(message);
         }
+
         saga.ClearUncommittedEvents();
         saga.ClearUndispatchedMessages();
         return saga;
     }
 
-    private static Dictionary<string, object> PrepareHeaders(ISaga saga, Action<IDictionary<string, object>>? updateHeaders)
+    private static Dictionary<string, object> PrepareHeaders(
+        ISaga saga,
+        Action<IDictionary<string, object>>? updateHeaders)
     {
         var dictionary = new Dictionary<string, object> { ["SagaType"] = saga.GetType().FullName! };
         updateHeaders?.Invoke(dictionary);
@@ -85,6 +103,7 @@ public class SagaEventStoreRepository : ISagaRepository
         {
             dictionary["UndispatchedMessage." + num++] = undispatchedMessage;
         }
+
         return dictionary;
     }
 

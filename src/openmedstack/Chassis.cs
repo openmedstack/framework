@@ -18,6 +18,9 @@ using Microsoft.Extensions.Configuration;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
 
+/// <summary>
+/// Defines the Chassis class.
+/// </summary>
 public static class Chassis
 {
     /// <summary>

@@ -7,7 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
 using Autofac;
 using OpenMedStack.Domain;
 
@@ -20,11 +19,16 @@ internal class SagaFactory : IConstructSagas
 {
     private readonly ILifetimeScope _lifetimeScope;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SagaFactory"/> class.
+    /// </summary>
+    /// <param name="lifetimeScope">The container to resolve dependencies from.</param>
     public SagaFactory(ILifetimeScope lifetimeScope)
     {
         _lifetimeScope = lifetimeScope;
     }
 
-    public ISaga Build(Type type, string id) =>
-        (ISaga)_lifetimeScope.Resolve(type, new NamedParameter("id", id));
+    /// <inheritdoc />
+    public TSaga Build<TSaga>(string id) where TSaga : ISaga =>
+        (TSaga)_lifetimeScope.Resolve(typeof(TSaga), new NamedParameter("id", id));
 }

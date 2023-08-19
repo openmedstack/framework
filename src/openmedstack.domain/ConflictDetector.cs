@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace OpenMedStack.Domain;
 
+using OpenMedStack.Events;
+
 /// <summary>
 ///   The conflict detector is used to determine if the events to be committed represent
 ///   a true business conflict as compared to events that have already been committed, thus
@@ -15,38 +17,43 @@ namespace OpenMedStack.Domain;
 /// </remarks>
 public class ConflictDetector : IDetectConflicts
 {
-    private readonly IDictionary<Type, IDictionary<Type, ConflictPredicate>> _actions = new Dictionary<Type, IDictionary<Type, ConflictPredicate>>();
+    private readonly IDictionary<Type, IDictionary<Type, ConflictPredicate>> _actions =
+        new Dictionary<Type, IDictionary<Type, ConflictPredicate>>();
 
-    public void Register<TUncommitted, TCommitted>(ConflictDelegate<TUncommitted, TCommitted> handler) where TUncommitted : class where TCommitted : class
+    /// <inheritdoc />
+    public void Register<TUncommitted, TCommitted>(ConflictDelegate<TUncommitted, TCommitted> handler)
+        where TUncommitted : BaseEvent
+        where TCommitted : BaseEvent
     {
         if (!_actions.TryGetValue(typeof(TUncommitted), out var dictionary))
         {
             _actions[typeof(TUncommitted)] = dictionary = new Dictionary<Type, ConflictPredicate>();
         }
-        dictionary[typeof(TCommitted)] = (uncommitted, committed) => handler((uncommitted as TUncommitted)!, (committed as TCommitted)!);
+
+        dictionary[typeof(TCommitted)] = (uncommitted, committed) =>
+            handler((uncommitted as TUncommitted)!, (committed as TCommitted)!);
     }
 
-    public bool ConflictsWith(IEnumerable<object> uncommittedEvents, IEnumerable<object> committedEvents)
+    /// <inheritdoc />
+    public bool ConflictsWith(IEnumerable<BaseEvent> uncommittedEvents, IEnumerable<BaseEvent> committedEvents)
     {
-        return uncommittedEvents.SelectMany(_ => committedEvents, (uncommitted, committed) => new
-        {
-            uncommitted,
-            committed
-        }).Where(param1 => Conflicts(param1.uncommitted, param1.committed)).Select(_ => uncommittedEvents).Any();
+        return uncommittedEvents
+            .SelectMany(
+                _ => committedEvents, (uncommitted, committed) => (uncommitted, committed))
+            .Where(param1 => Conflicts(param1.uncommitted, param1.committed))
+            .Select(_ => uncommittedEvents)
+            .Any();
     }
 
-    private bool Conflicts(object uncommitted, object committed)
+    private bool Conflicts(BaseEvent uncommitted, BaseEvent committed)
     {
         if (!_actions.TryGetValue(uncommitted.GetType(), out var dictionary))
         {
             return uncommitted.GetType() == committed.GetType();
         }
-        if (!dictionary.TryGetValue(committed.GetType(), out var conflictPredicate))
-        {
-            return true;
-        }
-        return conflictPredicate(uncommitted, committed);
+
+        return !dictionary.TryGetValue(committed.GetType(), out var conflictPredicate) || conflictPredicate(uncommitted, committed);
     }
 
-    private delegate bool ConflictPredicate(object uncommitted, object committed);
+    private delegate bool ConflictPredicate(BaseEvent uncommitted, BaseEvent committed);
 }

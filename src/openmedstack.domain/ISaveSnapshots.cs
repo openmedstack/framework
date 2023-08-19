@@ -21,5 +21,5 @@ public interface ISaveSnapshots
     /// </summary>
     /// <typeparam name="T">The <see cref="Type"/> of snapshot.</typeparam>
     /// <param name="aggregateRoot">The aggregate to snapshot.</param>
-    bool Save<T>(AggregateRootBase<T> aggregateRoot) where T : class, IMemento;
+    bool Save<T>(AggregateRootBase<T> aggregateRoot) where T : IMemento;
 }

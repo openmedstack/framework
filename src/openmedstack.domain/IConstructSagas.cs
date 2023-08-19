@@ -11,7 +11,15 @@ using System;
 
 namespace OpenMedStack.Domain;
 
+/// <summary>
+/// Defines the saga factory
+/// </summary>
 public interface IConstructSagas
 {
-    ISaga Build(Type type, string id);
+    /// <summary>
+    /// Builds a new saga of the specified type and id.
+    /// </summary>
+    /// <param name="id">The saga identifier.</param>
+    /// <returns>The constructed saga.</returns>
+    TSaga Build<TSaga>(string id) where TSaga : ISaga;
 }

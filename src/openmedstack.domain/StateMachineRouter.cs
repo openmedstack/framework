@@ -2,8 +2,14 @@ namespace OpenMedStack.Domain;
 
 using System;
 using Microsoft.Extensions.Logging;
+using OpenMedStack.Events;
 using Stateless;
 
+/// <summary>
+/// Defines the state machine implementation of <see cref="IDispatchEvents"/>.
+/// </summary>
+/// <typeparam name="TState">The <see cref="Type"/> of states.</typeparam>
+/// <typeparam name="TTrigger">The <see cref="Type"/> of triggers.</typeparam>
 public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
 {
     private readonly StateMachine<TState, TTrigger> _stateMachine;
@@ -11,11 +17,18 @@ public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
     private readonly StateMachineTypeCache<TState, TTrigger> _typeCache;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StateMachineRouter{TState,TTrigger}"/> class.
+    /// </summary>
+    /// <param name="stateMachine">The underlying process state machine.</param>
+    /// <param name="getTrigger">The <see cref="Func{TInput,TResult}"/> to get the trigger.</param>
+    /// <param name="typeCache">The <see cref="StateMachineTypeCache{TState,TTrigger}"/> for reflection performance.</param>
+    /// <param name="logger">The <see cref="ILogger{TCategoryName}"/>.</param>
     public StateMachineRouter(
         StateMachine<TState, TTrigger> stateMachine,
         Func<object, TTrigger> getTrigger,
         StateMachineTypeCache<TState, TTrigger> typeCache,
-        ILogger logger)
+        ILogger<StateMachineRouter<TState, TTrigger>> logger)
     {
         _stateMachine = stateMachine;
         _getTrigger = getTrigger;
@@ -23,20 +36,14 @@ public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         GC.SuppressFinalize(this);
     }
 
-    public void Register<T>(Action<T> handler)
-    {
-    }
-
-    public void Register(object aggregate)
-    {
-    }
-
-    public void Dispatch(object eventMessage)
+    /// <inheritdoc />
+    public void Dispatch(BaseEvent eventMessage)
     {
         var trigger = _getTrigger(eventMessage);
         if (_stateMachine.CanFire(trigger))

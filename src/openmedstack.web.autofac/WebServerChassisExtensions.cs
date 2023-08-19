@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac;
 
+/// <summary>
+/// Defines the extensions for the web server chassis.
+/// </summary>
 public static class ChassisExtensions
 {
     private const string LogFilters = "LogFilters";

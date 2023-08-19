@@ -12,6 +12,7 @@ using Stateless;
 /// </summary>
 public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable<ISaga>
 {
+    private readonly ILogger _logger;
     private readonly StateMachineRouter<TState, TTrigger> _eventRouter;
     private readonly ICollection<BaseEvent> _uncommitted = new LinkedList<BaseEvent>();
     private readonly ICollection<DomainCommand> _undispatched = new LinkedList<DomainCommand>();
@@ -22,23 +23,28 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
     /// <param name="id">The saga id.</param>
     /// <param name="initialState">The initial state of the state machine</param>
     /// <param name="typeCache">The <see cref="StateMachineTypeCache{TState,TTrigger}"/> to improve reflection performance.</param>
-    /// <param name="logger">The saga logger</param>
+    /// <param name="loggerFactory">The logger factory.</param>
     protected StateMachineSagaBase(
         string id,
         TState initialState,
         StateMachineTypeCache<TState, TTrigger> typeCache,
-        ILogger<StateMachineSagaBase<TState, TTrigger>> logger)
+        ILoggerFactory loggerFactory)
     {
+        _logger = loggerFactory.CreateLogger(GetType());
         var stateMachine = new StateMachine<TState, TTrigger>(initialState);
         stateMachine.OnTransitionCompleted(
-            transition => logger.LogInformation(
+            transition => _logger.LogInformation(
                 "Transitioned from {source} to {destination} with trigger {trigger}",
                 transition.Source,
                 transition.Destination,
                 transition.Trigger));
         // ReSharper disable once VirtualMemberCallInConstructor
         ConfigureStateMachine(stateMachine);
-        _eventRouter = new StateMachineRouter<TState, TTrigger>(stateMachine, GetTrigger, typeCache, logger);
+        _eventRouter = new StateMachineRouter<TState, TTrigger>(
+            stateMachine,
+            GetTrigger,
+            typeCache,
+            loggerFactory.CreateLogger<StateMachineRouter<TState, TTrigger>>());
         Id = id;
     }
 
@@ -64,14 +70,14 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
 
     protected abstract TTrigger GetTrigger(object message);
 
-    IEnumerable<object> ISaga.GetUncommittedEvents() => _uncommitted;
+    IEnumerable<BaseEvent> ISaga.GetUncommittedEvents() => _uncommitted;
 
     void ISaga.ClearUncommittedEvents()
     {
         _uncommitted.Clear();
     }
 
-    IEnumerable<object> ISaga.GetUndispatchedMessages() => _undispatched;
+    IEnumerable<DomainCommand> ISaga.GetUndispatchedMessages() => _undispatched;
 
     void ISaga.ClearUndispatchedMessages()
     {
