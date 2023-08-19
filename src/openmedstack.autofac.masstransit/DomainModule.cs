@@ -66,7 +66,7 @@ internal class DomainModule<TConfiguration> : Module
                 })
             .AsSelf()
             .IfNotRegistered(typeof(JsonSerializerSettings));
-        builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance();
+        builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance().IfNotRegistered(typeof(IProvideTenant));
         builder.Register<IProvideTopic>(
                 ctx => new StaticTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
             .SingleInstance();

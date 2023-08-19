@@ -28,6 +28,7 @@ public partial class FeatureSteps : IAsyncDisposable
     {
         var config = new WebDeploymentConfiguration
         {
+            TenantPrefix = "testings",
             Name = typeof(TestStartup).Assembly.GetName().Name!,
             Services = new Dictionary<Regex, Uri>
             {
@@ -61,6 +62,7 @@ public partial class FeatureSteps : IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         await _webServerService.DisposeAsync().ConfigureAwait(false);
     }
 

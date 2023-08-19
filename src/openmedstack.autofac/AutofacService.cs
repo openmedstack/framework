@@ -35,6 +35,7 @@ public class AutofacService<TConfiguration> : IService
     private readonly IContainer _container;
     private readonly IPublishEvents _eventBus;
     private readonly IRouteCommands _commandBus;
+    private readonly ILogger<AutofacService<TConfiguration>> _logger;
     private bool _isDisposed;
 
     /// <summary>
@@ -65,6 +66,7 @@ public class AutofacService<TConfiguration> : IService
 
         _container = builder.Build();
 
+        _logger = _container.Resolve<ILogger<AutofacService<TConfiguration>>>();
         _commandBus = _container.Resolve<IRouteCommands>();
         _eventBus = _container.Resolve<IPublishEvents>();
     }
@@ -88,8 +90,28 @@ public class AutofacService<TConfiguration> : IService
         var startupErrors = (await Task.WhenAll(validationTasks).ConfigureAwait(false)).NonNulls().ToArray();
         if (startupErrors.Length > 0)
         {
+            foreach (var error in startupErrors)
+            {
+                LogError(error);
+            }
             throw new AggregateException("Startup validation failed", startupErrors);
+
+            void LogError(Exception exception)
+            {
+                if (exception is AggregateException aggregateException)
+                {
+                    foreach (var innerException in aggregateException.InnerExceptions)
+                    {
+                        LogError(innerException);
+                    }
+                }
+                else
+                {
+                    _logger.LogError(exception, "{error}", exception.Message);
+                }
+            }
         }
+
         var bootstrappers = _container.Resolve<IEnumerable<IBootstrapSystem>>();
         foreach (var bootstrapper in bootstrappers.OrderBy(x => x.Order))
         {

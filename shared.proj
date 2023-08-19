@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>1.7.3</Version>
+        <Version>2.0.0</Version>
         <Authors>OpenMedStack;Jacob Reimers</Authors>
         <Company>OpenMedStack</Company>
         <Product>OpenMedStack Framework</Product>
@@ -9,13 +9,14 @@
         <RepositoryType>git</RepositoryType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Nullable>enable</Nullable>
         <langVersion>latest</langVersion>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarningsAsErrors/>
         <WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
-        <PackageReleaseNotes>Add project documentation.</PackageReleaseNotes>
+        <PackageReleaseNotes>Include state machine based sagas. Constrain sagas to use BaseEvents.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

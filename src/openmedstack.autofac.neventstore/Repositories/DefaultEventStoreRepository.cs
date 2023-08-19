@@ -65,7 +65,8 @@ internal sealed class DefaultEventStoreRepository : IRepository
         var commitId = Guid.NewGuid();
         var headers = PrepareHeaders(aggregate, updateHeaders);
 
-        var stream = await PrepareStream(_tenantId.GetTenantName(), aggregate, headers, cancellationToken)
+        var bucketId = _tenantId.GetTenantName();
+        var stream = await PrepareStream(bucketId, aggregate, headers, cancellationToken)
             .ConfigureAwait(false);
         var count = stream.CommittedEvents.Count;
         try
