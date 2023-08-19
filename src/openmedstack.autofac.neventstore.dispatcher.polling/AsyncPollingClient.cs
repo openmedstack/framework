@@ -17,7 +17,7 @@ internal sealed class AsyncPollingClient : IDisposable
     private readonly ILogger<AsyncPollingClient> _logger;
     private readonly TimeSpan _waitInterval;
     private Task? _pollingThread;
-    private Func<IAsyncEnumerable<ICommit>>? _pollingFunc;
+    private Func<IAsyncEnumerable<ICommit>> _pollingFunc = null!;
     private ITrackCheckpoints _checkpointToken = null!;
     private int _isPolling;
     private bool _isDisposed;
@@ -97,7 +97,7 @@ internal sealed class AsyncPollingClient : IDisposable
 
         try
         {
-            await foreach (var commit in _pollingFunc!().ConfigureAwait(false))
+            await foreach (var commit in _pollingFunc().ConfigureAwait(false))
             {
                 if (_tokenSource.IsCancellationRequested)
                 {

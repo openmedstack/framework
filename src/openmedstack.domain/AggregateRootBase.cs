@@ -16,7 +16,7 @@ using OpenMedStack.Events;
 public abstract class AggregateRootBase<TMemento> : IAggregate, IEquatable<IAggregate> where TMemento : class, IMemento
 {
     private readonly ICollection<DomainEvent> _uncommittedEvents = new LinkedList<DomainEvent>();
-    private readonly IRouteEvents _registeredRoutes;
+    private readonly IDispatchEvents _registeredRoutes;
 
     protected AggregateRootBase(string id, IMemento? snapshot)
     {
@@ -47,7 +47,7 @@ public abstract class AggregateRootBase<TMemento> : IAggregate, IEquatable<IAggr
         ++Version;
     }
 
-    ICollection<DomainEvent> IAggregate.GetUncommittedEvents() => _uncommittedEvents;
+    IEnumerable<DomainEvent> IAggregate.GetUncommittedEvents() => _uncommittedEvents;
 
     void IAggregate.ClearUncommittedEvents()
     {
@@ -64,7 +64,7 @@ public abstract class AggregateRootBase<TMemento> : IAggregate, IEquatable<IAggr
         ((IAggregate)this).ApplyEvent(@event);
         _uncommittedEvents.Add(@event);
     }
-        
+
     public override int GetHashCode() => Id.GetHashCode();
 
     public override bool Equals(object? obj) => Equals(obj as IAggregate);

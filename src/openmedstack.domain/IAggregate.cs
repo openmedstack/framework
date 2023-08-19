@@ -12,7 +12,7 @@ public interface IAggregate : IDisposable
 
     void ApplyEvent(DomainEvent @event);
 
-    ICollection<DomainEvent> GetUncommittedEvents();
+    IEnumerable<DomainEvent> GetUncommittedEvents();
 
     void ClearUncommittedEvents();
 

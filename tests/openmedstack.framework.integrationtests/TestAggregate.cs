@@ -6,7 +6,7 @@ using OpenMedStack.Domain;
 internal class TestAggregate : DefaultAggregateRoot
 {
     /// <inheritdoc />
-    public TestAggregate(string id, IMemento snapshot) : base("Test-" + id, snapshot)
+    public TestAggregate(string id, IMemento snapshot) : base($"Test-{id}", snapshot)
     {
     }
 
