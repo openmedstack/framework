@@ -4,7 +4,10 @@ using System;
 using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using OpenMedStack.Commands;
+using OpenMedStack.Events;
 using OpenMedStack.Web.Autofac;
 
 /// <summary>
@@ -34,6 +37,14 @@ public class TestChassis<TConfiguration> : IAsyncDisposable
 
     public T Resolve<T>() where T : class => _chassis.Resolve<T>();
 
+    public Task Publish<T>(T message, CancellationToken cancellationToken) where T : BaseEvent =>
+        _chassis.Publish(message, cancellationToken);
+
+    public Task<CommandResponse> Send<T>(T message, CancellationToken cancellationToken) where T : DomainCommand =>
+        _chassis.Send(message, cancellationToken);
+
+    public IDisposable Subscribe(IObserver<BaseEvent> observer) => _chassis.Subscribe(observer);
+
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
@@ -41,6 +52,6 @@ public class TestChassis<TConfiguration> : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    public IDisposable Subscribe(Action<object> func) =>
+    public IDisposable Subscribe(Action<BaseEvent> func) =>
         _chassis.SubscribeOn(TaskPoolScheduler.Default).Subscribe(func);
 }
