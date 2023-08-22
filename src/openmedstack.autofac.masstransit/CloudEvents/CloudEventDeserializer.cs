@@ -27,7 +27,7 @@ public class CloudEventDeserializer : IMessageDeserializer
     public ConsumeContext Deserialize(ReceiveContext receiveContext)
     {
         var envelope = ReadContext(receiveContext);
-        return new CloudEventContext(receiveContext, envelope, _serializer);
+        return new CloudEventContext(receiveContext, envelope, _serializer, _topicProvider);
     }
 
     /// <inheritdoc />
@@ -65,7 +65,7 @@ public class CloudEventDeserializer : IMessageDeserializer
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.ConversationId,
                     out var conversationHeader)
-             && Guid.TryParse(conversationHeader?.ToString(), out var conversationId)
+             && Guid.TryParse(conversationHeader.ToString(), out var conversationId)
                     ? conversationId
                     : default(Guid?),
             CorrelationId =
@@ -74,7 +74,7 @@ public class CloudEventDeserializer : IMessageDeserializer
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.InitiatorId,
                     out var initiatorHeader)
-             && Guid.TryParse(initiatorHeader?.ToString(), out var initiatorId)
+             && Guid.TryParse(initiatorHeader.ToString(), out var initiatorId)
                     ? initiatorId
                     : default(Guid?),
             MessageId = receiveContext.GetMessageId(Guid.Parse(cloudEvent.Id!)),
@@ -82,7 +82,7 @@ public class CloudEventDeserializer : IMessageDeserializer
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.RequestId,
                     out var requestIdHeader)
-             && Guid.TryParse(requestIdHeader?.ToString(), out var requestId)
+             && Guid.TryParse(requestIdHeader.ToString(), out var requestId)
                     ? requestId
                     : default(Guid?),
             SourceAddress = cloudEvent.Source!,
@@ -91,25 +91,25 @@ public class CloudEventDeserializer : IMessageDeserializer
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.DestinationAddress,
                     out var destinationAddress)
-                    ? new Uri(destinationAddress?.ToString()!)
+                    ? new Uri(destinationAddress.ToString()!)
                     : default,
             ResponseAddress =
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.ResponseAddress,
                     out var responseAddress)
-                    ? new Uri(responseAddress?.ToString()!)
+                    ? new Uri(responseAddress.ToString()!)
                     : cloudEvent.Source,
             FaultAddress =
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.FaultAddress,
                     out var faultAddress)
-                    ? new Uri(faultAddress?.ToString()!)
+                    ? new Uri(faultAddress.ToString()!)
                     : default,
             ExpirationTime =
                 receiveContext.TransportHeaders.TryGetHeader(
                     CloudEventHeaders.Expiration,
                     out var expirationHeader)
-             && long.TryParse(expirationHeader?.ToString(), out var expiration)
+             && long.TryParse(expirationHeader.ToString(), out var expiration)
                     ? DateTimeOffset.FromUnixTimeSeconds(expiration).UtcDateTime
                     : default(DateTime?),
             MessageType = new[] { cloudEvent.Type! }

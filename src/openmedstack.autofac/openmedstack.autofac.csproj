@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="7.0.1" />
+        <PackageReference Include="Autofac" Version="7.1.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Autofac.Multitenant" Version="7.0.0" />
         <PackageReference Include="microsoft.extensions.logging.console" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />

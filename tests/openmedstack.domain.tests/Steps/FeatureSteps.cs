@@ -13,16 +13,16 @@ using TechTalk.SpecFlow;
 using Xunit;
 
 [Binding]
-public partial class FeatureSteps : IAsyncDisposable
+public class FeatureSteps : IAsyncDisposable
 {
-    private Chassis<DeploymentConfiguration> Service = null!;
+    private Chassis<DeploymentConfiguration> _service = null!;
     private TestAggregateRoot _aggregate = null!;
     private ISaga _saga = null!;
 
     [Given(@"a started service")]
     public void GivenAStartedService()
     {
-        Service = Chassis
+        _service = Chassis
             .From(
                 new DeploymentConfiguration
                 {
@@ -41,7 +41,7 @@ public partial class FeatureSteps : IAsyncDisposable
             .UsingInMemoryEventStore()
             .UsingInMemoryMassTransit()
             .Build();
-        Service.Start();
+        _service.Start();
     }
 
     [Given(@"an aggregate root")]
@@ -66,14 +66,14 @@ public partial class FeatureSteps : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _aggregate.Dispose();
-        await Service.DisposeAsync().ConfigureAwait(false);
+        await _service.DisposeAsync().ConfigureAwait(false);
         GC.SuppressFinalize(this);
     }
 
     [When(@"performing action")]
     public async Task WhenPerformingAction()
     {
-        var repository = Service.Resolve<IRepository>();
+        var repository = _service.Resolve<IRepository>();
         var aggregate = await repository.GetById<TestAggregateRoot>("abc").ConfigureAwait(false);
         aggregate.SomeAction();
         await repository.Save(aggregate).ConfigureAwait(false);
@@ -82,20 +82,20 @@ public partial class FeatureSteps : IAsyncDisposable
     [When(@"processing is finished")]
     public async Task WhenProcessingIsFinished()
     {
-        await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
     }
 
     [Then(@"data store is updated (.*) times")]
     public void ThenDataStoreIsUpdatedTimes(int p0)
     {
-        var store = Service.Resolve<TestDataStore>();
+        var store = _service.Resolve<TestDataStore>();
         Assert.Equal(p0, store.Updates);
     }
 
     [When(@"a saga handles an event")]
     public async Task WhenASagaHandlesAnEvent()
     {
-        var repository = Service.Resolve<ISagaRepository>();
+        var repository = _service.Resolve<ISagaRepository>();
         var sagaId = Guid.NewGuid().ToString();
         var saga = await repository.GetById<TestSaga>(sagaId).ConfigureAwait(false);
 
@@ -107,14 +107,14 @@ public partial class FeatureSteps : IAsyncDisposable
     [Then(@"it is sent on command bus")]
     public void ThenItIsSentOnCommandBus()
     {
-        var store = Service.Resolve<TestDataStore>();
+        var store = _service.Resolve<TestDataStore>();
         Assert.Equal(1, store.Commands);
     }
 
     [When(@"loading a saga")]
     public async Task WhenLoadingASaga()
     {
-        var repository = Service.Resolve<ISagaRepository>();
+        var repository = _service.Resolve<ISagaRepository>();
         var sagaId = Guid.NewGuid().ToString();
         _saga = await repository.GetById<TestSaga>(sagaId).ConfigureAwait(false);
     }

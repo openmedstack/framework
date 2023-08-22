@@ -11,6 +11,7 @@ namespace OpenMedStack.Autofac.MassTransit.CloudEvents;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using global::MassTransit;
 using global::MassTransit.Context;
 using global::MassTransit.Metadata;
@@ -22,8 +23,12 @@ internal class CloudEventContext : DeserializerConsumeContext
     private readonly CloudEventEnvelope _envelope;
     private readonly JsonSerializer _jsonSerializer;
 
-    public CloudEventContext(ReceiveContext receiveContext, CloudEventEnvelope envelope, JsonSerializer serializer)
-        : base(receiveContext)
+    public CloudEventContext(
+        ReceiveContext receiveContext,
+        CloudEventEnvelope envelope,
+        JsonSerializer serializer,
+        IProvideTopic topicProvider)
+        : base(receiveContext, new CloudEventSerializerContext(envelope, serializer, topicProvider))
     {
         _envelope = envelope;
         _jsonSerializer = serializer;
@@ -31,11 +36,11 @@ internal class CloudEventContext : DeserializerConsumeContext
 
     public override bool HasMessageType(Type messageType) => true;
 
-    public override bool TryGetMessage<T>(out ConsumeContext<T>? consumeContext)
+    public override bool TryGetMessage<T>([NotNullWhen(true)] out ConsumeContext<T>? consumeContext)
     {
         try
         {
-            if (TryGetPayload(out T payload))
+            if (TryGetPayload(out T? payload))
             {
                 consumeContext = new MessageConsumeContext<T>(this, payload);
                 return true;
@@ -55,7 +60,7 @@ internal class CloudEventContext : DeserializerConsumeContext
     public override bool HasPayloadType(Type payloadType) => true;
 
     /// <inheritdoc />
-    public override bool TryGetPayload<T>(out T payload)
+    public override bool TryGetPayload<T>([NotNullWhen(true)] out T? payload) where T : class
     {
         var data = _envelope.CloudEvent.Data switch
         {
@@ -91,16 +96,25 @@ internal class CloudEventContext : DeserializerConsumeContext
     public override Guid? ConversationId => _envelope.ConversationId;
     public override Guid? InitiatorId => _envelope.InitiatorId;
     public override DateTime? ExpirationTime => _envelope.ExpirationTime;
-    public override Uri? SourceAddress => _envelope.SourceAddress;
-    public override Uri? DestinationAddress => _envelope.DestinationAddress;
-    public override Uri? ResponseAddress => _envelope.ResponseAddress;
-    public override Uri? FaultAddress => _envelope.FaultAddress;
+
+    public override Uri SourceAddress =>
+        _envelope.SourceAddress ?? throw new InvalidOperationException("Source address is null");
+
+    public override Uri DestinationAddress => _envelope.DestinationAddress
+     ?? throw new InvalidOperationException("Destination address is null");
+
+    public override Uri ResponseAddress => _envelope.ResponseAddress
+     ?? throw new InvalidOperationException("Destination address is null");
+
+    public override Uri FaultAddress =>
+        _envelope.FaultAddress ?? throw new InvalidOperationException("Destination address is null");
+
     public override DateTime? SentTime => _envelope.SentTime;
-    public override Headers? Headers => _envelope.Headers;
+    public override Headers Headers => _envelope.Headers;
 #if DEBUG
-    public override HostInfo? Host { get; } = new BusHostInfo(true);
+    public override HostInfo Host { get; } = new BusHostInfo(true);
 #else
         public override HostInfo? Host { get; }
 #endif
-    public override IEnumerable<string>? SupportedMessageTypes => _envelope.MessageType;
+    public override IEnumerable<string> SupportedMessageTypes => _envelope.MessageType;
 }
