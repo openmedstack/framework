@@ -9,6 +9,7 @@
 
 namespace openmedstack.autofac.neventstore.dispatcher.polling
 {
+    using System;
     using OpenMedStack;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.NEventstore;

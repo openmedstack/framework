@@ -23,17 +23,15 @@ internal class CompositePollingClientModule : Module
     /// <inheritdoc />
     protected override void Load(ContainerBuilder builder)
     {
-        builder.Register(ctx => new CompositePollingClientSetup(
-                ctx.Resolve<IPersistStreams>(),
-                ctx.Resolve<IProvideTenant>(),
-                ctx.Resolve<ILogger<AsyncPollingClient>>(),
-                _pollingInterval,
-                new (ITrackCheckpoints, ICommitDispatcher)[]
-                {
+        builder.Register(
+                ctx => new CompositePollingClientSetup(
+                    ctx.Resolve<IPersistStreams>(),
+                    ctx.Resolve<IProvideTenant>(),
+                    ctx.Resolve<ILogger<AsyncPollingClient>>(),
+                    _pollingInterval,
                     (ctx.Resolve<ITrackCommandCheckpoints>(), ctx.Resolve<ICommandCommitDispatcher>()),
                     (ctx.Resolve<ITrackEventCheckpoints>(), ctx.Resolve<IEventCommitDispatcher>()),
-                    (ctx.Resolve<ITrackReadModelCheckpoints>(), ctx.Resolve<IReadModelCommitDispatcher>())
-                }))
+                    (ctx.Resolve<ITrackReadModelCheckpoints>(), ctx.Resolve<IReadModelCommitDispatcher>())))
             .AsImplementedInterfaces()
             .SingleInstance();
     }
