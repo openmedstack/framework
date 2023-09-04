@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\shared.proj" />
+    <PropertyGroup>
+        <RootNamespace>OpenMedStack.Infrastructure.Bootstrapping</RootNamespace>
+        <AssemblyName>openmedstack.infrastructure.bootstrapping</AssemblyName>
+        <PackageId>OpenMedStack.Infrastructure.Bootstrapping</PackageId>
+        <PackageTags>OpenMedStack Architecture ASAP Bootstrapping Infrastructure</PackageTags>
+        <PackageReleaseNotes>Packaged with nubian for Debian compatibility.</PackageReleaseNotes>
+        <Description>Bootstrapping bindings for OpenMedStack based applications.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\openmedstack\openmedstack.csproj" />
+    </ItemGroup>
+
+</Project>
