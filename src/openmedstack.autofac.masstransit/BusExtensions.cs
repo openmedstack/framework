@@ -34,13 +34,13 @@ internal static class BusExtensions
         where T : class, IBusFactoryConfigurator
         where TConfiguration : DeploymentConfiguration
     {
+        sbc.UseInMemoryOutbox();
         sbc.ConfigureJson(c);
         sbc.ReceiveEndpoint(
             configuration.QueueName,
             e =>
             {
-                e.UseInMemoryOutbox();
-                e.UseRetry(r => r.SetRetryPolicy(_ => retryPolicy));
+                e.UseMessageRetry(r => r.SetRetryPolicy(_ => retryPolicy));
                 e.RegisterConsumers(c);
             });
 
@@ -62,7 +62,7 @@ internal static class BusExtensions
         return bus;
     }
 
-    public static void ConfigureJson(this IBusFactoryConfigurator configurator, IComponentContext c)
+    private static void ConfigureJson(this IBusFactoryConfigurator configurator, IComponentContext c)
     {
         var settings = c.Resolve<JsonSerializerSettings>();
         var converters = c.Resolve<IEnumerable<JsonConverter>>().ToArray();

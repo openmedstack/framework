@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CloudEventContext.cs" company="Reimers.dk">
-//   Copyright � Reimers.dk
+//   Copyright © Reimers.dk
 // </copyright>
 // <summary>
 //   Defines the CloudEventContext type.
@@ -111,10 +111,8 @@ internal class CloudEventContext : DeserializerConsumeContext
 
     public override DateTime? SentTime => _envelope.SentTime;
     public override Headers Headers => _envelope.Headers;
-#if DEBUG
+
     public override HostInfo Host { get; } = new BusHostInfo(true);
-#else
-        public override HostInfo? Host { get; }
-#endif
+
     public override IEnumerable<string> SupportedMessageTypes => _envelope.MessageType;
 }
