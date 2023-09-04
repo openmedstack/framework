@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>2.0.1</Version>
+        <Version>2.0.2</Version>
         <Authors>OpenMedStack;Jacob Reimers</Authors>
         <Company>OpenMedStack</Company>
         <Product>OpenMedStack Framework</Product>
@@ -16,7 +16,7 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarningsAsErrors/>
         <WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
-        <PackageReleaseNotes>Include state machine based sagas. Constrain sagas to use BaseEvents.</PackageReleaseNotes>
+        <PackageReleaseNotes>Code level improvements and added documentation.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
