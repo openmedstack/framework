@@ -20,7 +20,7 @@ public class InMemoryEventStoreModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.Register(
-                ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
+                ctx => Wireup.Init(ctx.Resolve<ILoggerFactory>())
                     .UsingInMemoryPersistence()
                     .UsingJsonSerialization()
                     .Build())

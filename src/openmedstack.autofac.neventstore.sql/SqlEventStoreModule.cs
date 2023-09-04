@@ -34,7 +34,7 @@ public sealed class SqlEventStoreModule<TDialect> : Module
     {
         builder.RegisterType<TDialect>().As<ISqlDialect>().SingleInstance();
         builder.Register(
-                ctx => Wireup.Init(ctx.Resolve<ILogger<Wireup>>())
+                ctx => Wireup.Init(ctx.Resolve<ILoggerFactory>())
                     .UsingSqlPersistence(_dbProviderFactory, _connectionString)
                     .WithDialect(ctx.Resolve<ISqlDialect>())
                     .UsingJsonSerialization()

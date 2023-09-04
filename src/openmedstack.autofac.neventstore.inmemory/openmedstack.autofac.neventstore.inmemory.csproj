@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="openmedstack.neventstore.abstractions" Version="1.5.1" />
+    <PackageReference Include="openmedstack.neventstore.abstractions" Version="1.6.0" />
   </ItemGroup>
 
 </Project>

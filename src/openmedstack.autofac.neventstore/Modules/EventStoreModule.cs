@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac.NEventstore.Domain;
 using OpenMedStack.Autofac.NEventstore.Repositories;
 using OpenMedStack.Domain;
-using NEventStore;
+using OpenMedStack.NEventStore.Abstractions;
 
 /// <summary>
 /// Defines the module for configuring an NEventStore based event store in the project.
