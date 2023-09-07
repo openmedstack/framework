@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\shared.proj" />
+    <PropertyGroup>
+        <RootNamespace>OpenMedStack.Autofac.MassTransit.Grpc</RootNamespace>
+        <PackageId>OpenMedStack.Autofac.MassTransit.Grpc</PackageId>
+        <PackageTags>OpenMedStack Architecture Messaging MassTransit gRPC</PackageTags>
+        <Description>Autofac bindings for OpenMedStack based applications.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.Grpc" Version="8.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
+    </ItemGroup>
+
+</Project>
