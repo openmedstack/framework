@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenMedStack.Autofac.Startup;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
 using OpenMedStack.Startup;

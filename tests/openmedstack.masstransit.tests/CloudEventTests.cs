@@ -1,13 +1,11 @@
 namespace openmedstack.masstransit.tests;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
-using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.NewtonsoftJson;
 using OpenMedStack;
 using OpenMedStack.Autofac;

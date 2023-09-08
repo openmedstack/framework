@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using OpenMedStack.Autofac.Startup;
 using OpenMedStack.Commands;
-using OpenMedStack.Startup;
 using Xunit;
 
 public class CommandHandlerRegistrationValidatorTests

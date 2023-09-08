@@ -7,24 +7,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Domain;
-using NEventStore;
 using OpenMedStack.Events;
 using OpenMedStack.NEventStore.Abstractions;
 
 public class SagaEventStoreRepository : ISagaRepository
 {
-    private readonly IProvideTenant _tenantId;
+    private readonly IProvideTenant _tenantProvider;
     private readonly IStoreEvents _eventStore;
     private readonly IConstructSagas _factory;
     private readonly ILogger<SagaEventStoreRepository> _logger;
 
     public SagaEventStoreRepository(
-        IProvideTenant tenantId,
+        IProvideTenant tenantProvider,
         IStoreEvents eventStore,
         IConstructSagas factory,
         ILogger<SagaEventStoreRepository> logger)
     {
-        _tenantId = tenantId;
+        _tenantProvider = tenantProvider;
         _eventStore = eventStore;
         _factory = factory;
         _logger = logger;
@@ -33,7 +32,7 @@ public class SagaEventStoreRepository : ISagaRepository
     public async Task<TSaga> GetById<TSaga>(string sagaId, CancellationToken cancellationToken = default)
         where TSaga : ISaga
     {
-        var eventStream = await OpenStream(_tenantId.GetTenantName(), sagaId).ConfigureAwait(false);
+        var eventStream = await OpenStream(_tenantProvider.GetTenantName(), sagaId).ConfigureAwait(false);
         return BuildSaga<TSaga>(sagaId, eventStream);
     }
 
@@ -49,7 +48,7 @@ public class SagaEventStoreRepository : ISagaRepository
 
         var commitId = Guid.NewGuid();
         var headers = PrepareHeaders(saga, updateHeaders);
-        var eventStream = await PrepareStream(_tenantId.GetTenantName(), saga, headers).ConfigureAwait(false);
+        var eventStream = await PrepareStream(_tenantProvider.GetTenantName(), saga, headers).ConfigureAwait(false);
         await Persist(eventStream, commitId, cancellationToken).ConfigureAwait(false);
         saga.ClearUncommittedEvents();
         saga.ClearUndispatchedMessages();
@@ -110,7 +109,6 @@ public class SagaEventStoreRepository : ISagaRepository
     private async Task<IEventStream> PrepareStream(string bucketId, ISaga saga, Dictionary<string, object> headers)
     {
         var stream = await OpenStream(bucketId, saga.Id, saga.Version).ConfigureAwait(false);
-        //.CreateStream(bucketId, saga.Id).ConfigureAwait(false);
 
         foreach (var (key, value) in headers)
         {

@@ -43,10 +43,7 @@ public static class NEventstoreChassisExtensions
     private static ConflictDetector GetDetector<TConfiguration>(Chassis<TConfiguration> chassis)
         where TConfiguration : DeploymentConfiguration
     {
-        if (!chassis.Metadata.ContainsKey(ConflictDetectorKey))
-        {
-            chassis.Metadata[ConflictDetectorKey] = new ConflictDetector();
-        }
+        chassis.Metadata.TryAdd(ConflictDetectorKey, new ConflictDetector());
 
         return (ConflictDetector)chassis.Metadata[ConflictDetectorKey];
     }

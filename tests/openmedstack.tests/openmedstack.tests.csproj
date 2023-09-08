@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\openmedstack.autofac\openmedstack.autofac.csproj" />
         <ProjectReference Include="..\..\src\openmedstack\openmedstack.csproj" />
     </ItemGroup>
 

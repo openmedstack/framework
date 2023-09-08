@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
+using OpenMedStack.Autofac.Startup;
 using OpenMedStack.Commands;
-using OpenMedStack.Startup;
 using Xunit;
 
 public class CommandHandlerCreationValidatorTests

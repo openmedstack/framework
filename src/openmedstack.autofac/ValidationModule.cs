@@ -1,6 +1,7 @@
 namespace OpenMedStack.Autofac;
 
 using global::Autofac;
+using OpenMedStack.Autofac.Startup;
 using OpenMedStack.Startup;
 
 internal class ValidationModule : Module

@@ -1,4 +1,4 @@
-﻿namespace OpenMedStack.Startup;
+﻿namespace OpenMedStack.Autofac.Startup;
 
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Commands;
+using OpenMedStack.Startup;
 
 public class CommandHandlerCreationValidator : IValidateStartup
 {
