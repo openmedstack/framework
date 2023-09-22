@@ -37,8 +37,8 @@ public class InMemoryValidationTests
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
             chassis.Start();
-            await chassis.DisposeAsync().ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await chassis.DisposeAsync();
+        });
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class InMemoryValidationTests
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
             chassis.Start();
-            await chassis.DisposeAsync().ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await chassis.DisposeAsync();
+        });
     }
 }

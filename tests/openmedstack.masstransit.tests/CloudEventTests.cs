@@ -30,7 +30,7 @@ public class CloudEventTests
         chassis.Start();
         var publishTask = chassis.Publish(new TestEvent("test", 1, DateTimeOffset.UtcNow), tokenSource.Token);
         var handled = waitHandle.Wait(TimeSpan.FromSeconds(Debugger.IsAttached ? 300 : 3));
-        await publishTask.ConfigureAwait(false);
+        await publishTask;
 
         Assert.True(handled);
     }

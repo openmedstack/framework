@@ -5,7 +5,7 @@
         <Authors>OpenMedStack;Jacob Reimers</Authors>
         <Company>OpenMedStack</Company>
         <Product>OpenMedStack Framework</Product>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <Copyright>OpenMedStack © 2016 - 2023</Copyright>
         <RepositoryType>git</RepositoryType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>

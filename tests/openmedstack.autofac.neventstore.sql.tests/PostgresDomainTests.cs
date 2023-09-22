@@ -56,7 +56,7 @@ public class PostgresDomainTests : IAsyncLifetime
         _chassis.Start();
         using (_chassis.Subscribe(_ => waitHandle.Set()))
         {
-            var response = await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0)).ConfigureAwait(false);
+            var response = await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0));
 
             Assert.Null(response.FaultMessage);
 

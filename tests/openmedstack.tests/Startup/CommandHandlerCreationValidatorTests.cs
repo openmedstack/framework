@@ -18,7 +18,7 @@ public class CommandHandlerCreationValidatorTests
         var validator = new CommandHandlerCreationValidator(
             createFunc,
             new NullLogger<CommandHandlerCreationValidator>());
-        var result = await validator.Validate().ConfigureAwait(false);
+        var result = await validator.Validate();
 
         Assert.NotNull(result);
     }
@@ -29,7 +29,7 @@ public class CommandHandlerCreationValidatorTests
         var createFunc = new Func<IEnumerable<IHandleCommands>>(() => new[] { new TestCommandHandler() });
 
         var validator = new CommandHandlerCreationValidator(createFunc, NullLogger<CommandHandlerCreationValidator>.Instance);
-        var result = await validator.Validate().ConfigureAwait(false);
+        var result = await validator.Validate();
 
         Assert.Null(result);
     }

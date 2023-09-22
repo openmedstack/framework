@@ -18,7 +18,7 @@ public class EventHandlerCreationValidatorTests
         var validator = new EventHandlerCreationValidator(
             createFunc,
             NullLogger<EventHandlerCreationValidator>.Instance);
-        var result = await validator.Validate().ConfigureAwait(false);
+        var result = await validator.Validate();
 
         Assert.NotNull(result);
     }
@@ -31,7 +31,7 @@ public class EventHandlerCreationValidatorTests
         var validator = new EventHandlerCreationValidator(
             createFunc,
             NullLogger<EventHandlerCreationValidator>.Instance);
-        var result = await validator.Validate().ConfigureAwait(false);
+        var result = await validator.Validate();
 
         Assert.Null(result);
     }

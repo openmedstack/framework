@@ -21,7 +21,7 @@ public class CommandHandlerRoutingValidatorTests
             createFunc,
             NullLogger<CommandHandlerRoutingValidator>.Instance);
 
-        var error = await validator.Validate().ConfigureAwait(false);
+        var error = await validator.Validate();
 
         Assert.NotNull(error);
     }
@@ -42,7 +42,7 @@ public class CommandHandlerRoutingValidatorTests
             createFunc,
             NullLogger<CommandHandlerRoutingValidator>.Instance);
 
-        var error = await validator.Validate().ConfigureAwait(false);
+        var error = await validator.Validate();
 
         Assert.Null(error);
     }

@@ -74,7 +74,7 @@ public class InMemoryDomainTests
             _chassis.Start();
             using var s = _chassis.Subscribe(_ => waitHandle.Set());
             await _chassis.Send(new TestCommand(Guid.NewGuid().ToString(), 0), CancellationToken.None)
-                .ConfigureAwait(false);
+;
 
             var success = waitHandle.WaitOne(TimeSpan.FromSeconds(Debugger.IsAttached ? 5 : 50));
 
@@ -85,7 +85,7 @@ public class InMemoryDomainTests
         }
         finally
         {
-            await _chassis.DisposeAsync().ConfigureAwait(false);
+            await _chassis.DisposeAsync();
         }
     }
 
@@ -95,7 +95,7 @@ public class InMemoryDomainTests
         try
         {
             _chassis.Start();
-            await _chassis.DisposeAsync().ConfigureAwait(false);
+            await _chassis.DisposeAsync();
         }
         catch (OperationCanceledException)
         {
@@ -116,7 +116,7 @@ public class InMemoryDomainTests
             logger.LogInformation("test");
             logger.LogDebug("test");
             logger.LogTrace("test");
-            await _chassis.DisposeAsync().ConfigureAwait(false);
+            await _chassis.DisposeAsync();
         }
         catch (OperationCanceledException)
         {

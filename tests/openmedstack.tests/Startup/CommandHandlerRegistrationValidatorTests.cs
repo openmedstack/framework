@@ -31,7 +31,7 @@ public class CommandHandlerRegistrationValidatorTests
             createFunc,
             mock);
 
-        await validator.Validate().ConfigureAwait(false);
+        await validator.Validate();
 
         Assert.Equal(LogLevel.Error, mock.LevelCalled);
     }
@@ -52,7 +52,7 @@ public class CommandHandlerRegistrationValidatorTests
             createFunc,
             NSubstitute.Substitute.For<ILogger<CommandHandlerRegistrationValidator>>());
 
-        var error = await validator.Validate().ConfigureAwait(false);
+        var error = await validator.Validate();
 
         Assert.Null(error);
     }

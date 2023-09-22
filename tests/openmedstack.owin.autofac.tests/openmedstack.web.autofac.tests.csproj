@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <Import Project="..\..\shared.proj"/>
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <RootNamespace>OpenMedStack.Web.Autofac.Tests</RootNamespace>
         <LangVersion>latest</LangVersion>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
-    <Import Project="..\..\shared.proj" />
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
-        <PackageReference Include="xunit" Version="2.5.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23424-02" />
+        <PackageReference Include="xunit" Version="2.5.1" />
         <PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />
         <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>

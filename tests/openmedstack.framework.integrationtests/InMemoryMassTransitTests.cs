@@ -46,14 +46,14 @@ public class InMemoryMassTransitTests : IAsyncLifetime
         _chassis.Start();
         using (_chassis.Subscribe(_ => waitHandle.Set()))
         {
-            await _chassis.Publish(new TestEvent(), CancellationToken.None).ConfigureAwait(false);
+            await _chassis.Publish(new TestEvent(), CancellationToken.None);
 
             var success = waitHandle.WaitOne(TimeSpan.FromSeconds(5));
 
             Assert.True(success);
         }
 
-        await _chassis.DisposeAsync().ConfigureAwait(false);
+        await _chassis.DisposeAsync();
     }
 
     /// <inheritdoc />
