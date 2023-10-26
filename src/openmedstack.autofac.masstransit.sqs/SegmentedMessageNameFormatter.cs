@@ -15,9 +15,9 @@
         }
 
         /// <inheritdoc />
-        public MessageName GetMessageName(Type type) =>
+        public string GetMessageName(Type type) =>
             string.IsNullOrWhiteSpace(_segment)
                 ? _innerFormatter.GetMessageName(type)
-                : new MessageName($"{_segment}_{_innerFormatter.GetMessageName(type)}");
+                : $"{_segment}_{_innerFormatter.GetMessageName(type)}";
     }
 }
