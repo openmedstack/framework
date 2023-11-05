@@ -7,13 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace openmedstack.autofac.neventstore.dispatcher.polling
+namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling
 {
     using System;
     using OpenMedStack;
     using OpenMedStack.Autofac;
     using OpenMedStack.Autofac.NEventstore;
-    using OpenMedStack.Autofac.NEventstore.Modules;
     using OpenMedStack.Domain;
 
     public static class PollingChassisExtensions

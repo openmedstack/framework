@@ -1,9 +1,10 @@
-﻿namespace OpenMedStack.Autofac.NEventstore.Modules;
+﻿namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System;
 using global::Autofac;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OpenMedStack.Autofac.NEventstore.Domain;
+using OpenMedStack.Autofac.NEventstore.Modules;
 using OpenMedStack.Domain;
 using OpenMedStack.NEventStore.Abstractions;
 
@@ -29,7 +30,7 @@ internal class SeparatePollingClientModule : Module
                     ctx.Resolve<ICommandCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackCommandCheckpoints>(),
-                    ctx.Resolve<ILogger<AsyncPollingClient>>(),
+                    ctx.Resolve<NullLoggerFactory>(),
                     _pollingInterval))
             .AsImplementedInterfaces()
             .SingleInstance();
@@ -39,7 +40,7 @@ internal class SeparatePollingClientModule : Module
                     ctx.Resolve<IEventCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackEventCheckpoints>(),
-                    ctx.Resolve<ILogger<AsyncPollingClient>>(),
+                    ctx.Resolve<NullLoggerFactory>(),
                     _pollingInterval))
             .AsImplementedInterfaces()
             .SingleInstance();
@@ -49,7 +50,7 @@ internal class SeparatePollingClientModule : Module
                     ctx.Resolve<IReadModelCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackReadModelCheckpoints>(),
-                    ctx.Resolve<ILogger<AsyncPollingClient>>(),
+                    ctx.Resolve<NullLoggerFactory>(),
                     _pollingInterval))
             .AsImplementedInterfaces()
             .SingleInstance();

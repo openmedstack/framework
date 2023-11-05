@@ -1,4 +1,4 @@
-namespace OpenMedStack.Autofac.NEventstore.Modules;
+namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System;
 using System.Threading;
@@ -14,7 +14,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
     private readonly ICommitDispatcher _dispatcher;
     private readonly IProvideTenant _tenantProvider;
     private readonly TCheckpointTracker _checkpointTracker;
-    private readonly ILogger<AsyncPollingClient> _logger;
+    private readonly ILogger<PollingClientSetup<TCheckpointTracker, TCommitDispatcher>> _logger;
     private readonly AsyncPollingClient _pollingClient2;
     private int _errorCount;
 
@@ -23,17 +23,17 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
         TCommitDispatcher dispatcher,
         IProvideTenant tenantProvider,
         TCheckpointTracker checkpointTracker,
-        ILogger<AsyncPollingClient> logger,
+        ILoggerFactory loggerFactory,
         TimeSpan pollingInterval = default)
     {
         _dispatcher = dispatcher;
         _tenantProvider = tenantProvider;
         _checkpointTracker = checkpointTracker;
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<PollingClientSetup<TCheckpointTracker, TCommitDispatcher>>();
         _pollingClient2 = new AsyncPollingClient(
             persistence,
             HandleCommit,
-            logger,
+            loggerFactory.CreateLogger<AsyncPollingClient>(),
             pollingInterval == default ? TimeSpan.FromMilliseconds(500) : pollingInterval);
     }
 
@@ -52,7 +52,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
     {
         _pollingClient2.Stop();
         _pollingClient2.Dispose();
-        _dispatcher?.Dispose();
+        _dispatcher.Dispose();
         return Task.CompletedTask;
     }
 
@@ -67,7 +67,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
         catch (Exception ex)
         {
             _errorCount++;
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "{Error}", ex.Message);
             return _errorCount > 3 ? HandlingResult.Stop : HandlingResult.Retry;
         }
     }

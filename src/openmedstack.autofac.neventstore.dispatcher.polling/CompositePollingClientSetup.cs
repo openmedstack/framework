@@ -1,4 +1,4 @@
-namespace OpenMedStack.Autofac.NEventstore.Modules;
+namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Autofac.NEventstore.Domain;
+using OpenMedStack.Autofac.NEventstore.Modules;
 using OpenMedStack.Domain;
 using OpenMedStack.NEventStore.Abstractions;
 

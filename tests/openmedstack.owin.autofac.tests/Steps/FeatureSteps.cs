@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using OpenMedStack.Autofac;
 using OpenMedStack.Autofac.MassTransit;
 using OpenMedStack.Autofac.NEventstore;
-using openmedstack.autofac.neventstore.dispatcher.polling;
+using OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 using OpenMedStack.Autofac.NEventstore.InMemory;
 using OpenMedStack.Web.Testing;
 using TechTalk.SpecFlow;

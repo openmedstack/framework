@@ -1,4 +1,4 @@
-namespace OpenMedStack.Autofac.NEventstore.Modules;
+namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System;
 using System.Collections.Generic;

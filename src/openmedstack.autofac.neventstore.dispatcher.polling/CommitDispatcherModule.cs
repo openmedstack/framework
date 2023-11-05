@@ -1,10 +1,11 @@
-﻿namespace OpenMedStack.Autofac.NEventstore.Modules;
+﻿namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using global::Autofac;
 using OpenMedStack.Autofac.NEventstore.Domain;
+using OpenMedStack.Autofac.NEventstore.Modules;
 using OpenMedStack.Domain;
 using OpenMedStack.ReadModels;
 using Module = global::Autofac.Module;
