@@ -51,7 +51,7 @@ public abstract class SagaEventHandlerBase<TSaga, TBaseEvent> : IHandleEvents<TB
             return;
         }
 
-        var saga = await _sagaRepository.GetById<TSaga>(newMessage.CorrelationId).ConfigureAwait(false);
+        var saga = await _sagaRepository.GetById<TSaga>(newMessage.CorrelationId, cancellationToken).ConfigureAwait(false);
 
         _logger.LogDebug("Transitioning with {eventName}", typeof(TBaseEvent).Name);
         saga.Transition(newMessage);

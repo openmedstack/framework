@@ -58,18 +58,18 @@ public class EventStoreModule : global::Autofac.Module
         builder.Register(
                 c => new DefaultEventStoreRepository(
                     c.Resolve<IProvideTenant>(),
-                    c.Resolve<IStoreEvents>(),
+                    c.Resolve<ICommitEvents>(),
+                    c.Resolve<IAccessSnapshots>(),
                     c.Resolve<IConstructAggregates>(),
-                    c.Resolve<IDetectConflicts>(),
-                    c.Resolve<ILogger<DefaultEventStoreRepository>>()))
+                    c.Resolve<ILoggerFactory>()))
             .As<IRepository>()
             .SingleInstance();
         builder.Register(
                 c => new SagaEventStoreRepository(
                     c.Resolve<IProvideTenant>(),
-                    c.Resolve<IStoreEvents>(),
+                    c.Resolve<ICommitEvents>(),
                     c.Resolve<IConstructSagas>(),
-                    c.Resolve<ILogger<SagaEventStoreRepository>>()))
+                    c.Resolve<ILoggerFactory>()))
             .As<ISagaRepository>()
             .SingleInstance();
     }

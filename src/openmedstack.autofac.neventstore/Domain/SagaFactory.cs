@@ -12,6 +12,8 @@ using OpenMedStack.Domain;
 
 namespace OpenMedStack.Autofac.NEventstore.Domain;
 
+using OpenMedStack.NEventStore.Abstractions;
+
 /// <summary>
 /// Defines the factory for constructing sagas.
 /// </summary>
@@ -29,6 +31,9 @@ internal class SagaFactory : IConstructSagas
     }
 
     /// <inheritdoc />
-    public TSaga Build<TSaga>(string id) where TSaga : ISaga =>
-        (TSaga)_lifetimeScope.Resolve(typeof(TSaga), new NamedParameter("id", id));
+    public TSaga Build<TSaga>(string id, IEventStream stream) where TSaga : ISaga =>
+        (TSaga)_lifetimeScope.Resolve(
+            typeof(TSaga),
+            new NamedParameter("id", id),
+            new NamedParameter("stream", stream));
 }

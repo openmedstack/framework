@@ -11,12 +11,9 @@ namespace OpenMedStack.Autofac.NEventstore.Sql;
 
 using System.Data.Common;
 using global::Autofac;
-using global::NEventStore;
 using Microsoft.Extensions.Logging;
-using OpenMedStack.NEventStore;
 using OpenMedStack.NEventStore.Abstractions;
 using OpenMedStack.NEventStore.Persistence.Sql;
-using OpenMedStack.NEventStore.Serialization;
 
 public sealed class SqlEventStoreModule<TDialect> : Module
     where TDialect : ISqlDialect
@@ -34,13 +31,17 @@ public sealed class SqlEventStoreModule<TDialect> : Module
     {
         builder.RegisterType<TDialect>().As<ISqlDialect>().SingleInstance();
         builder.Register(
-                ctx => Wireup.Init(ctx.Resolve<ILoggerFactory>())
-                    .UsingSqlPersistence(_dbProviderFactory, _connectionString)
-                    .WithDialect(ctx.Resolve<ISqlDialect>())
-                    .UsingJsonSerialization()
-                    .Build())
-            .As<IStoreEvents>()
+                ctx => new SqlPersistenceEngine(
+                    new NetStandardConnectionFactory(
+                        _dbProviderFactory,
+                        _connectionString,
+                        ctx.Resolve<ILogger<NetStandardConnectionFactory>>()),
+                    ctx.Resolve<ISqlDialect>(),
+                    ctx.Resolve<ISerialize>(),
+                    1000,
+                    ctx.Resolve<IStreamIdHasher>(),
+                    ctx.Resolve<ILogger<SqlPersistenceEngine>>()))
+            .AsImplementedInterfaces()
             .SingleInstance();
-        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>().SingleInstance();
     }
 }

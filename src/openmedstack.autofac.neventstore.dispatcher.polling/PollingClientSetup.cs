@@ -19,7 +19,7 @@ internal class PollingClientSetup<TCheckpointTracker, TCommitDispatcher> : IBoot
     private int _errorCount;
 
     public PollingClientSetup(
-        IPersistStreams persistence,
+        IManagePersistence persistence,
         TCommitDispatcher dispatcher,
         IProvideTenant tenantProvider,
         TCheckpointTracker checkpointTracker,

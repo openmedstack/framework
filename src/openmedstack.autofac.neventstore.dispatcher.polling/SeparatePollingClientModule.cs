@@ -26,7 +26,7 @@ internal class SeparatePollingClientModule : Module
     {
         builder.Register(
                 ctx => new PollingClientSetup<ITrackCommandCheckpoints, ICommandCommitDispatcher>(
-                    ctx.Resolve<IPersistStreams>(),
+                    ctx.Resolve<IManagePersistence>(),
                     ctx.Resolve<ICommandCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackCommandCheckpoints>(),
@@ -36,7 +36,7 @@ internal class SeparatePollingClientModule : Module
             .SingleInstance();
         builder.Register(
                 ctx => new PollingClientSetup<ITrackEventCheckpoints, IEventCommitDispatcher>(
-                    ctx.Resolve<IPersistStreams>(),
+                    ctx.Resolve<IManagePersistence>(),
                     ctx.Resolve<IEventCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackEventCheckpoints>(),
@@ -46,7 +46,7 @@ internal class SeparatePollingClientModule : Module
             .SingleInstance();
         builder.Register(
                 ctx => new PollingClientSetup<ITrackReadModelCheckpoints, IReadModelCommitDispatcher>(
-                    ctx.Resolve<IPersistStreams>(),
+                    ctx.Resolve<IManagePersistence>(),
                     ctx.Resolve<IReadModelCommitDispatcher>(),
                     ctx.Resolve<IProvideTenant>(),
                     ctx.Resolve<ITrackReadModelCheckpoints>(),

@@ -26,9 +26,9 @@ internal class CompositePollingClientModule : Module
     {
         builder.Register(
                 ctx => new CompositePollingClientSetup(
-                    ctx.Resolve<IPersistStreams>(),
+                    ctx.Resolve<IManagePersistence>(),
                     ctx.Resolve<IProvideTenant>(),
-                    ctx.Resolve<ILogger<AsyncPollingClient>>(),
+                    ctx.Resolve<ILoggerFactory>(),
                     _pollingInterval,
                     (ctx.Resolve<ITrackCommandCheckpoints>(), ctx.Resolve<ICommandCommitDispatcher>()),
                     (ctx.Resolve<ITrackEventCheckpoints>(), ctx.Resolve<IEventCommitDispatcher>()),

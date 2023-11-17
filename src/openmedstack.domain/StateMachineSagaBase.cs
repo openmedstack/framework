@@ -1,10 +1,10 @@
 namespace OpenMedStack.Domain;
 
 using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
+using OpenMedStack.NEventStore.Abstractions;
 using Stateless;
 
 /// <summary>
@@ -14,27 +14,28 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
 {
     private readonly ILogger _logger;
     private readonly StateMachineRouter<TState, TTrigger> _eventRouter;
-    private readonly ICollection<BaseEvent> _uncommitted = new LinkedList<BaseEvent>();
-    private readonly ICollection<DomainCommand> _undispatched = new LinkedList<DomainCommand>();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SagaBase"/> class.
     /// </summary>
     /// <param name="id">The saga id.</param>
+    /// <param name="stream">The event stream for the saga.</param>
     /// <param name="initialState">The initial state of the state machine</param>
     /// <param name="typeCache">The <see cref="StateMachineTypeCache{TState,TTrigger}"/> to improve reflection performance.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     protected StateMachineSagaBase(
         string id,
+        IEventStream stream,
         TState initialState,
         StateMachineTypeCache<TState, TTrigger> typeCache,
         ILoggerFactory loggerFactory)
     {
+        Stream = stream;
         _logger = loggerFactory.CreateLogger(GetType());
         var stateMachine = new StateMachine<TState, TTrigger>(initialState);
         stateMachine.OnTransitionCompleted(
             transition => _logger.LogInformation(
-                "Transitioned from {source} to {destination} with trigger {trigger}",
+                "Transitioned from {Source} to {Destination} with trigger {Trigger}",
                 transition.Source,
                 transition.Destination,
                 transition.Trigger));
@@ -55,14 +56,16 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
     public int Version { get; private set; }
 
     /// <inheritdoc />
+    public IEventStream Stream { get; }
+
+    /// <inheritdoc />
     public virtual bool Equals(ISaga? other) => other?.Id == Id;
 
     /// <inheritdoc />
     public virtual void Transition(BaseEvent message)
     {
         _eventRouter.Dispatch(message);
-
-        _uncommitted.Add(message);
+        Stream.Add(new EventMessage(message));
         ++Version;
     }
 
@@ -70,27 +73,13 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
 
     protected abstract TTrigger GetTrigger(object message);
 
-    IEnumerable<BaseEvent> ISaga.GetUncommittedEvents() => _uncommitted;
-
-    void ISaga.ClearUncommittedEvents()
-    {
-        _uncommitted.Clear();
-    }
-
-    IEnumerable<DomainCommand> ISaga.GetUndispatchedMessages() => _undispatched;
-
-    void ISaga.ClearUndispatchedMessages()
-    {
-        _undispatched.Clear();
-    }
-
     /// <summary>
     /// Dispatches the <see cref="DomainCommand"/>.
     /// </summary>
     /// <param name="message"></param>
     protected void Dispatch(DomainCommand message)
     {
-        _undispatched.Add(message);
+        Stream.Add($"UndispatchedMessage.{Stream.UncommittedHeaders.Count}", message);
     }
 
     /// <inheritdoc />

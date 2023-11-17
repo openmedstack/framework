@@ -7,9 +7,9 @@ using OpenMedStack.NEventStore.Abstractions;
 
 internal class DbFixture : IBootstrapSystem
 {
-    private readonly IPersistStreams _persistence;
+    private readonly IManagePersistence _persistence;
 
-    public DbFixture(IPersistStreams persistence)
+    public DbFixture(IManagePersistence persistence)
     {
         _persistence = persistence;
     }

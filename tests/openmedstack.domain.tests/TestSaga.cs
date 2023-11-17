@@ -6,15 +6,18 @@
 //   Defines the Blob type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace OpenMedStack.Domain.Tests;
 
 using System;
+using OpenMedStack.NEventStore.Abstractions;
+using OpenMedStack.NEventStore.Abstractions.Persistence;
 
 internal class TestSaga : SagaBase
 {
     /// <inheritdoc />
-    public TestSaga(string id)
-        : base(id)
+    public TestSaga(string id, IEventStream stream)
+        : base(id, stream)
     {
     }
 

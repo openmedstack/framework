@@ -37,7 +37,7 @@ public class FeatureSteps : IAsyncDisposable
             .DefinedIn(GetType().Assembly)
             .AddAutofacModules((c, _) => new TestModule(c))
             .UsingNEventStore()
-            .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.25))
+            .UsingInMemoryEventDispatcher(TimeSpan.FromSeconds(0.1))
             .UsingInMemoryEventStore()
             .UsingInMemoryMassTransit()
             .Build();
@@ -128,7 +128,7 @@ public class FeatureSteps : IAsyncDisposable
     [Then(@"has uncommitted events")]
     public void ThenHasUncommittedEvents()
     {
-        Assert.NotEmpty(_saga.GetUncommittedEvents());
+        Assert.NotEmpty(_saga.Stream.UncommittedEvents);
     }
 
     [Then(@"event is handled")]

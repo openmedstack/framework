@@ -7,31 +7,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Domain;
-using NEventStore;
 using OpenMedStack.Events;
 using OpenMedStack.NEventStore.Abstractions;
 
 internal sealed class DefaultEventStoreRepository : IRepository
 {
     private const string AggregateTypeHeader = "AggregateType";
-    private readonly IDetectConflicts _conflictDetector;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<DefaultEventStoreRepository> _logger;
     private readonly IProvideTenant _tenantId;
-    private readonly IStoreEvents _eventStore;
+    private readonly ICommitEvents _eventStore;
+    private readonly IAccessSnapshots _snapshots;
     private readonly IConstructAggregates _factory;
 
     public DefaultEventStoreRepository(
         IProvideTenant tenantId,
-        IStoreEvents eventStore,
+        ICommitEvents eventStore,
+        IAccessSnapshots snapshots,
         IConstructAggregates factory,
-        IDetectConflicts conflictDetector,
-        ILogger<DefaultEventStoreRepository> logger)
+        ILoggerFactory logger)
     {
         _tenantId = tenantId;
         _eventStore = eventStore;
+        _snapshots = snapshots;
         _factory = factory;
-        _conflictDetector = conflictDetector;
-        _logger = logger;
+        _loggerFactory = logger;
+        _logger = _loggerFactory.CreateLogger<DefaultEventStoreRepository>();
     }
 
     public Task<TAggregate> GetById<TAggregate>(string id, CancellationToken cancellationToken)
@@ -49,7 +50,7 @@ internal sealed class DefaultEventStoreRepository : IRepository
         ApplyEventsToAggregate(version, stream, aggregate);
 
         _logger.LogDebug(
-            "Loaded aggregate of type {typeName} with id {id} at version {version}",
+            "Loaded aggregate of type {TypeName} with id {Id} at version {Version}",
             typeof(TAggregate).Name,
             id,
             aggregate.Version);
@@ -68,43 +69,14 @@ internal sealed class DefaultEventStoreRepository : IRepository
         var bucketId = _tenantId.GetTenantName();
         var stream = await PrepareStream(bucketId, aggregate, headers, cancellationToken)
             .ConfigureAwait(false);
-        var count = stream.CommittedEvents.Count;
-        try
-        {
-            await stream.CommitChanges(commitId, cancellationToken).ConfigureAwait(false);
-            aggregate.ClearUncommittedEvents();
+        await _eventStore.Commit(stream, commitId, cancellationToken).ConfigureAwait(false);
+        aggregate.ClearUncommittedEvents();
 
-            _logger.LogDebug(
-                "Saved aggregate of type {type} with id {id} at version {version}",
-                aggregate.GetType(),
-                aggregate.Id,
-                aggregate.Version);
-        }
-        catch (DuplicateCommitException ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            await stream.ClearChanges().ConfigureAwait(false);
-        }
-        catch (ConcurrencyException ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            var flag = ThrowOnConflict(stream, count);
-            await stream.ClearChanges().ConfigureAwait(false);
-            if (flag)
-            {
-                throw new ConflictingCommandException(ex.Message, ex);
-            }
-        }
-        catch (StorageException ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            throw new PersistenceException(ex.Message, ex);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            throw;
-        }
+        _logger.LogDebug(
+            "Saved aggregate of type {Type} with id {Id} at version {Version}",
+            aggregate.GetType(),
+            aggregate.Id,
+            aggregate.Version);
     }
 
     private static void ApplyEventsToAggregate(int versionToLoad, IEventStream stream, IAggregate aggregate)
@@ -131,7 +103,7 @@ internal sealed class DefaultEventStoreRepository : IRepository
         string id,
         int version,
         CancellationToken cancellationToken) =>
-        _eventStore.Advanced.GetSnapshot(bucketId, id, version, cancellationToken);
+        _snapshots.GetSnapshot(bucketId, id, version, cancellationToken);
 
     private async Task<IEventStream> OpenStream(
         string bucketId,
@@ -141,8 +113,21 @@ internal sealed class DefaultEventStoreRepository : IRepository
         CancellationToken cancellationToken)
     {
         var eventStream = snapshot == null
-            ? _eventStore.OpenStream(bucketId, id, 0, version, cancellationToken)
-            : _eventStore.OpenStream(snapshot, version, cancellationToken);
+            ? OptimisticEventStream.Create(
+                bucketId,
+                id,
+                _eventStore,
+                0,
+                version,
+                _loggerFactory.CreateLogger<OptimisticEventStream>(),
+                cancellationToken)
+            : OptimisticEventStream.Create(
+                snapshot,
+                _eventStore,
+                version,
+                _loggerFactory.CreateLogger<OptimisticEventStream>(),
+                cancellationToken);
+
         return await eventStream.ConfigureAwait(false);
     }
 
@@ -157,7 +142,7 @@ internal sealed class DefaultEventStoreRepository : IRepository
 
         foreach (var (key, value) in headers)
         {
-            stream.UncommittedHeaders[key] = value;
+            stream.Add(key, value);
         }
 
         foreach (var uncommittedEvent in aggregate.GetUncommittedEvents().ToArray())
@@ -178,11 +163,11 @@ internal sealed class DefaultEventStoreRepository : IRepository
         return dictionary;
     }
 
-    private bool ThrowOnConflict(IEventStream stream, int skip)
-    {
-        var committedEvents = stream.CommittedEvents.Skip(skip).Select(x => x.Body).OfType<BaseEvent>();
-        return _conflictDetector.ConflictsWith(
-            stream.UncommittedEvents.Select(x => x.Body).OfType<BaseEvent>(),
-            committedEvents);
-    }
+//    private bool ThrowOnConflict(IEventStream stream, int skip)
+//    {
+//        var committedEvents = stream.CommittedEvents.Skip(skip).Select(x => x.Body).OfType<BaseEvent>();
+//        return _conflictDetector.ConflictsWith(
+//            stream.UncommittedEvents.Select(x => x.Body).OfType<BaseEvent>(),
+//            committedEvents);
+//    }
 }

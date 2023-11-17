@@ -11,21 +11,15 @@ namespace OpenMedStack.Autofac.NEventstore.InMemory;
 
 using global::Autofac;
 using Microsoft.Extensions.Logging;
-using OpenMedStack.NEventStore;
-using OpenMedStack.NEventStore.Abstractions;
-using OpenMedStack.NEventStore.Serialization;
+using OpenMedStack.NEventStore.Persistence.InMemory;
 
 public class InMemoryEventStoreModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
         builder.Register(
-                ctx => Wireup.Init(ctx.Resolve<ILoggerFactory>())
-                    .UsingInMemoryPersistence()
-                    .UsingJsonSerialization()
-                    .Build())
-            .As<IStoreEvents>()
+                ctx => new InMemoryPersistenceEngine(ctx.Resolve<ILogger<InMemoryPersistenceEngine>>()))
+            .AsImplementedInterfaces()
             .SingleInstance();
-        builder.Register(ctx => ctx.Resolve<IStoreEvents>().Advanced).As<IPersistStreams>().SingleInstance();
     }
 }

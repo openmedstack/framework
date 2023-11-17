@@ -13,26 +13,32 @@ using OpenMedStack.NEventStore.Abstractions;
 public class SagaEventStoreRepository : ISagaRepository
 {
     private readonly IProvideTenant _tenantProvider;
-    private readonly IStoreEvents _eventStore;
+    private readonly ICommitEvents _eventStore;
     private readonly IConstructSagas _factory;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<SagaEventStoreRepository> _logger;
 
     public SagaEventStoreRepository(
         IProvideTenant tenantProvider,
-        IStoreEvents eventStore,
+        ICommitEvents eventStore,
         IConstructSagas factory,
-        ILogger<SagaEventStoreRepository> logger)
+        ILoggerFactory loggerFactory)
     {
         _tenantProvider = tenantProvider;
         _eventStore = eventStore;
         _factory = factory;
-        _logger = logger;
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<SagaEventStoreRepository>();
     }
 
     public async Task<TSaga> GetById<TSaga>(string sagaId, CancellationToken cancellationToken = default)
         where TSaga : ISaga
     {
-        var eventStream = await OpenStream(_tenantProvider.GetTenantName(), sagaId).ConfigureAwait(false);
+        var eventStream = await OpenStream(
+                _tenantProvider.GetTenantName(),
+                sagaId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
         return BuildSaga<TSaga>(sagaId, eventStream);
     }
 
@@ -46,12 +52,7 @@ public class SagaEventStoreRepository : ISagaRepository
             throw new ArgumentNullException(nameof(saga), "Saga cannot be null");
         }
 
-        var commitId = Guid.NewGuid();
-        var headers = PrepareHeaders(saga, updateHeaders);
-        var eventStream = await PrepareStream(_tenantProvider.GetTenantName(), saga, headers).ConfigureAwait(false);
-        await Persist(eventStream, commitId, cancellationToken).ConfigureAwait(false);
-        saga.ClearUncommittedEvents();
-        saga.ClearUndispatchedMessages();
+        await Persist(saga.Stream, Guid.NewGuid(), cancellationToken).ConfigureAwait(false);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -67,12 +68,19 @@ public class SagaEventStoreRepository : ISagaRepository
         IEventStream eventStream;
         try
         {
-            eventStream = await _eventStore.OpenStream(bucketId, sagaId, 0, maxVersion, cancellationToken)
+            eventStream = await OptimisticEventStream.Create(
+                    bucketId,
+                    sagaId,
+                    _eventStore,
+                    0,
+                    maxVersion,
+                    _loggerFactory.CreateLogger<OptimisticEventStream>(),
+                    cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (StreamNotFoundException)
         {
-            eventStream = await _eventStore.CreateStream(bucketId, sagaId).ConfigureAwait(false);
+            eventStream = OptimisticEventStream.Create(bucketId, sagaId);
         }
 
         return eventStream;
@@ -80,64 +88,21 @@ public class SagaEventStoreRepository : ISagaRepository
 
     private TSaga BuildSaga<TSaga>(string sagaId, IEventStream stream) where TSaga : ISaga
     {
-        var saga = _factory.Build<TSaga>(sagaId);
+        var saga = _factory.Build<TSaga>(sagaId, stream);
         foreach (var message in stream.CommittedEvents.Select(x => x.Body).OfType<BaseEvent>().ToArray())
         {
             saga.Transition(message);
         }
 
-        saga.ClearUncommittedEvents();
-        saga.ClearUndispatchedMessages();
         return saga;
-    }
-
-    private static Dictionary<string, object> PrepareHeaders(
-        ISaga saga,
-        Action<IDictionary<string, object>>? updateHeaders)
-    {
-        var dictionary = new Dictionary<string, object> { ["SagaType"] = saga.GetType().FullName! };
-        updateHeaders?.Invoke(dictionary);
-        var num = 0;
-        foreach (var undispatchedMessage in saga.GetUndispatchedMessages())
-        {
-            dictionary["UndispatchedMessage." + num++] = undispatchedMessage;
-        }
-
-        return dictionary;
-    }
-
-    private async Task<IEventStream> PrepareStream(string bucketId, ISaga saga, Dictionary<string, object> headers)
-    {
-        var stream = await OpenStream(bucketId, saga.Id, saga.Version).ConfigureAwait(false);
-
-        foreach (var (key, value) in headers)
-        {
-            stream.UncommittedHeaders[key] = value;
-        }
-
-        foreach (var msg in saga.GetUncommittedEvents().Select(x => new EventMessage(x)))
-        {
-            stream.Add(msg);
-        }
-
-        return stream;
     }
 
     private async Task Persist(IEventStream stream, Guid commitId, CancellationToken cancellationToken)
     {
-        try
+        var commit = await _eventStore.Commit(stream, commitId, cancellationToken).ConfigureAwait(false);
+        if (commit != null)
         {
-            await stream.CommitChanges(commitId, cancellationToken).ConfigureAwait(false);
-        }
-        catch (DuplicateCommitException ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            await stream.ClearChanges().ConfigureAwait(false);
-        }
-        catch (StorageException ex)
-        {
-            _logger.LogError(ex, "{message}", ex.Message);
-            throw new PersistenceException(ex.Message, ex);
+            stream.SetPersisted(commit.CommitSequence);
         }
     }
 }

@@ -3,6 +3,7 @@ namespace OpenMedStack.Domain;
 using System.Collections.Generic;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
+using OpenMedStack.NEventStore.Abstractions;
 
 /// <summary>
 /// Defines the saga interface.
@@ -20,30 +21,13 @@ public interface ISaga
     int Version { get; }
 
     /// <summary>
+    /// Gets the event stream for the saga
+    /// </summary>
+    IEventStream Stream { get; }
+
+    /// <summary>
     /// Transitions the saga to the next state based on the passed <see cref="BaseEvent"/>.
     /// </summary>
-    /// <param name="message"></param>
+    /// <param name="message">The <see cref="BaseEvent"/> to handle.</param>
     void Transition(BaseEvent message);
-
-    /// <summary>
-    /// Gets the uncommitted events.
-    /// </summary>
-    /// <returns>The uncommitted events as an <see cref="IEnumerable{T}"/></returns>
-    IEnumerable<BaseEvent> GetUncommittedEvents();
-
-    /// <summary>
-    /// Clears the uncommitted events.
-    /// </summary>
-    void ClearUncommittedEvents();
-
-    /// <summary>
-    /// Gets the undispatched messages.
-    /// </summary>
-    /// <returns>The uncommitted messages as an <see cref="IEnumerable{T}"/></returns>
-    IEnumerable<DomainCommand> GetUndispatchedMessages();
-
-    /// <summary>
-    /// Clears the undispatched messages.
-    /// </summary>
-    void ClearUndispatchedMessages();
 }

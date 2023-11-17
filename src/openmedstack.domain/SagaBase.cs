@@ -10,9 +10,9 @@
 namespace OpenMedStack.Domain;
 
 using System;
-using System.Collections.Generic;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
+using OpenMedStack.NEventStore.Abstractions;
 
 /// <summary>
 /// Defines the abstract base class for sagas.
@@ -20,16 +20,16 @@ using OpenMedStack.Events;
 public abstract class SagaBase : ISaga, IEquatable<ISaga>
 {
     private readonly IDispatchEvents _eventRouter;
-    private readonly ICollection<BaseEvent> _uncommitted = new LinkedList<BaseEvent>();
-    private readonly ICollection<DomainCommand> _undispatched = new LinkedList<DomainCommand>();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SagaBase"/> class.
     /// </summary>
     /// <param name="id">The saga id.</param>
+    /// <param name="stream">The event stream for the saga.</param>
     /// <param name="eventRouter">The event router. If <c>null</c> is provided, then uses a <see cref="ConventionEventRouter"/>.</param>
-    protected SagaBase(string id, IDispatchEvents? eventRouter = null)
+    protected SagaBase(string id, IEventStream stream, IDispatchEvents? eventRouter = null)
     {
+        Stream = stream;
         _eventRouter = eventRouter ?? new ConventionEventRouter(true, this);
         Id = id;
     }
@@ -41,6 +41,9 @@ public abstract class SagaBase : ISaga, IEquatable<ISaga>
     public int Version { get; private set; }
 
     /// <inheritdoc />
+    public IEventStream Stream { get; }
+
+    /// <inheritdoc />
     public virtual bool Equals(ISaga? other) => other?.Id == Id;
 
     /// <inheritdoc />
@@ -48,25 +51,8 @@ public abstract class SagaBase : ISaga, IEquatable<ISaga>
     {
         _eventRouter.Dispatch(message);
 
-        _uncommitted.Add(message);
+        Stream.Add(new EventMessage(message));
         ++Version;
-    }
-
-    /// <inheritdoc />
-    IEnumerable<BaseEvent> ISaga.GetUncommittedEvents() => _uncommitted;
-
-    /// <inheritdoc />
-    void ISaga.ClearUncommittedEvents()
-    {
-        _uncommitted.Clear();
-    }
-
-    /// <inheritdoc />
-    IEnumerable<DomainCommand> ISaga.GetUndispatchedMessages() => _undispatched;
-
-    void ISaga.ClearUndispatchedMessages()
-    {
-        _undispatched.Clear();
     }
 
     /// <summary>
@@ -75,7 +61,7 @@ public abstract class SagaBase : ISaga, IEquatable<ISaga>
     /// <param name="message"></param>
     protected void Dispatch(DomainCommand message)
     {
-        _undispatched.Add(message);
+        Stream.Add($"UndispatchedMessage.{Stream.UncommittedHeaders.Count}", message);
     }
 
     /// <inheritdoc />

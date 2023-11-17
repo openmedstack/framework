@@ -13,27 +13,27 @@ using OpenMedStack.NEventStore.Abstractions;
 internal class CompositePollingClientSetup : IBootstrapSystem
 {
     private readonly IProvideTenant _tenantProvider;
-    private readonly ILogger<AsyncPollingClient> _logger;
+    private readonly ILogger<CompositePollingClientSetup> _logger;
     private readonly AsyncPollingClient _pollingClient2;
     private readonly (ITrackCheckpoints checkpointTracker, ICommitDispatcher commitDispatcher)[] _dispatchers;
     private readonly CompositeCheckpointTracker _tracker;
     private byte _errorCount;
 
     public CompositePollingClientSetup(
-        IPersistStreams persistence,
+        IManagePersistence persistence,
         IProvideTenant tenantProvider,
-        ILogger<AsyncPollingClient> logger,
+        ILoggerFactory logger,
         TimeSpan pollingInterval = default,
         params (ITrackCheckpoints checkpointTracker, ICommitDispatcher commitDispatcher)[] dispatchers)
     {
         _tenantProvider = tenantProvider;
-        _logger = logger;
+        _logger = logger.CreateLogger<CompositePollingClientSetup>();
         _dispatchers = dispatchers;
         _tracker = new CompositeCheckpointTracker(dispatchers.Select(x => x.checkpointTracker).ToArray());
         _pollingClient2 = new AsyncPollingClient(
             persistence,
             HandleCommit,
-            logger,
+            logger.CreateLogger<AsyncPollingClient>(),
             pollingInterval == default ? TimeSpan.FromMilliseconds(500) : pollingInterval);
     }
 
@@ -57,7 +57,7 @@ internal class CompositePollingClientSetup : IBootstrapSystem
                 catch (Exception ex)
                 {
                     _errorCount++;
-                    _logger.LogError("{error}", ex.Message);
+                    _logger.LogError("{Error}", ex.Message);
                     return _errorCount >= 3
                         ? HandlingResult.Stop
                         : HandlingResult.Retry;

@@ -13,7 +13,7 @@ internal sealed class AsyncPollingClient : IDisposable
 {
     private readonly CancellationTokenSource _tokenSource = new();
     private readonly Func<ICommit, CancellationToken, Task<HandlingResult>> _commitCallback;
-    private readonly IPersistStreams _persistStreams;
+    private readonly IManagePersistence _persistStreams;
     private readonly ILogger<AsyncPollingClient> _logger;
     private readonly TimeSpan _waitInterval;
     private Task? _pollingThread;
@@ -23,7 +23,7 @@ internal sealed class AsyncPollingClient : IDisposable
     private bool _isDisposed;
 
     public AsyncPollingClient(
-        IPersistStreams persistStreams,
+        IManagePersistence persistStreams,
         Func<ICommit, CancellationToken, Task<HandlingResult>> callback,
         ILogger<AsyncPollingClient> logger,
         TimeSpan waitInterval = default)
