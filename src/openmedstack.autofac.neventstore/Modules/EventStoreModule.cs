@@ -10,6 +10,7 @@
 namespace OpenMedStack.Autofac.NEventstore.Modules;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -44,6 +45,10 @@ public class EventStoreModule : global::Autofac.Module
     }
 
     /// <inheritdoc />
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Assembly scanning is required for DI.")]
     protected override void Load(ContainerBuilder builder)
     {
         Contract.Assume(builder != null);

@@ -20,6 +20,8 @@
         <WarningsAsErrors/>
         <WarningsNotAsErrors>618;1701</WarningsNotAsErrors>
         <PackageReleaseNotes>Change target framework to net8.0.</PackageReleaseNotes>
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
     <ItemGroup>

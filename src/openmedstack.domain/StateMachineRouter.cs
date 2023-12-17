@@ -1,6 +1,7 @@
 namespace OpenMedStack.Domain;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Events;
 using Stateless;
@@ -10,7 +11,8 @@ using Stateless;
 /// </summary>
 /// <typeparam name="TState">The <see cref="Type"/> of states.</typeparam>
 /// <typeparam name="TTrigger">The <see cref="Type"/> of triggers.</typeparam>
-public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
+public class StateMachineRouter<
+    TState, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TTrigger> : IDispatchEvents
 {
     private readonly StateMachine<TState, TTrigger> _stateMachine;
     private readonly Func<object, TTrigger> _getTrigger;
@@ -43,6 +45,10 @@ public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
     }
 
     /// <inheritdoc />
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "<Pending>")]
     public void Dispatch(BaseEvent eventMessage)
     {
         var trigger = _getTrigger(eventMessage);
@@ -57,7 +63,7 @@ public class StateMachineRouter<TState, TTrigger> : IDispatchEvents
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{error}", ex.Message);
+                _logger.LogError(ex, "{Error}", ex.Message);
                 throw;
             }
         }

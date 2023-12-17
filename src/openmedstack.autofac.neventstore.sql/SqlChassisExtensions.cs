@@ -10,11 +10,15 @@
 namespace OpenMedStack.Autofac.NEventstore.Sql;
 
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using NEventStore.Persistence.Sql;
 
 public static class SqlChassisExtensions
 {
-    public static Chassis<TConfiguration> UsingSqlEventStore<TConfiguration, TDialect>(
+    public static Chassis<TConfiguration> UsingSqlEventStore<TConfiguration,
+                                                             [DynamicallyAccessedMembers(
+                                                                 DynamicallyAccessedMemberTypes.PublicConstructors)]
+                                                             TDialect>(
         this Chassis<TConfiguration> chassis,
         DbProviderFactory dbProviderFactory)
         where TConfiguration : DeploymentConfiguration

@@ -20,14 +20,15 @@ internal static class ConsumerExtensions
                 .Select(rs => rs.s.ServiceType)
                 .ToArray();
 
-        foreach (var consumerType in FindType(
-            ctx,
-            type => type.IsClass
-             && type.GetTypeInfo()
-                    .GetInterfaces()
-                    .Any(
-                        t => t.IsGenericType
-                         && typeof(IConsumer<>).IsAssignableFrom(t.GetGenericTypeDefinition()))))
+        bool Filter(Type type) =>
+            type.IsClass
+         && type.GetTypeInfo()
+                .GetInterfaces()
+                .Any(
+                    t => t.IsGenericType
+                     && typeof(IConsumer<>).IsAssignableFrom(t.GetGenericTypeDefinition()));
+
+        foreach (var consumerType in FindType(ctx, Filter))
         {
             e.Consumer(consumerType, t => ctx.Resolve(t));
         }

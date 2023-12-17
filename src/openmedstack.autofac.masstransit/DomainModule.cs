@@ -11,6 +11,7 @@ namespace OpenMedStack.Autofac.MassTransit;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -66,15 +67,20 @@ internal class DomainModule<TConfiguration> : Module
                 })
             .AsSelf()
             .IfNotRegistered(typeof(JsonSerializerSettings));
-        builder.RegisterType<ConfigurationTenantProvider>().As<IProvideTenant>().SingleInstance().IfNotRegistered(typeof(IProvideTenant));
+        builder.RegisterType<ConfigurationTenantProvider>()
+            .As<IProvideTenant>()
+            .SingleInstance()
+            .IfNotRegistered(typeof(IProvideTenant));
         builder.Register<IProvideTopic>(
                 ctx => new StaticTopicProvider(ctx.Resolve<IProvideTenant>(), _configuration.TopicMap))
             .SingleInstance();
         builder.RegisterType<EnvironmentTopicNameFormatter>().As<IEntityNameFormatter>().SingleInstance();
-        builder.RegisterGeneric(typeof(MassTransitCommandSubscriber<>)).As(typeof(ISubscribeCommands<>)).SingleInstance();
+        builder.RegisterGeneric(typeof(MassTransitCommandSubscriber<>))
+            .As(typeof(ISubscribeCommands<>))
+            .SingleInstance();
         builder.RegisterGeneric(typeof(MassTransitEventSubscriber<>)).As(typeof(ISubscribeEvents<>)).SingleInstance();
 
-        var assemblyTypes = _sourceAssemblies.SelectMany(a => a.GetTypes())
+        var assemblyTypes = _sourceAssemblies.SelectMany(TypeSelector)
             .Where(t => !t.IsAbstract)
             .ToArray();
 
@@ -86,31 +92,54 @@ internal class DomainModule<TConfiguration> : Module
 
         var commandConsumers =
             commandHandlers
-                .SelectMany(t => t.GetInterfaces())
+                .SelectMany(CollectionSelector)
                 .Where(
                     t => t.IsGenericType
                      && typeof(IHandleCommands<>).IsAssignableFrom(t.GetGenericTypeDefinition()))
                 .Select(t => t.GetGenericArguments()[0])
                 .Distinct()
-                .Select(t => typeof(CommandConsumer<>).MakeGenericType(t))
+                .Select(Selector)
                 .ToArray();
         builder.RegisterTypes(commandConsumers).AsSelf().AsImplementedInterfaces();
 
-        var messageHandlerTypes = _sourceAssemblies.SelectMany(a => a.GetTypes())
-            .Where(t => !t.IsAbstract && t.GetInterfaces().Any(IsBaseEventHandler))
+        var messageHandlerTypes = _sourceAssemblies.SelectMany(TypeSelector)
+            .Where(Predicate)
             .ToArray();
 
         builder.RegisterTypes(messageHandlerTypes).AsSelf().AsImplementedInterfaces();
 
         var eventHandlers = messageHandlerTypes
-            .SelectMany(t => t.GetInterfaces())
+            .SelectMany(CollectionSelector)
             .Where(IsBaseEventHandler)
             .Select(t => t.GetGenericArguments()[0])
             .Distinct()
-            .Select(t => typeof(BaseEventConsumer<>).MakeGenericType(t))
+            .Select(Func)
             .ToArray();
 
         builder.RegisterTypes(eventHandlers).AsSelf().AsImplementedInterfaces();
+        return;
+
+        [UnconditionalSuppressMessage(
+            "Trimming",
+            "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+            Justification = "<Pending>")]
+        IEnumerable<Type> TypeSelector(Assembly a) => a.GetTypes();
+
+        IEnumerable<Type> CollectionSelector(Type t) => t.GetInterfaces();
+
+        bool Predicate(Type t) => !t.IsAbstract && t.GetInterfaces().Any(IsBaseEventHandler);
+
+        [UnconditionalSuppressMessage(
+            "AOT",
+            "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "<Pending>")]
+        Type Func(Type t) => typeof(BaseEventConsumer<>).MakeGenericType(t);
+
+        [UnconditionalSuppressMessage(
+            "AOT",
+            "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "<Pending>")]
+        Type Selector(Type t) => typeof(CommandConsumer<>).MakeGenericType(t);
     }
 
     private static bool IsBaseEventHandler(Type t) =>

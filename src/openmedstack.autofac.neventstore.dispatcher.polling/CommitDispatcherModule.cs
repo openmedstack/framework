@@ -1,6 +1,7 @@
 ﻿namespace OpenMedStack.Autofac.NEventStore.Dispatcher.Polling;
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using global::Autofac;
@@ -10,7 +11,11 @@ using OpenMedStack.Domain;
 using OpenMedStack.ReadModels;
 using Module = global::Autofac.Module;
 
-internal class CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModelTracker, TConfiguration> : Module
+internal class CommitDispatcherModule<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEventTracker,
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TCommandTracker,
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TReadModelTracker,
+    TConfiguration> : Module
     where TEventTracker : ITrackEventCheckpoints
     where TCommandTracker : ITrackCommandCheckpoints
     where TReadModelTracker : ITrackReadModelCheckpoints
@@ -28,6 +33,10 @@ internal class CommitDispatcherModule<TEventTracker, TCommandTracker, TReadModel
     }
 
     /// <inheritdoc />
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Type parameter is required for DI.")]
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterAssemblyTypes(_assemblies)

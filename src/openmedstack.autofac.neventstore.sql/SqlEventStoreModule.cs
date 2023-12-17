@@ -10,12 +10,14 @@
 namespace OpenMedStack.Autofac.NEventstore.Sql;
 
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using global::Autofac;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.NEventStore.Abstractions;
 using OpenMedStack.NEventStore.Persistence.Sql;
 
-public sealed class SqlEventStoreModule<TDialect> : Module
+public sealed class SqlEventStoreModule<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDialect> : Module
     where TDialect : ISqlDialect
 {
     private readonly string _connectionString;

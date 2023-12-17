@@ -3,6 +3,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -23,13 +24,13 @@ public sealed class ReadModelUpdater : IReadModelUpdater
         _logger = logger;
         var updaters = readModelUpdaters.ToArray();
 
-        _logger.LogDebug("Read model updater created with {count} updaters.", updaters.Length);
+        _logger.LogDebug("Read model updater created with {Count} updaters", updaters.Length);
 
         var pairs = GroupUpdaters(updaters);
         _readModelUpdaters = new ConcurrentDictionary<Type, IEnumerable<object>>(pairs);
 
         _logger.LogDebug(
-            "Read model updaters defined for {names}",
+            "Read model updaters defined for {Names}",
             string.Join(Environment.NewLine, _readModelUpdaters.Keys.Select(x => x.Name)));
     }
 
@@ -49,10 +50,7 @@ public sealed class ReadModelUpdater : IReadModelUpdater
                                                             Constants.CommitSequence,
                                                             commit.CheckpointToken)))
                                             let method =
-                                                _updateMethods.GetOrAdd(
-                                                    bodyType,
-                                                    t => typeof(IUpdateReadModel<>).MakeGenericType(t)
-                                                        .GetMethod("Update")!)
+                                                _updateMethods.GetOrAdd(bodyType, ValueFactory)
                                             from updater in _readModelUpdaters.GetOrAdd(
                                                 bodyType,
                                                 _ => Array.Empty<IUpdateReadModel>())
@@ -62,7 +60,7 @@ public sealed class ReadModelUpdater : IReadModelUpdater
                                             select (Task)result).ToArray();
 
                 _logger.LogDebug(
-                    "Invoking {amount} read model updaters for commit {commitId}",
+                    "Invoking {Amount} read model updaters for commit {CommitId}",
                     updateReadModelTasks.Length,
                     commit.CommitId);
 
@@ -72,16 +70,24 @@ public sealed class ReadModelUpdater : IReadModelUpdater
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception.Message);
+            _logger.LogError("{Error}", exception.Message);
             return false;
         }
     }
+
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Generic method available")]
+    private MethodInfo ValueFactory(Type t) =>
+        typeof(IUpdateReadModel<>).MakeGenericType(t)
+            .GetMethod("Update")!;
 
     private Type GetBodyType(object body)
     {
         var type = body.GetType();
 
-        _logger.LogDebug("Event of type {type} raised", type);
+        _logger.LogDebug("Event of type {Type} raised", type);
 
         return type;
     }
@@ -101,7 +107,7 @@ public sealed class ReadModelUpdater : IReadModelUpdater
         foreach (var pair in groups)
         {
             _logger.LogDebug(
-                "{key} updates: {types}",
+                "{Key} updates: {Types}",
                 pair.Key.Name,
                 string.Join(Environment.NewLine, pair.Value.Select(x => x.GetType().Name)));
         }

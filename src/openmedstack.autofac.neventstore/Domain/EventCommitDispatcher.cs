@@ -3,6 +3,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -49,19 +50,22 @@ public class EventCommitDispatcher : IEventCommitDispatcher
                               let eventHeaders =
                                   new Dictionary<string, object>(evt.Headers) { [Constants.CommitSequence] = token }
                               let method =
-                                  _eventPublishMethods.GetOrAdd(
-                                      evt.Body.GetType(),
-                                      t => _eventBusPublishMethod.MakeGenericMethod(t))
-                              let result = method.Invoke(eventBus, new[] { evt.Body, eventHeaders, CancellationToken.None })
+                                  _eventPublishMethods.GetOrAdd(evt.Body.GetType(), ValueFactory)
+                              let result = method.Invoke(
+                                  eventBus,
+                                  new[] { evt.Body, eventHeaders, CancellationToken.None })
                               select (Task)result).ToArray();
 
-                _logger.LogInformation("Publishing {count} events for commit {commitId}", events.Length, commit.CommitId);
+                _logger.LogInformation(
+                    "Publishing {Count} events for commit {CommitId}",
+                    events.Length,
+                    commit.CommitId);
 
                 await Task.WhenAll(events).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, exception.Message);
+                _logger.LogError(exception, "{Error}", exception.Message);
                 return HandlingResult.Retry;
             }
         }
@@ -69,8 +73,15 @@ public class EventCommitDispatcher : IEventCommitDispatcher
         return HandlingResult.MoveToNext;
     }
 
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Generic method available")]
+    private MethodInfo ValueFactory(Type t) => _eventBusPublishMethod.MakeGenericMethod(t);
+
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         _isDisposed = true;
     }
 }

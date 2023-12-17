@@ -2,6 +2,7 @@ namespace OpenMedStack.Domain;
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Stateless;
@@ -24,13 +25,20 @@ public class StateMachineTypeCache<TState, TTrigger>
     /// <returns></returns>
     public object GetParameterInstance(Type messageType, TTrigger trigger)
     {
-        return _parameters.GetOrAdd(messageType, static (t, tr) =>
+        [UnconditionalSuppressMessage(
+            "AOT",
+            "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+            Justification = "<Pending>")]
+        static object ValueFactory(Type t, TTrigger tr)
         {
-            var typedInstance =
-                typeof(StateMachine<,>.TriggerWithParameters<>).MakeGenericType(typeof(TState), typeof(TTrigger),
-                    t);
+            var typedInstance = typeof(StateMachine<,>.TriggerWithParameters<>).MakeGenericType(
+                typeof(TState),
+                typeof(TTrigger),
+                t);
             return Activator.CreateInstance(typedInstance, tr)!;
-        }, trigger);
+        }
+
+        return _parameters.GetOrAdd(messageType, ValueFactory, trigger);
     }
 
     /// <summary>
@@ -38,23 +46,36 @@ public class StateMachineTypeCache<TState, TTrigger>
     /// </summary>
     /// <param name="messageType">The message type.</param>
     /// <returns>The fire <see cref="MethodInfo"/>.</returns>
-    public MethodInfo GetFireMethod(Type messageType)
+    [RequiresDynamicCode("Calls System.Reflection.MethodInfo.MakeGenericMethod(params Type[])")]
+    public MethodInfo GetFireMethod(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type messageType)
     {
-        return _fireMethods.GetOrAdd(messageType, static (t, smt) =>
+        [RequiresDynamicCode("Calls System.Reflection.MethodInfo.MakeGenericMethod(params Type[])")]
+        static MethodInfo ValueFactory(
+            Type t,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type smt)
         {
-            var genericFunc = smt.GetMethods().First(m =>
-            {
-                if (!m.IsGenericMethod || m.Name != "Fire")
-                {
-                    return false;
-                }
+            var genericFunc = smt.GetMethods()
+                .First(
+                    m =>
+                    {
+                        if (!m.IsGenericMethod || m.Name != "Fire")
+                        {
+                            return false;
+                        }
 
-                var parameterInfos = m.GetParameters();
-                return parameterInfos is
-                    [{ ParameterType.IsGenericType: true }, { ParameterType.IsGenericType: false }];
-            });
+                        var parameterInfos = m.GetParameters();
+                        return parameterInfos is
+                            [{ ParameterType.IsGenericType: true }, { ParameterType.IsGenericType: false }];
+                    });
 
             return genericFunc.MakeGenericMethod(t);
-        }, typeof(StateMachine<TState, TTrigger>));
+        }
+
+        return _fireMethods.GetOrAdd(
+            messageType,
+            ValueFactory,
+            typeof(StateMachine<TState, TTrigger>));
     }
 }

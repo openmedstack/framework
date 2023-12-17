@@ -1,6 +1,7 @@
 namespace OpenMedStack.Domain;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
@@ -10,9 +11,10 @@ using Stateless;
 /// <summary>
 /// Defines the abstract base class for sagas.
 /// </summary>
-public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable<ISaga>
+public abstract class StateMachineSagaBase<
+    TState, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TTrigger> : ISaga,
+                                                                                                      IEquatable<ISaga>
 {
-    private readonly ILogger _logger;
     private readonly StateMachineRouter<TState, TTrigger> _eventRouter;
 
     /// <summary>
@@ -31,10 +33,10 @@ public abstract class StateMachineSagaBase<TState, TTrigger> : ISaga, IEquatable
         ILoggerFactory loggerFactory)
     {
         Stream = stream;
-        _logger = loggerFactory.CreateLogger(GetType());
+        var logger = loggerFactory.CreateLogger(GetType());
         var stateMachine = new StateMachine<TState, TTrigger>(initialState);
         stateMachine.OnTransitionCompleted(
-            transition => _logger.LogInformation(
+            transition => logger.LogInformation(
                 "Transitioned from {Source} to {Destination} with trigger {Trigger}",
                 transition.Source,
                 transition.Destination,

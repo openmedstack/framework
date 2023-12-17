@@ -2,6 +2,7 @@ namespace OpenMedStack.Autofac;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using global::Autofac;
@@ -18,6 +19,7 @@ internal class EventSubscriberValidator : IValidateStartup
     }
 
     /// <inheritdoc />
+    [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     public Task<Exception?> Validate()
     {
         var exceptions = new List<Exception>();

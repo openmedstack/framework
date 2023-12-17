@@ -2,6 +2,7 @@ namespace OpenMedStack.Autofac.NEventstore.Domain;
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -74,15 +75,16 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
         var commandTasks = (from cmd in commands
                             let command = cmd.Value
                             let method =
-                                _commandSendMethods.GetOrAdd(
-                                    command.GetType(),
-                                    t => _commandBusSendMethod.MakeGenericMethod(t))
+                                _commandSendMethods.GetOrAdd(command.GetType(), ValueFactory)
                             let result = method.Invoke(
                                 commandBus,
                                 new[] { command, commandHeaders, tokenSource.Token })
                             select (Task<CommandResponse>)result).ToArray();
 
-        _logger.LogInformation("Dispatched {count} commands for commit {commitId}", commandTasks.Length, commit.CommitId);
+        _logger.LogInformation(
+            "Dispatched {Count} commands for commit {CommitId}",
+            commandTasks.Length,
+            commit.CommitId);
         try
         {
             var commandResults = await Task.WhenAll(commandTasks).ConfigureAwait(false);
@@ -95,24 +97,32 @@ public class CommandCommitDispatcher<TConfiguration> : ICommandCommitDispatcher
                 return HandlingResult.MoveToNext;
             }
 
-            _logger.LogError("Failed to send {amount} commands.", faults.Length);
+            _logger.LogError("Failed to send {Amount} commands", faults.Length);
 
             foreach (var fault in faults)
             {
                 _logger.LogError(
-                    "Target: {targetAggregate}, Version: {keyVersion}, Errors: {errors}",
+                    "Target: {TargetAggregate}, Version: {KeyVersion}, Errors: {Errors}",
                     fault.Key.TargetAggregate,
                     fault.Key.Version,
                     string.Join(Environment.NewLine, fault.Select(x => x.FaultMessage)));
             }
 
             return HandlingResult.Retry;
-
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, exception.Message);
+            _logger.LogError(exception, "{Error}", exception.Message);
             return HandlingResult.Retry;
         }
+    }
+
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Generic type available at compile time.")]
+    private MethodInfo ValueFactory(Type t)
+    {
+        return _commandBusSendMethod.MakeGenericMethod(t);
     }
 }
