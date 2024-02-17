@@ -122,8 +122,9 @@ internal class DomainModule<TConfiguration> : Module
         [UnconditionalSuppressMessage(
             "Trimming",
             "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-            Justification = "<Pending>")]
-        IEnumerable<Type> TypeSelector(Assembly a) => a.GetTypes();
+            Justification = "Types available at runtime.")]
+        IEnumerable<Type> TypeSelector([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Assembly a) =>
+            a.GetTypes();
 
         IEnumerable<Type> CollectionSelector(Type t) => t.GetInterfaces();
 
@@ -132,13 +133,13 @@ internal class DomainModule<TConfiguration> : Module
         [UnconditionalSuppressMessage(
             "AOT",
             "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-            Justification = "<Pending>")]
+            Justification = "Generic type is not known at compile time.")]
         Type Func(Type t) => typeof(BaseEventConsumer<>).MakeGenericType(t);
 
         [UnconditionalSuppressMessage(
             "AOT",
             "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-            Justification = "<Pending>")]
+            Justification = "Generic type is not known at compile time.")]
         Type Selector(Type t) => typeof(CommandConsumer<>).MakeGenericType(t);
     }
 
