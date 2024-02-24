@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\shared.proj"/>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>OpenMedStack.DynamoDB.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="TechTalk.SpecFlow"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+        <PackageReference Include="openmedstack.neventstore.dynamodb" Version="1.9.2"/>
+        <PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57"/>
+        <PackageReference Include="SpecFlow.xUnit" Version="3.9.74"/>
+        <PackageReference Include="xunit" Version="2.7.0"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\openmedstack.autofac.masstransit\openmedstack.autofac.masstransit.csproj" />
+        <ProjectReference Include="..\..\src\openmedstack.autofac.neventstore.dynamodb.dispatcher\openmedstack.autofac.neventstore.dynamodb.dispatcher.csproj"/>
+        <ProjectReference Include="..\..\src\openmedstack.autofac.neventstore.dynamodb\openmedstack.autofac.neventstore.dynamodb.csproj"/>
+    </ItemGroup>
+
+</Project>

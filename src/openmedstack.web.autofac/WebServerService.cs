@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenMedStack.Autofac.Startup;
 using OpenMedStack.Commands;
 using OpenMedStack.Events;
 using OpenMedStack.Startup;
@@ -98,7 +97,7 @@ internal class WebServerService<TConfiguration> : IService
         }
 
         await _container.StartAsync(cancellationToken).ConfigureAwait(false);
-        _logger.LogInformation("Web server bound to: {url}", _urlBinding);
+        _logger.LogInformation("Web server bound to: {Url}", _urlBinding);
     }
 
     /// <inheritdoc />

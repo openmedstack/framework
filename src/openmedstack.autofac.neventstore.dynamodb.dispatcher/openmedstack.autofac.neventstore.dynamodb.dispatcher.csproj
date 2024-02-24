@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\shared.proj" />
+    <PropertyGroup>
+        <RootNamespace>OpenMedStack.Autofac.NEventstore.DynamoDb.Dispatcher</RootNamespace>
+        <PackageId>OpenMedStack.Autofac.NEventstore.DynamoDb.Dispatcher</PackageId>
+        <PackageTags>OpenMedStack Architecture EventStore DynamoDb</PackageTags>
+        <Description>Autofac bindings for OpenMedStack based applications.</Description>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\openmedstack.autofac.neventstore\openmedstack.autofac.neventstore.csproj" />
+      <ProjectReference Include="..\openmedstack\openmedstack.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="openmedstack.neventstore.dynamodbclient" Version="1.9.2" />
+    </ItemGroup>
+
+</Project>

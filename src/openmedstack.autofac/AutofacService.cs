@@ -107,7 +107,7 @@ public class AutofacService<TConfiguration> : IService
                 }
                 else
                 {
-                    _logger.LogError(exception, "{error}", exception.Message);
+                    _logger.LogError(exception, "{Error}", exception.Message);
                 }
             }
         }

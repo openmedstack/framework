@@ -11,6 +11,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\openmedstack.autofac\openmedstack.autofac.csproj" />
 		<ProjectReference Include="..\openmedstack.domain\openmedstack.domain.csproj" />
-		<PackageReference Include="openmedstack.neventstore" Version="1.8.0" />
+		<PackageReference Include="openmedstack.neventstore" Version="1.9.2" />
 	</ItemGroup>
 </Project>
