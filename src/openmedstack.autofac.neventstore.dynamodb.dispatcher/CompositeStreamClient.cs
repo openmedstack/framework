@@ -32,28 +32,17 @@ internal class CompositeStreamClient : StreamClient
         ISerialize serializer,
         IEnumerable<ICommitDispatcher> dispatchers,
         ILogger<CompositeStreamClient> logger)
-        : base(credentials, config, serializer)
+        : base(credentials, config, serializer, logger)
     {
         _dispatchers = dispatchers.ToArray();
         _logger = logger;
     }
 
     /// <inheritdoc />
-    protected override async Task Handle(ICommit commit, CancellationToken cancellationToken)
+    protected override async Task<HandlingResult> Handler(ICommit commit, CancellationToken cancellationToken)
     {
         var result = await Task.WhenAll(
             _dispatchers.Select(d => d.Dispatch(commit, cancellationToken)));
-        var handlingResult = result.Max();
-        switch (handlingResult)
-        {
-            case HandlingResult.Retry:
-                await Handle(commit, cancellationToken);
-                break;
-            case HandlingResult.Stop:
-                _logger.LogError("Error in dispatching commit. Received result: {Result}", handlingResult);
-                throw new Exception();
-            case HandlingResult.MoveToNext:
-                break;
-        }
+        return result.Max();
     }
 }

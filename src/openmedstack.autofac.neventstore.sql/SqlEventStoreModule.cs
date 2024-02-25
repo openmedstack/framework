@@ -31,6 +31,7 @@ public sealed class SqlEventStoreModule<
 
     protected override void Load(ContainerBuilder builder)
     {
+        builder.RegisterType<Sha1StreamIdHasher>().AsImplementedInterfaces().SingleInstance();
         builder.RegisterType<TDialect>().As<ISqlDialect>().SingleInstance();
         builder.Register(
                 ctx => new SqlPersistenceEngine(

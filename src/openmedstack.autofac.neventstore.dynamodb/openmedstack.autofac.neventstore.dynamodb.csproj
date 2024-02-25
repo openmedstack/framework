@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="Autofac" Version="8.0.0"/>
-        <PackageReference Include="openmedstack.neventstore.dynamodb" Version="1.9.2"/>
+        <PackageReference Include="openmedstack.neventstore.dynamodb" Version="2.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

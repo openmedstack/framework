@@ -13,6 +13,7 @@ namespace OpenMedStack.Autofac.NEventstore.DynamoDb.Dispatcher
     using Amazon.Runtime;
     using global::Autofac;
     using OpenMedStack.Autofac.NEventstore.Domain;
+    using OpenMedStack.NEventStore.Abstractions;
     using OpenMedStack.NEventStore.DynamoDbClient;
 
     internal class DynamoDbClientModule : Module

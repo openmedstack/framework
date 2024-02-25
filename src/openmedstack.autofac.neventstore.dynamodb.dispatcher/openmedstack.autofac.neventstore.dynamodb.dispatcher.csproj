@@ -12,7 +12,7 @@
       <ProjectReference Include="..\openmedstack\openmedstack.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="openmedstack.neventstore.dynamodbclient" Version="1.9.2" />
+      <PackageReference Include="openmedstack.neventstore.dynamodbclient" Version="2.0.0" />
     </ItemGroup>
 
 </Project>

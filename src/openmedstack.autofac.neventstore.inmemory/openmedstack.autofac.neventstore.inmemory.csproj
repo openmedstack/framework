@@ -12,8 +12,4 @@
     <ProjectReference Include="..\openmedstack.autofac.neventstore\openmedstack.autofac.neventstore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="openmedstack.neventstore.abstractions" Version="1.9.2" />
-  </ItemGroup>
-
 </Project>
